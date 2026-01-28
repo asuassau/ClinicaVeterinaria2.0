@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true
     },
-    contrasena: { // mejor sin ñ
+    contrasena: { 
       type: DataTypes.STRING(255),
       allowNull: false
     },

@@ -1,0 +1,4 @@
+git status          # ver qué cambió
+git add .           # preparar cambios
+git commit -m "Descripción clara del cambio"
+git push            # subir a GitHub

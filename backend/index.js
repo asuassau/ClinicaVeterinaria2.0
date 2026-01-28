@@ -86,8 +86,8 @@ app.use((req, res, next) => {
       req.body = {};
     }
 
-    req.body.username = username;
-    req.body.password = password;
+    req.body.email = username;
+    req.body.contrasena = password;
 
     return next();
   }
@@ -121,8 +121,8 @@ app.use((req, res, next) => {
 
 // Se cargan y registran las rutas de usuario y vehículo
 
-//require("./routes/user.routes")(app);
-//require("./routes/vehiculo.routes")(app);
+require("./routes/usuario.routes")(app);
+//require("./routes/clinete.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
