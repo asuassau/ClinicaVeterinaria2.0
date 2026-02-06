@@ -59,9 +59,8 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: false
   });
 
-  // ======================
-  // 🔗 Asociaciones
-  // ======================
+
+  
   Animal.associate = (models) => {
     // Un cliente puede tener muchos animales
     Animal.belongsTo(models.Cliente, { foreignKey: 'idCliente' });

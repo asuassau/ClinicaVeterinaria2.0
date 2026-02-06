@@ -119,10 +119,29 @@ app.use((req, res, next) => {
 });
 
 
-// Se cargan y registran las rutas de usuario y vehículo
+// Se cargan y registran las rutas 
 
 require("./routes/usuario.routes")(app);
-//require("./routes/clinete.routes")(app);
+
+require("./routes/animal.routes")(app);
+require("./routes/cliente.routes")(app);
+require("./routes/producto.routes")(app);
+require("./routes/servicioClinico.routes")(app);
+require("./routes/cita.routes")(app);
+require("./routes/pedido.routes")(app);
+require("./routes/factura.routes")(app);
+
+require("./routes/lineaPedido.routes")(app);
+require("./routes/lineaFactura.routes")(app);
+
+require("./routes/atienden.routes")(app);
+require("./routes/consultan.routes")(app);
+require("./routes/incluyen.routes")(app);
+require("./routes/necesitan.routes")(app);
+require("./routes/realizan.routes")(app);
+
+
+
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
