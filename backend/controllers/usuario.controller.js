@@ -18,7 +18,6 @@ exports.create = async (req, res) => {
     const user = {
       nombre: req.body.nombre,
       email: req.body.email,
-      contrasena: req.body.contrasena,
       rol:req.body.rol
      // filename: req.file ? req.file.filename : ""
     };
@@ -54,7 +53,7 @@ exports.findAll = (req, res) => {
 // localiza a un usuario por su ID y lo devuelve
 
 exports.findOne = (req, res) => {
-  const idUsuario = req.params.idUsuario;
+  const idUsuario = req.params.id;
 
   User.findByPk(idUsuario)
     .then(data => {
@@ -62,13 +61,13 @@ exports.findOne = (req, res) => {
         res.send(data);
       } else {
         res.status(404).send({
-          message: `No se ha podido localizar el usuario con  id=${id} .`
+          message: `No se ha podido localizar el usuario con  id=${idUsuario} .`
         });
       }
     })
     .catch(err => {
       res.status(500).send({
-        message: "Error al obtner el usuario con id= " + id
+        message: "Error al obtner el usuario con id= " + idUsuario
       });
     });
 
@@ -79,7 +78,7 @@ exports.findOne = (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const idUsuario = req.params.idUsuario;
+    const idUsuario = req.params.id;
     /* const removeImage =
       req.body.removeImage === true ||
       req.body.removeImage === 'true' ||
@@ -92,9 +91,11 @@ exports.update = async (req, res) => {
       rol:req.body.rol
     };
 
+
     // Si viene password se hashea 
-    if (req.body.password) {
+    if (req.body.contrasena) {
       data.contrasena = await bcrypt.hash(String(req.body.contrasena), 10);
+
     }
 
     /*if (req.file) {
@@ -121,13 +122,13 @@ exports.update = async (req, res) => {
 
   } catch (err) {
     return res.status(500).send({
-      message: "Error actualizando el usuario con id=" + req.params.idUsuario
+      message: "Error actualizando el usuario con id=" + idUsuario
     });
   }
 };
 // Borra un usuario concreto identificado por su id . 
 exports.delete = (req, res) => {
-  const idUsuario = req.params.idUsuario;
+  const idUsuario = req.params.id;
 
   User.destroy({
     where: { idUsuario: idUsuario }

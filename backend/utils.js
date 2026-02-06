@@ -9,7 +9,7 @@ function generateToken(user) {
     return null;
   } 
   var u = {
-    id: user.id,
+    idUsuario: user.idUsuario,
     nombre: user.nombre,
     email: user.email,
     rol: user.rol,
@@ -28,7 +28,7 @@ function getCleanUser(user) {
   if (!user) return null;
  
   return {
-    id: user.id,
+    idUsuario: user.idUsuario,
     nombre: user.nombre,
     email: user.email,
     rol: user.rol,

@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 var corsOptions = {
-  origin: "http://localhost:8100"
+  origin: "*"//"http://localhost:8100"
 };
 // Se indica que solo se admiten peticiones de este frontend (se deja abierto)
 app.use(cors(corsOptions));
@@ -56,10 +56,10 @@ db.sequelize.sync({ force: FORCE_SYNC}).then(async () => {
     const hashedPassword = await bcrypt.hash(adminPass, 10);
 
  await Usuario.findOrCreate({
-      where: { email: "alejandro@pgv.com" }, 
+      where: { email: "alejandro@ppp.com" }, 
       defaults: {
         nombre: "Alejandro",
-        email: "alejandro@pgv.com",
+        email: "alejandro@ppp.com",
         contrasena: hashedPassword,
         rol: "administrativo" 
       }

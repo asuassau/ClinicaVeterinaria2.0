@@ -67,7 +67,7 @@ exports.isAuthenticated = (req, res, next) => {
       message: "Invalid token."
     });
 
-    User.findByPk(user.id)
+    User.findByPk(user.idUsuario)
       .then(data => {
 
         if (!data) {
@@ -81,7 +81,7 @@ exports.isAuthenticated = (req, res, next) => {
       })
       .catch(err => {
         res.status(500).send({
-          message: "Error retrieving User with id=" + user.id
+          message: "Error retrieving User with id=" + user.idUsuario
         });
       });
   });
