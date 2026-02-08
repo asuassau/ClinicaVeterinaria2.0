@@ -1,0 +1,47 @@
+<!-- frontend/src/app/login/login.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Iniciar sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="login()" #loginForm="ngForm">
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input
+        type="email"
+        required
+        name="email"
+        [(ngModel)]="email"
+        #emailInput="ngModel">
+      </ion-input>
+    </ion-item>
+
+    <div *ngIf="emailInput.invalid && emailInput.touched" style="color:red; margin-left: 16px;">
+      El email es obligatorio.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input
+        type="password"
+        required
+        name="password"
+        [(ngModel)]="password"
+        #passwordInput="ngModel">
+      </ion-input>
+    </ion-item>
+
+    <div *ngIf="passwordInput.invalid && passwordInput.touched" style="color:red; margin-left: 16px;">
+      La contraseña es obligatoria.
+    </div>
+
+    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || loading">
+      Entrar
+    </ion-button>
+
+    <div *ngIf="loading" style="text-align:center; margin-top:8px;">Cargando...</div>
+    <div *ngIf="errorMsg" style="color:red; margin:16px 0;">{{errorMsg}}</div>
+  </form>
+</ion-content>

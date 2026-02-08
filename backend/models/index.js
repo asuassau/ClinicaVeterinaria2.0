@@ -41,7 +41,7 @@ db.realizan = require("./union/realizan.js")(sequelize, Sequelize);
 
 //Relaciones de los modelos
 
-// Usuarios <-> Clientes (Consultan)
+// Usuarios - Clientes (Consultan)
 
 db.usuario.belongsToMany(db.cliente, {
   through: db.consultan,
@@ -56,7 +56,7 @@ db.cliente.belongsToMany(db.usuario, {
   as: "UsuariosQueConsultan"
 });
 
-// Usuarios <-> Clientes (Atienden)
+// Usuarios - Clientes (Atienden)
 db.usuario.belongsToMany(db.cliente, {
   through: db.atienden,
   foreignKey: "idUsuario",
@@ -70,7 +70,7 @@ db.cliente.belongsToMany(db.usuario, {
   as: "UsuariosQueAtienden"
 });
 
-// Citas <-> Productos (Incluyen)
+// Citas - Productos (Incluyen)
 db.cita.belongsToMany(db.producto, {
   through: db.incluyen,
   foreignKey: "idCita",
@@ -84,7 +84,7 @@ db.producto.belongsToMany(db.cita, {
   as: "Citas"
 });
 
-// Productos <-> ServicioClinico (Necesitan)
+// Productos -ServicioClinico (Necesitan)
 db.producto.belongsToMany(db.servicioClinico, {
   through: db.necesitan,
   foreignKey: "idProducto",
@@ -98,7 +98,7 @@ db.servicioClinico.belongsToMany(db.producto, {
   as: "ProductosQueNecesitan"
 });
 
-// Productos <-> Pedidos (Realizan)
+// Productos - Pedidos (Realizan)
 db.producto.belongsToMany(db.pedido, {
   through: db.realizan,
   foreignKey: "idProducto",

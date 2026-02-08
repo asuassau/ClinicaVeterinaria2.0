@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 var corsOptions = {
-  origin: "*"//"http://localhost:8100"
+  origin:"http://localhost:8100"
 };
 // Se indica que solo se admiten peticiones de este frontend (se deja abierto)
 app.use(cors(corsOptions));
