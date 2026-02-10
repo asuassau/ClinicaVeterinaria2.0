@@ -18,7 +18,11 @@ exports.create = async (req, res) => {
     const user = {
       nombre: req.body.nombre,
       email: req.body.email,
-      rol:req.body.rol
+      rol:req.body.rol,
+      nif: req.body.nif,
+      direccion: req.body.direccion,
+      telefono: req.body.telefono,
+      apellidos: req.body.apellidos,
      // filename: req.file ? req.file.filename : ""
     };
 
@@ -88,7 +92,12 @@ exports.update = async (req, res) => {
     const data = {
       nombre: req.body.nombre,
       email: req.body.email,
-      rol:req.body.rol
+      rol:req.body.rol,
+      nif: req.body.nif,
+      direccion: req.body.direccion,
+      telefono: req.body.telefono,
+      apellidos: req.body.apellidos,
+      // filename: req.file ? req.file.filename : undefined
     };
 
 
