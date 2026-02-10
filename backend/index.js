@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 const db = require("./models");
 
 //Se crea un objeto User y se importa Bcrypt para la creación de un usuario basico en el caso de reinicio de la base de datos. 
-const Usuario = db.usuario;
+const Usuario = db.Usuario;
 const bcrypt = require('bcryptjs');
 
 //Se pone el control de si se reinicia con el usuario administrado y que constraseña usa en el .env
@@ -61,7 +61,7 @@ db.sequelize.sync({ force: FORCE_SYNC}).then(async () => {
         nombre: "Alejandro",
         email: "alejandro@ppp.com",
         contrasena: hashedPassword,
-        rol: "administrativo" 
+        rol: "administrador" 
       }
     });
 
@@ -121,24 +121,22 @@ app.use((req, res, next) => {
 
 // Se cargan y registran las rutas 
 
-require("./routes/usuario.routes")(app);
+// Se cargan y registran las rutas 
 
-require("./routes/animal.routes")(app);
-require("./routes/cliente.routes")(app);
-require("./routes/producto.routes")(app);
-require("./routes/servicioClinico.routes")(app);
-require("./routes/cita.routes")(app);
-require("./routes/pedido.routes")(app);
-require("./routes/factura.routes")(app);
+require("./routes/baseRoutes/usuario.routes")(app);
 
-require("./routes/lineaPedido.routes")(app);
-require("./routes/lineaFactura.routes")(app);
+require("./routes/animalesRoutes/animal.routes")(app);
+require("./routes/catalogoRoutes/elemento.routes")(app);
+require("./routes/catalogoRoutes/producto.routes")(app);
+require("./routes/catalogoRoutes/servicio.routes")(app);
+require("./routes/citasRoutes/cita.routes")(app);
 
-require("./routes/atienden.routes")(app);
-require("./routes/consultan.routes")(app);
-require("./routes/incluyen.routes")(app);
-require("./routes/necesitan.routes")(app);
-require("./routes/realizan.routes")(app);
+require("./routes/historialesRoutes/historial.routes")(app);
+require("./routes/historialesRoutes/lineaHistorial.routes")(app);
+
+require("./routes/facturacionRoutes/factura.routes")(app);
+require("./routes/facturacionRoutes/lineaFactura.routes")(app);
+
 
 
 

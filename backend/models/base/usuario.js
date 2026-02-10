@@ -2,46 +2,36 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Usuario = sequelize.define('Usuario', {
-    idUsuario: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    nombre: {
-      type: DataTypes.STRING(100),
-      allowNull: false
-    },
-    email: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-      unique: true
-    },
-    contrasena: { 
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
+    idUsuario: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    nif: { type: DataTypes.STRING(20), allowNull: true },
+    nombre: { type: DataTypes.STRING(100), allowNull: false },
+    apellidos: { type: DataTypes.STRING(150), allowNull: true },
+    email: { type: DataTypes.STRING(150), allowNull: false, unique: true },
+    telefono: { type: DataTypes.STRING(30), allowNull: true },
+    direccion: { type: DataTypes.STRING(255), allowNull: true },
+    contrasena: { type: DataTypes.STRING(255), allowNull: false },
+    foto: { type: DataTypes.STRING(255), allowNull: true },
     rol: {
-      type: DataTypes.ENUM('veterinario', 'administrativo', 'recepcionista'),
+      type: DataTypes.ENUM('administrador', 'veterinario', 'recepcionista', 'cliente'),
       allowNull: false
     }
   }, {
-    tableName: 'Usuarios',
+    tableName: 'USUARIOS',
     timestamps: false
   });
 
   Usuario.associate = (models) => {
-    Usuario.belongsToMany(models.Cliente, {
-      through: models.Consultan,
-      foreignKey: 'idUsuario',
-      otherKey: 'idCliente'
-    });
+    Usuario.hasMany(models.Animal, { foreignKey: 'idUsuario', as: 'Animales' });
 
-    Usuario.belongsToMany(models.Cliente, {
-      through: models.Atienden,
-      foreignKey: 'idUsuario',
-      otherKey: 'idCliente',
-      as: 'ClientesAtendidos'
-    });
+    Usuario.hasMany(models.LineaHistorial, { foreignKey: 'idUsuario', as: 'LineasHistorialCreadas' });
+
+    Usuario.hasMany(models.Cita, { foreignKey: 'idUsuario_programa', as: 'CitasProgramadas' });
+    Usuario.hasMany(models.Cita, { foreignKey: 'idUsuario_atiende', as: 'CitasAtendidas' });
+
+    Usuario.hasMany(models.Factura, { foreignKey: 'idUsuario_pagador', as: 'FacturasPagadas' });
+    Usuario.hasMany(models.Factura, { foreignKey: 'idUsuario_emisor', as: 'FacturasEmitidas' });
+
+    Usuario.hasMany(models.LineaFactura, { foreignKey: 'idUsuario_creador', as: 'LineasFacturaCreadas' });
   };
 
   return Usuario;
