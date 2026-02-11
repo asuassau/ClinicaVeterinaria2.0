@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Menú</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Salir
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-card *ngIf="role">
+    <ion-card-header>
+      <ion-card-title>Acceso: {{ roleLabel }}</ion-card-title>
+      <ion-card-subtitle *ngIf="userEmail">{{ userEmail }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Selecciona una opción para continuar.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-item color="warning" *ngIf="!role">
+    <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
+    <ion-label>No se ha detectado sesión válida. Volviendo a login…</ion-label>
+  </ion-item>
+
+  <ion-list *ngIf="menuItems.length > 0">
+    <ion-item
+      button
+      detail="true"
+      *ngFor="let item of menuItems"
+      (click)="goTo(item)"
+    >
+      <ion-icon [name]="item.icon" slot="start"></ion-icon>
+      <ion-label>
+        <h2>{{ item.title }}</h2>
+        <p *ngIf="item.description">{{ item.description }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-item *ngIf="role && menuItems.length === 0" color="medium">
+    <ion-icon name="information-circle-outline" slot="start"></ion-icon>
+    <ion-label>No hay opciones configuradas para tu rol.</ion-label>
+  </ion-item>
+
+</ion-content>
