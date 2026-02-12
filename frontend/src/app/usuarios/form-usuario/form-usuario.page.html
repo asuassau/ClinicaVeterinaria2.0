@@ -1,0 +1,116 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nuevo usuario</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-usuario"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <ion-item>
+      <ion-label position="floating">Nombre *</ion-label>
+      <ion-input
+        name="nombre"
+        [(ngModel)]="form.nombre"
+        required
+        #nombre="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="nombre.invalid && nombre.touched" style="margin-left:16px;">
+      El nombre es obligatorio.
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Apellidos</ion-label>
+      <ion-input
+        name="apellidos"
+        [(ngModel)]="form.apellidos">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Email *</ion-label>
+      <ion-input
+        type="email"
+        name="email"
+        [(ngModel)]="form.email"
+        required
+        email
+        #email="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="email.invalid && email.touched" style="margin-left:16px;">
+      Introduce un email válido.
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Rol *</ion-label>
+      <ion-select name="rol" [(ngModel)]="form.rol" required #rol="ngModel">
+        <ion-select-option value="administrador">Administrador</ion-select-option>
+        <ion-select-option value="veterinario">Veterinario</ion-select-option>
+        <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
+        <ion-select-option value="cliente">Cliente</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="rol.invalid && rol.touched" style="margin-left:16px;">
+      El rol es obligatorio.
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">NIF</ion-label>
+      <ion-input name="nif" [(ngModel)]="form.nif"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Teléfono</ion-label>
+      <ion-input type="tel" name="telefono" [(ngModel)]="form.telefono"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Dirección</ion-label>
+      <ion-input name="direccion" [(ngModel)]="form.direccion"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña *</ion-label>
+      <ion-input
+        type="password"
+        name="contrasena"
+        [(ngModel)]="form.contrasena"
+        required
+        minlength="4"
+        #contrasena="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="contrasena.invalid && contrasena.touched" style="margin-left:16px;">
+      La contraseña es obligatoria (mín. 4 caracteres).
+    </ion-note>
+
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+</ion-content>

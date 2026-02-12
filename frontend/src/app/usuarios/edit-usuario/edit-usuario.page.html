@@ -1,0 +1,181 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle de usuario</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-usuario"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="usuario && !editMode">
+      <ion-button (click)="activarEdicion()">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Editar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item *ngIf="loading">
+    <ion-label>Cargando usuario...</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="errorMsg" lines="none">
+    <ion-label style="color:red">{{ errorMsg }}</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="okMsg" lines="none">
+    <ion-label style="color:green">{{ okMsg }}</ion-label>
+  </ion-item>
+
+  <!-- ===================== -->
+  <!-- MODO DETALLE (VER) -->
+  <!-- ===================== -->
+  <div *ngIf="usuario && !editMode">
+
+    <ion-list>
+
+      <ion-item>
+        <ion-label>
+          <h2>Nombre</h2>
+          <p>{{ usuario.nombre || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Apellidos</h2>
+          <p>{{ usuario.apellidos || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Email</h2>
+          <p>{{ usuario.email || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Rol</h2>
+          <p>{{ usuario.rol || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>NIF</h2>
+          <p>{{ usuario.nif || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Teléfono</h2>
+          <p>{{ usuario.telefono || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Dirección</h2>
+          <p>{{ usuario.direccion || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Foto</h2>
+          <p>{{ usuario.foto || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- ✅ Contraseña NO se muestra aquí -->
+
+    </ion-list>
+
+    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver al listado
+    </ion-button>
+
+  </div>
+
+  <!-- ===================== -->
+  <!-- MODO EDICIÓN -->
+  <!-- ===================== -->
+  <div *ngIf="usuario && editMode">
+
+    <form #f="ngForm" (ngSubmit)="guardarCambios()">
+
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input name="nombre" [(ngModel)]="form.nombre"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Apellidos</ion-label>
+        <ion-input name="apellidos" [(ngModel)]="form.apellidos"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input type="email" name="email" [(ngModel)]="form.email"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Rol</ion-label>
+        <ion-select name="rol" [(ngModel)]="form.rol">
+          <ion-select-option *ngFor="let r of roles" [value]="r">
+            {{ r }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">NIF</ion-label>
+        <ion-input name="nif" [(ngModel)]="form.nif"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Teléfono</ion-label>
+        <ion-input name="telefono" [(ngModel)]="form.telefono"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Dirección</ion-label>
+        <ion-input name="direccion" [(ngModel)]="form.direccion"></ion-input>
+      </ion-item>
+
+      <!-- ✅ Contraseña SOLO en edición (vacía por defecto) -->
+      <ion-item>
+        <ion-label position="floating">Nueva contraseña (opcional)</ion-label>
+        <ion-input
+          type="password"
+          name="contrasena"
+          [(ngModel)]="form.contrasena"
+          placeholder="Dejar en blanco para no cambiarla">
+        </ion-input>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="saving"
+        style="margin-top: 18px;">
+        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        type="button"
+        (click)="cancelarEdicion()">
+        Cancelar
+      </ion-button>
+
+    </form>
+  </div>
+
+</ion-content>
+

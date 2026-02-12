@@ -16,7 +16,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   {
     title: 'Usuarios',
     
-    url: '/usuarios',
+    url: '/list-usuario',
     icon: 'people',
     roles: ['administrador', 'recepcionista'],
     description: 'Gestión de usuarios, roles y acceso a datos relacionados',

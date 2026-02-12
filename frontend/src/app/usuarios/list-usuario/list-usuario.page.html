@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Usuarios</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="crearUsuario()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- FILTROS -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Filtros</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-item>
+        <ion-label>Rol</ion-label>
+        <ion-select [(ngModel)]="filtroRol" (ionChange)="aplicarFiltros()">
+          <ion-select-option value="todos">Todos</ion-select-option>
+          <ion-select-option value="administrador">Administrador</ion-select-option>
+          <ion-select-option value="veterinario">Veterinario</ion-select-option>
+          <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
+          <ion-select-option value="cliente">Cliente</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Buscar por nombre o email</ion-label>
+        <ion-input [(ngModel)]="filtroNombre" (ionInput)="aplicarFiltros()"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+
+  <!-- LOADING -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <!-- ERROR -->
+  <ion-text color="danger" *ngIf="errorMsg">
+    <p>{{ errorMsg }}</p>
+  </ion-text>
+
+  <!-- LISTADO -->
+  <ion-list *ngIf="!loading">
+
+    <ion-item *ngFor="let u of usuariosFiltrados">
+
+      <ion-label>
+        <h2>{{u.nombre}} {{u.apellidos}}</h2>
+        <p><b>Email:</b> {{u.email}}</p>
+        <p><b>Rol:</b> {{u.rol}}</p>
+      </ion-label>
+
+      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(u)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarUsuario(u)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+
+    </ion-item>
+
+  </ion-list>
+
+  <ion-text *ngIf="usuariosFiltrados.length === 0 && !loading">
+    <p>No hay usuarios para mostrar.</p>
+  </ion-text>
+
+</ion-content>
