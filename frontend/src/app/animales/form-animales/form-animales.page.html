@@ -1,0 +1,120 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nuevo animal</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-animal"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <!-- PROPIETARIO -->
+    <ion-item>
+      <ion-label position="floating">Propietario *</ion-label>
+      <ion-select
+        name="idUsuario"
+        [(ngModel)]="form.idUsuario"
+        required
+        #idUsuario="ngModel">
+        <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
+          {{ ownerLabel(u) }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="idUsuario.invalid && idUsuario.touched" style="margin-left:16px;">
+      Debes seleccionar un propietario.
+    </ion-note>
+
+    <!-- NOMBRE -->
+    <ion-item>
+      <ion-label position="floating">Nombre *</ion-label>
+      <ion-input
+        name="nombre"
+        [(ngModel)]="form.nombre"
+        required
+        #nombre="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="nombre.invalid && nombre.touched" style="margin-left:16px;">
+      El nombre es obligatorio.
+    </ion-note>
+
+    <!-- ESPECIE -->
+    <ion-item>
+      <ion-label position="floating">Especie *</ion-label>
+      <ion-input
+        name="especie"
+        [(ngModel)]="form.especie"
+        required
+        #especie="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="especie.invalid && especie.touched" style="margin-left:16px;">
+      La especie es obligatoria.
+    </ion-note>
+
+    <!-- RAZA -->
+    <ion-item>
+      <ion-label position="floating">Raza</ion-label>
+      <ion-input name="raza" [(ngModel)]="form.raza"></ion-input>
+    </ion-item>
+
+    <!-- FECHA NAC -->
+    <ion-item>
+      <ion-label position="floating">Fecha nacimiento</ion-label>
+      <ion-input type="date" name="Fechanac" [(ngModel)]="form.Fechanac"></ion-input>
+    </ion-item>
+
+    <!-- SEXO -->
+    <ion-item>
+      <ion-label position="floating">Sexo</ion-label>
+      <ion-select name="sexo" [(ngModel)]="form.sexo">
+        <ion-select-option [value]="null">Sin especificar</ion-select-option>
+        <ion-select-option value="M">M (macho)</ion-select-option>
+        <ion-select-option value="H">H (hembra)</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- OBSERVACIONES -->
+    <ion-item>
+      <ion-label position="floating">Observaciones</ion-label>
+      <ion-textarea
+        name="observaciones"
+        [(ngModel)]="form.observaciones"
+        autoGrow="true">
+      </ion-textarea>
+    </ion-item>
+
+    <!-- FOTO (URL o nombre de archivo, según tu backend) -->
+    <ion-item>
+      <ion-label position="floating">Foto (opcional)</ion-label>
+      <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
+    </ion-item>
+
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+</ion-content>

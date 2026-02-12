@@ -51,7 +51,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: 'Animales',
-    url: '/animales',
+    url: '/list-animales',
     icon: 'paw',
     roles: ['administrador', 'veterinario', 'cliente'],
     description: 'Listado, búsqueda y CRUD de animales',

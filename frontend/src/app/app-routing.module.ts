@@ -27,6 +27,18 @@ const routes: Routes = [
   {
     path: 'edit-usuario/:id',
     loadChildren: () => import('./usuarios/edit-usuario/edit-usuario.module').then( m => m.EditUsuarioPageModule)
+  },
+  {
+    path: 'list-animales',
+    loadChildren: () => import('./animales/list-animales/list-animales.module').then( m => m.ListAnimalesPageModule)
+  },
+  {
+    path: 'form-animales',
+    loadChildren: () => import('./animales/form-animales/form-animales.module').then( m => m.FormAnimalesPageModule)
+  },
+  {
+    path: 'edit-animales/:id',
+    loadChildren: () => import('./animales/edit-animales/edit-animales.module').then( m => m.EditAnimalesPageModule)
   }
 
 

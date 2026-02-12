@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Animales</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="crearAnimal()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- FILTROS -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Filtros</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-item>
+        <ion-label>Especie</ion-label>
+        <ion-select [(ngModel)]="filtroEspecie" (ionChange)="aplicarFiltros()">
+          <ion-select-option value="todas">Todas</ion-select-option>
+          <ion-select-option *ngFor="let e of especiesDisponibles" [value]="e">
+            {{ e }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Buscar por animal, raza o propietario</ion-label>
+        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LOADING -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <!-- ERROR -->
+  <ion-text color="danger" *ngIf="errorMsg">
+    <p>{{ errorMsg }}</p>
+  </ion-text>
+
+  <!-- LISTADO -->
+  <ion-list *ngIf="!loading">
+    <ion-item *ngFor="let a of animalesFiltrados">
+
+      <ion-label>
+        <h2>{{ a.nombre }}</h2>
+        <p><b>Propietario:</b> {{ getOwnerName(a.idUsuario) }}</p>
+        <p><b>Especie:</b> {{ a.especie }}</p>
+        <p><b>Raza:</b> {{ a.raza || '-' }}</p>
+      </ion-label>
+
+      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(a)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarAnimal(a)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+
+    </ion-item>
+  </ion-list>
+
+  <ion-text *ngIf="animalesFiltrados.length === 0 && !loading">
+    <p>No hay animales para mostrar.</p>
+  </ion-text>
+
+</ion-content>
