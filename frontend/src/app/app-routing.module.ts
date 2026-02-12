@@ -39,6 +39,18 @@ const routes: Routes = [
   {
     path: 'edit-animales/:id',
     loadChildren: () => import('./animales/edit-animales/edit-animales.module').then( m => m.EditAnimalesPageModule)
+  },
+  {
+    path: 'list-citas',
+    loadChildren: () => import('./citas/list-citas/list-citas.module').then( m => m.ListCitasPageModule)
+  },
+  {
+    path: 'form-citas',
+    loadChildren: () => import('./citas/form-citas/form-citas.module').then( m => m.FormCitasPageModule)
+  },
+  {
+    path: 'edit-citas/:id',
+    loadChildren: () => import('./citas/edit-citas/edit-citas.module').then( m => m.EditCitasPageModule)
   }
 
 

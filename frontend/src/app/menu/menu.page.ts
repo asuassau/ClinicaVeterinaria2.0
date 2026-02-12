@@ -23,7 +23,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: 'Citas',
-    url: '/citas',
+    url: '/list-citas',
     icon: 'calendar',
     roles: ['administrador', 'veterinario', 'recepcionista', 'cliente'],
     description: 'Listado, búsqueda y CRUD de citas',

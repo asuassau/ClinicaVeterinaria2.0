@@ -1,0 +1,206 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle de cita</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-citas"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="cita && !editMode">
+      <ion-button (click)="activarEdicion()">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Editar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item *ngIf="loading">
+    <ion-label>Cargando cita...</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="errorMsg" lines="none">
+    <ion-label style="color:red">{{ errorMsg }}</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="okMsg" lines="none">
+    <ion-label style="color:green">{{ okMsg }}</ion-label>
+  </ion-item>
+
+  <!-- ===================== -->
+  <!-- MODO DETALLE (VER) -->
+  <!-- ===================== -->
+  <div *ngIf="cita && !editMode">
+
+    <ion-list>
+
+      <ion-item>
+        <ion-label>
+          <h2>Animal</h2>
+          <p>{{ animalLabelById(cita.idAnimal) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Usuario que asigna</h2>
+          <p>{{ userLabelById(cita.idUsuario_programa) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Veterinario que atiende</h2>
+          <p>{{ userLabelById(cita.idUsuario_atiende) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Fecha</h2>
+          <p>{{ cita.fecha || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Hora inicio</h2>
+          <p>{{ cita.HoraIni || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Hora fin</h2>
+          <p>{{ cita.HoraFin || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Estado</h2>
+          <p>{{ cita.estado || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Motivo</h2>
+          <p>{{ cita.motivo || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Notas</h2>
+          <p>{{ cita.notas || '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver al listado
+    </ion-button>
+
+  </div>
+
+  <!-- ===================== -->
+  <!-- MODO EDICIÓN -->
+  <!-- ===================== -->
+  <div *ngIf="cita && editMode">
+
+    <form #f="ngForm" (ngSubmit)="guardarCambios()">
+
+      <!-- ANIMAL -->
+      <ion-item>
+        <ion-label position="floating">Animal *</ion-label>
+        <ion-select name="idAnimal" [(ngModel)]="form.idAnimal" required>
+          <ion-select-option *ngFor="let a of animales" [value]="a.idAnimal">
+            {{ animalOptionLabel(a) }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- USUARIO QUE PROGRAMA -->
+      <ion-item>
+        <ion-label position="floating">Usuario que asigna *</ion-label>
+        <ion-select name="idUsuario_programa" [(ngModel)]="form.idUsuario_programa" required>
+          <ion-select-option *ngFor="let u of programadores" [value]="u.idUsuario">
+            {{ userOptionLabel(u) }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- VETERINARIO -->
+      <ion-item>
+        <ion-label position="floating">Veterinario que atiende *</ion-label>
+        <ion-select name="idUsuario_atiende" [(ngModel)]="form.idUsuario_atiende" required>
+          <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
+            {{ userOptionLabel(v) }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- FECHA -->
+      <ion-item>
+        <ion-label position="floating">Fecha *</ion-label>
+        <ion-input type="date" name="fecha" [(ngModel)]="form.fecha" required></ion-input>
+      </ion-item>
+
+      <!-- HORA INI -->
+      <ion-item>
+        <ion-label position="floating">Hora inicio *</ion-label>
+        <ion-input type="time" name="HoraIni" [(ngModel)]="form.HoraIni" required></ion-input>
+      </ion-item>
+
+      <!-- HORA FIN -->
+      <ion-item>
+        <ion-label position="floating">Hora fin *</ion-label>
+        <ion-input type="time" name="HoraFin" [(ngModel)]="form.HoraFin" required></ion-input>
+      </ion-item>
+
+      <!-- ESTADO -->
+      <ion-item>
+        <ion-label position="floating">Estado *</ion-label>
+        <ion-select name="estado" [(ngModel)]="form.estado" required>
+          <ion-select-option *ngFor="let e of estados" [value]="e">
+            {{ e }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- MOTIVO -->
+      <ion-item>
+        <ion-label position="floating">Motivo</ion-label>
+        <ion-input name="motivo" [(ngModel)]="form.motivo"></ion-input>
+      </ion-item>
+
+      <!-- NOTAS -->
+      <ion-item>
+        <ion-label position="floating">Notas</ion-label>
+        <ion-textarea name="notas" [(ngModel)]="form.notas" autoGrow="true"></ion-textarea>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="f.invalid || saving"
+        style="margin-top: 18px;">
+        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        type="button"
+        (click)="cancelarEdicion()">
+        Cancelar
+      </ion-button>
+
+    </form>
+  </div>
+
+</ion-content>

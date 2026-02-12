@@ -1,0 +1,162 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nueva cita</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-citas"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <!-- ANIMAL -->
+    <ion-item>
+      <ion-label position="floating">Animal *</ion-label>
+      <ion-select
+        name="idAnimal"
+        [(ngModel)]="form.idAnimal"
+        required
+        #idAnimal="ngModel">
+        <ion-select-option *ngFor="let a of animales" [value]="a.idAnimal">
+          {{ animalLabel(a) }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="idAnimal.invalid && idAnimal.touched" style="margin-left:16px;">
+      Debes seleccionar un animal.
+    </ion-note>
+
+    <!-- USUARIO QUE PROGRAMA -->
+    <ion-item>
+      <ion-label position="floating">Usuario que asigna *</ion-label>
+      <ion-select
+        name="idUsuario_programa"
+        [(ngModel)]="form.idUsuario_programa"
+        required
+        #idUsuario_programa="ngModel">
+        <ion-select-option *ngFor="let u of programadores" [value]="u.idUsuario">
+          {{ userLabel(u) }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="idUsuario_programa.invalid && idUsuario_programa.touched" style="margin-left:16px;">
+      Debes seleccionar quién asigna la cita.
+    </ion-note>
+
+    <!-- VETERINARIO QUE ATIENDE -->
+    <ion-item>
+      <ion-label position="floating">Veterinario que atiende *</ion-label>
+      <ion-select
+        name="idUsuario_atiende"
+        [(ngModel)]="form.idUsuario_atiende"
+        required
+        #idUsuario_atiende="ngModel">
+        <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
+          {{ userLabel(v) }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="idUsuario_atiende.invalid && idUsuario_atiende.touched" style="margin-left:16px;">
+      Debes seleccionar un veterinario.
+    </ion-note>
+
+    <!-- FECHA -->
+    <ion-item>
+      <ion-label position="floating">Fecha *</ion-label>
+      <ion-input
+        type="date"
+        name="fecha"
+        [(ngModel)]="form.fecha"
+        required
+        #fecha="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="fecha.invalid && fecha.touched" style="margin-left:16px;">
+      La fecha es obligatoria.
+    </ion-note>
+
+    <!-- HORA INICIO -->
+    <ion-item>
+      <ion-label position="floating">Hora inicio *</ion-label>
+      <ion-input
+        type="time"
+        name="HoraIni"
+        [(ngModel)]="form.HoraIni"
+        required
+        #HoraIni="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="HoraIni.invalid && HoraIni.touched" style="margin-left:16px;">
+      Hora inicio es obligatoria.
+    </ion-note>
+
+    <!-- HORA FIN -->
+    <ion-item>
+      <ion-label position="floating">Hora fin *</ion-label>
+      <ion-input
+        type="time"
+        name="HoraFin"
+        [(ngModel)]="form.HoraFin"
+        required
+        #HoraFin="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="HoraFin.invalid && HoraFin.touched" style="margin-left:16px;">
+      Hora fin es obligatoria.
+    </ion-note>
+
+    <!-- ESTADO -->
+    <ion-item>
+      <ion-label position="floating">Estado *</ion-label>
+      <ion-select name="estado" [(ngModel)]="form.estado" required #estado="ngModel">
+        <ion-select-option *ngFor="let e of estados" [value]="e">
+          {{ e }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="estado.invalid && estado.touched" style="margin-left:16px;">
+      El estado es obligatorio.
+    </ion-note>
+
+    <!-- MOTIVO -->
+    <ion-item>
+      <ion-label position="floating">Motivo</ion-label>
+      <ion-input name="motivo" [(ngModel)]="form.motivo"></ion-input>
+    </ion-item>
+
+    <!-- NOTAS -->
+    <ion-item>
+      <ion-label position="floating">Notas</ion-label>
+      <ion-textarea
+        name="notas"
+        [(ngModel)]="form.notas"
+        autoGrow="true">
+      </ion-textarea>
+    </ion-item>
+
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+</ion-content>
