@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Servicios</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="crearServicio()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- FILTROS -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Filtros</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-item>
+        <ion-label>Tipo de servicio</ion-label>
+        <ion-select [(ngModel)]="filtroTipo" (ionChange)="aplicarFiltros()">
+          <ion-select-option value="todos">Todos</ion-select-option>
+          <ion-select-option *ngFor="let t of tiposServicio" [value]="t">
+            {{ t }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Buscar por nombre o precio</ion-label>
+        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LOADING -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <!-- ERROR -->
+  <ion-text color="danger" *ngIf="errorMsg">
+    <p>{{ errorMsg }}</p>
+  </ion-text>
+
+  <!-- LISTADO -->
+  <ion-list *ngIf="!loading">
+
+    <ion-item *ngFor="let s of serviciosFiltrados">
+
+      <ion-label>
+        <h2>{{ s.Elemento?.nombre || 'Sin nombre' }}</h2>
+        <p><b>Precio:</b> {{ s.Elemento?.precio ?? '-' }}</p>
+        <p><b>Tipo servicio:</b> {{ s.tipoServicio || '-' }}</p>
+      </ion-label>
+
+      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(s)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarServicio(s)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+
+    </ion-item>
+
+  </ion-list>
+
+  <ion-text *ngIf="serviciosFiltrados.length === 0 && !loading">
+    <p>No hay servicios para mostrar.</p>
+  </ion-text>
+
+</ion-content>

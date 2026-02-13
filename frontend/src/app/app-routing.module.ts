@@ -51,6 +51,34 @@ const routes: Routes = [
   {
     path: 'edit-citas/:id',
     loadChildren: () => import('./citas/edit-citas/edit-citas.module').then( m => m.EditCitasPageModule)
+  },
+  {
+    path: 'menu-catalogo',
+    loadChildren: () => import('./catalogo/menu-catalogo/menu-catalogo.module').then( m => m.MenuCatalogoPageModule)
+  },
+  {
+    path: 'list-productos',
+    loadChildren: () => import('./catalogo/productos/list-productos/list-productos.module').then( m => m.ListProductosPageModule)
+  },
+  {
+    path: 'form-productos',
+    loadChildren: () => import('./catalogo/productos/form-productos/form-productos.module').then( m => m.FormProductosPageModule)
+  },
+  {
+    path: 'edit-productos/:id',
+    loadChildren: () => import('./catalogo/productos/edit-productos/edit-productos.module').then( m => m.EditProductosPageModule)
+  },
+  {
+    path: 'list-servicios',
+    loadChildren: () => import('./catalogo/servicios/list-servicios/list-servicios.module').then( m => m.ListServiciosPageModule)
+  },
+  {
+    path: 'form-servicios',
+    loadChildren: () => import('./catalogo/servicios/form-servicios/form-servicios.module').then( m => m.FormServiciosPageModule)
+  },
+  {
+    path: 'edit-servicios/:id',
+    loadChildren: () => import('./catalogo/servicios/edit-servicios/edit-servicios.module').then( m => m.EditServiciosPageModule)
   }
 
 

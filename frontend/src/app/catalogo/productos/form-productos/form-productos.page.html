@@ -1,0 +1,134 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nuevo producto</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-productos"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <!-- NOMBRE (Elemento) -->
+    <ion-item>
+      <ion-label position="floating">Nombre *</ion-label>
+      <ion-input
+        name="nombre"
+        [(ngModel)]="form.nombre"
+        required
+        #nombre="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="nombre.invalid && nombre.touched" style="margin-left:16px;">
+      El nombre es obligatorio.
+    </ion-note>
+
+    <!-- DESCRIPCIÓN (Elemento) -->
+    <ion-item>
+      <ion-label position="floating">Descripción</ion-label>
+      <ion-textarea
+        name="descripcion"
+        [(ngModel)]="form.descripcion"
+        autoGrow="true">
+      </ion-textarea>
+    </ion-item>
+
+    <!-- PRECIO (Elemento) -->
+    <ion-item>
+      <ion-label position="floating">Precio *</ion-label>
+      <ion-input
+        type="number"
+        inputmode="decimal"
+        name="precio"
+        [(ngModel)]="form.precio"
+        required
+        min="0"
+        step="0.01"
+        #precio="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="precio.invalid && precio.touched" style="margin-left:16px;">
+      El precio es obligatorio (>= 0).
+    </ion-note>
+
+    <!-- TIPO (Producto) -->
+    <ion-item>
+      <ion-label position="floating">Tipo *</ion-label>
+      <ion-select name="tipo" [(ngModel)]="form.tipo" required #tipo="ngModel">
+        <ion-select-option *ngFor="let t of tipos" [value]="t">
+          {{ t }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="tipo.invalid && tipo.touched" style="margin-left:16px;">
+      El tipo es obligatorio.
+    </ion-note>
+
+    <!-- STOCK (Producto) -->
+    <ion-item>
+      <ion-label position="floating">Stock *</ion-label>
+      <ion-input
+        type="number"
+        inputmode="numeric"
+        name="stock"
+        [(ngModel)]="form.stock"
+        required
+        min="0"
+        step="1"
+        #stock="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="stock.invalid && stock.touched" style="margin-left:16px;">
+      El stock es obligatorio (>= 0).
+    </ion-note>
+
+    <!-- STOCK MÍNIMO (Producto) -->
+    <ion-item>
+      <ion-label position="floating">Stock mínimo *</ion-label>
+      <ion-input
+        type="number"
+        inputmode="numeric"
+        name="stockMinimo"
+        [(ngModel)]="form.stockMinimo"
+        required
+        min="0"
+        step="1"
+        #stockMinimo="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="stockMinimo.invalid && stockMinimo.touched" style="margin-left:16px;">
+      El stock mínimo es obligatorio (>= 0).
+    </ion-note>
+
+    <!-- FOTO (Producto) -->
+    <ion-item>
+      <ion-label position="floating">Foto (URL o nombre de archivo)</ion-label>
+      <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
+    </ion-item>
+
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+</ion-content>

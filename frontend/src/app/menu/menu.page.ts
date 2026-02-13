@@ -44,7 +44,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: 'Catálogo',
-    url: '/catalogo',
+    url: '/menu-catalogo',
     icon: 'pricetag',
     roles: ['administrador'],
     description: 'Productos y servicios',
