@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Líneas de factura</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="crearLinea()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- INFO FACTURA (opcional) -->
+  <ion-card *ngIf="factura">
+    <ion-card-header>
+      <ion-card-title>Factura #{{ factura.idFactura }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><b>Estado:</b> {{ factura.estado }}</p>
+      <p><b>Total (calculado):</b> {{ factura.total }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LOADING -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <!-- ERROR -->
+  <ion-text color="danger" *ngIf="errorMsg">
+    <p>{{ errorMsg }}</p>
+  </ion-text>
+
+  <!-- LISTADO -->
+  <ion-list *ngIf="!loading">
+
+    <ion-item *ngFor="let l of lineas">
+      <ion-label>
+        <h2>{{ nombreElemento(l) }}</h2>
+
+        <p><b>Cantidad:</b> {{ l.cantidad }}</p>
+        <p><b>Precio unitario:</b> {{ precioElemento(l) }}</p>
+        <p><b>Importe:</b> {{ importeLinea(l) }}</p>
+      </ion-label>
+
+      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(l)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarLinea(l)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-text *ngIf="lineas.length === 0 && !loading && !errorMsg">
+    <p>No hay líneas para esta factura.</p>
+  </ion-text>
+
+  <ion-button expand="block" fill="outline" (click)="volverAFacturas()" style="margin-top: 12px;">
+    Volver a facturas
+  </ion-button>
+
+</ion-content>

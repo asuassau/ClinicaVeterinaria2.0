@@ -79,7 +79,24 @@ const routes: Routes = [
   {
     path: 'edit-servicios/:id',
     loadChildren: () => import('./catalogo/servicios/edit-servicios/edit-servicios.module').then( m => m.EditServiciosPageModule)
-  }
+  },
+  {
+    path: 'list-facturas',
+    loadChildren: () => import('./facturacion/facturas/list-facturas/list-facturas.module').then( m => m.ListFacturasPageModule)
+  },
+  {
+    path: 'list-lineas-facturas',
+    loadChildren: () => import('./facturacion/lineasFacturas/list-lineas-facturas/list-lineas-facturas.module').then( m => m.ListLineasFacturasPageModule)
+  },
+  {
+    path: 'form-lineas-facturas',
+    loadChildren: () => import('./facturacion/lineasFacturas/form-lineas-facturas/form-lineas-facturas.module').then( m => m.FormLineasFacturasPageModule)
+  },
+{
+  path: 'edit-lineas-facturas/:id',
+  loadChildren: () => import('./facturacion/lineasFacturas/edit-lineas-facturas/edit-lineas-facturas.module')
+    .then(m => m.EditLineasFacturasPageModule)
+}
 
 
 ];

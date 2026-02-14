@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   LineaFactura.associate = (models) => {
-    LineaFactura.belongsTo(models.Factura, { foreignKey: 'idFactura', as: 'Factura' });
+    LineaFactura.belongsTo(models.Factura, {
+      foreignKey: 'idFactura',
+      as: 'Factura',
+      onDelete: 'CASCADE'
+    });
     LineaFactura.belongsTo(models.Elemento, { foreignKey: 'idElemento', as: 'Elemento' });
     LineaFactura.belongsTo(models.Usuario, { foreignKey: 'idUsuario_creador', as: 'Creador' });
   };

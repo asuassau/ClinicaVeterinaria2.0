@@ -1,0 +1,106 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle línea de factura</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-lineas-facturas"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item *ngIf="loading">
+    <ion-label>Cargando línea...</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="errorMsg" lines="none">
+    <ion-label style="color:red">{{ errorMsg }}</ion-label>
+  </ion-item>
+
+  <div *ngIf="linea && !loading">
+
+    <ion-list>
+
+      <ion-item>
+        <ion-label>
+          <h2>ID Línea</h2>
+          <p>{{ linea.idLineaFactura }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Factura</h2>
+          <p>{{ linea.idFactura }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- 👇 fecha y hora separados -->
+      <ion-item>
+        <ion-label>
+          <h2>Fecha creación</h2>
+          <p>{{ fechaSolo() }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Hora creación</h2>
+          <p>{{ horaSolo() }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- 👇 Elemento: nombre -->
+      <ion-item>
+        <ion-label>
+          <h2>Elemento</h2>
+          <p>{{ elementoNombre() }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Cantidad</h2>
+          <p>{{ linea.cantidad }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Precio unitario</h2>
+          <p>{{ formatMoney(linea.precioUnitario) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Descuento</h2>
+          <p>{{ formatMoney(linea.descuento ?? 0) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Importe</h2>
+          <p>{{ formatMoney(linea.importe) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- 👇 Creador: nombre + apellidos -->
+      <ion-item>
+        <ion-label>
+          <h2>Creado por</h2>
+          <p>{{ creadorNombre() }}</p>
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver al listado
+    </ion-button>
+
+  </div>
+
+</ion-content>

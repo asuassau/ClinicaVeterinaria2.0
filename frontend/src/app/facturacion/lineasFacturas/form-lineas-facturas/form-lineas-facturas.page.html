@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nueva línea de factura</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-facturas"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <!-- ELEMENTO -->
+    <ion-item>
+      <ion-label position="floating">Elemento *</ion-label>
+      <ion-select
+        name="idElemento"
+        [(ngModel)]="form.idElemento"
+        required
+        (ionChange)="onElementoChange()"
+        #idElemento="ngModel">
+
+        <ion-select-option *ngFor="let e of elementos" [value]="e.idElemento">
+          {{ elementoLabel(e) }}
+        </ion-select-option>
+
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="idElemento.invalid && idElemento.touched" style="margin-left:16px;">
+      Debes seleccionar un elemento.
+    </ion-note>
+
+    <!-- CANTIDAD -->
+    <ion-item>
+      <ion-label position="floating">Cantidad *</ion-label>
+      <ion-input
+        type="number"
+        inputmode="numeric"
+        name="cantidad"
+        [(ngModel)]="form.cantidad"
+        required
+        min="1"
+        step="1"
+        #cantidad="ngModel">
+      </ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="cantidad.invalid && cantidad.touched" style="margin-left:16px;">
+      La cantidad es obligatoria y debe ser mayor que 0.
+    </ion-note>
+
+    <!-- DESCUENTO % -->
+    <ion-item>
+      <ion-label position="floating">Descuento (%)</ion-label>
+      <ion-input
+        type="number"
+        inputmode="decimal"
+        name="descuentoPct"
+        [(ngModel)]="form.descuentoPct"
+        min="0"
+        max="100"
+        step="0.01">
+      </ion-input>
+    </ion-item>
+
+    <!-- RESUMEN (auto) -->
+    <ion-card style="margin-top: 14px;" *ngIf="form.idElemento">
+      <ion-card-header>
+        <ion-card-title>Resumen</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><b>Factura:</b> {{ idFactura }}</p>
+        <p><b>Precio unitario:</b> {{ precioUnitario | number:'1.2-2' }} €</p>
+        <p><b>Subtotal:</b> {{ subtotal | number:'1.2-2' }} €</p>
+        <p><b>Descuento:</b> -{{ descuentoImporte | number:'1.2-2' }} €</p>
+        <p><b>Importe final:</b> {{ importeFinal | number:'1.2-2' }} €</p>
+        <ion-text color="medium">
+          <p style="margin-top:10px;">
+            * El total de la factura se recalcula automáticamente en el backend al crear la línea.
+          </p>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- MENSAJES -->
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <!-- BOTONES -->
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>

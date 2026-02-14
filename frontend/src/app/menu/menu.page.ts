@@ -37,7 +37,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: 'Facturas',
-    url: '/facturas',
+    url: '/list-facturas',
     icon: 'receipt',
     roles: ['administrador', 'recepcionista', 'cliente'],
     description: 'Listado, búsqueda y CRUD de facturas',

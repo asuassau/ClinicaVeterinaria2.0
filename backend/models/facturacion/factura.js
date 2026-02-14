@@ -27,7 +27,14 @@ module.exports = (sequelize, DataTypes) => {
   Factura.associate = (models) => {
     Factura.belongsTo(models.Usuario, { foreignKey: 'idUsuario_pagador', as: 'Pagador' });
     Factura.belongsTo(models.Usuario, { foreignKey: 'idUsuario_emisor', as: 'Emisor' });
-    Factura.hasMany(models.LineaFactura, { foreignKey: 'idFactura', as: 'Lineas' });
+
+    // 👇 IMPORTANTE: CASCADE en DB + hooks por si usas destroy
+    Factura.hasMany(models.LineaFactura, {
+      foreignKey: 'idFactura',
+      as: 'Lineas',
+      onDelete: 'CASCADE',
+      hooks: true
+    });
   };
 
   return Factura;
