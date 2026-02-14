@@ -30,7 +30,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: 'Historiales',
-    url: '/historiales',
+    url: '/list-historiales',
     icon: 'document-text',
     roles: ['administrador', 'veterinario'],
     description: 'Listado, búsqueda y CRUD de historiales clínicos',

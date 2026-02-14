@@ -1,5 +1,6 @@
 const db = require("../../models");
 const Historial = db.Historial;
+const LineaHistorial = db.LineaHistorial;
 
 exports.create = async (req, res) => {
   try {
@@ -45,12 +46,23 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+  const t = await db.sequelize.transaction();
   try {
     const id = req.params.id;
-    const num = await Historial.destroy({ where: { idHistorial: id } });
-    if (num === 1) return res.send({ message: "Historial eliminado correctamente." });
+
+    // 1) Borra líneas primero (si no tienes FK cascade real)
+    await LineaHistorial.destroy({ where: { idHistorial: id }, transaction: t });
+
+    // 2) Borra historial
+    const num = await Historial.destroy({ where: { idHistorial: id }, transaction: t });
+
+    await t.commit();
+
+    if (num === 1) return res.send({ message: "Historial eliminado correctamente (y sus líneas)." });
     return res.send({ message: `No ha sido posible eliminar Historial id=${id}.` });
+
   } catch (err) {
+    await t.rollback();
     return res.status(500).send({ message: "Error eliminando Historial id=" + req.params.id });
   }
 };

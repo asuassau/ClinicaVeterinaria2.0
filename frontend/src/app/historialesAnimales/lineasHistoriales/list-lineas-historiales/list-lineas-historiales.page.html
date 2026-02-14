@@ -1,0 +1,114 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Líneas de historial</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="crearLinea()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- REFERENCIA HISTORIAL -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ historialRefLabel() }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p *ngIf="animalRefLabel()"><b>Animal:</b> {{ animalRefLabel() }}</p>
+      <p><b>Total líneas:</b> {{ lineasFiltradas.length }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- FILTROS -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Filtros</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-item>
+        <ion-label>Autor</ion-label>
+        <ion-select [(ngModel)]="filtroAutor" (ionChange)="aplicarFiltros()">
+          <ion-select-option value="todos">Todos</ion-select-option>
+
+          <ion-select-option
+            *ngFor="let a of autoresDisponibles()"
+            [value]="a.idUsuario">
+            {{ a.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">
+          Buscar (fecha creación, fecha edición, autor, descripción)
+        </ion-label>
+        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LOADING -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <!-- ERROR -->
+  <ion-text color="danger" *ngIf="errorMsg">
+    <p>{{ errorMsg }}</p>
+  </ion-text>
+
+  <!-- LISTADO -->
+  <ion-list *ngIf="!loading">
+
+    <ion-item *ngFor="let vm of lineasFiltradas">
+
+      <ion-label>
+        <h2>{{ vm.autorLabel }}</h2>
+
+        <p>
+          <b>Creación:</b>
+          {{ formatFecha(vm.fechaCreacion) }} {{ formatHora(vm.fechaCreacion) }}
+        </p>
+
+        <p>
+          <b>Edición:</b>
+          {{ vm.fechaEdicion === '-' ? '-' : (formatFecha(vm.fechaEdicion) + ' ' + formatHora(vm.fechaEdicion)) }}
+        </p>
+
+        <p><b>Descripción:</b> {{ vm.descripcion || '-' }}</p>
+      </ion-label>
+
+      <!-- VER DETALLE -->
+      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+
+      <!-- ELIMINAR -->
+      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarLinea(vm)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+
+    </ion-item>
+
+  </ion-list>
+
+  <ion-text *ngIf="lineasFiltradas.length === 0 && !loading && !errorMsg">
+    <p>No hay líneas para este historial.</p>
+  </ion-text>
+
+  <ion-button expand="block" fill="outline" (click)="volverAHistoriales()" style="margin-top: 12px;">
+    Volver a historiales
+  </ion-button>
+
+</ion-content>

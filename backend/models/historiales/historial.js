@@ -13,7 +13,14 @@ module.exports = (sequelize, DataTypes) => {
 
   Historial.associate = (models) => {
     Historial.belongsTo(models.Animal, { foreignKey: 'idAnimal', as: 'Animal' });
-    Historial.hasMany(models.LineaHistorial, { foreignKey: 'idHistorial', as: 'Lineas' });
+
+    // 👇 Igual que Facturas: CASCADE + hooks
+    Historial.hasMany(models.LineaHistorial, {
+      foreignKey: 'idHistorial',
+      as: 'Lineas',
+      onDelete: 'CASCADE',
+      hooks: true
+    });
   };
 
   return Historial;

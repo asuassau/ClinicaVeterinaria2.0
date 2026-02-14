@@ -104,6 +104,22 @@ const routes: Routes = [
   {
     path: 'edit-facturas/:id',
     loadChildren: () => import('./facturacion/facturas/edit-facturas/edit-facturas.module').then( m => m.EditFacturasPageModule)
+  },
+  {
+    path: 'list-historiales',
+    loadChildren: () => import('./historialesAnimales/historiales/list-historiales/list-historiales.module').then( m => m.ListHistorialesPageModule)
+  },
+  {
+    path: 'list-lineas-historiales',
+    loadChildren: () => import('./historialesAnimales/lineasHistoriales/list-lineas-historiales/list-lineas-historiales.module').then( m => m.ListLineasHistorialesPageModule)
+  },
+  {
+    path: 'form-lineas-historiales',
+    loadChildren: () => import('./historialesAnimales/lineasHistoriales/form-lineas-historiales/form-lineas-historiales.module').then( m => m.FormLineasHistorialesPageModule)
+  },
+  {
+    path: 'edit-lineas-historiales/:id',
+    loadChildren: () => import('./historialesAnimales/lineasHistoriales/edit-lineas-historiales/edit-lineas-historiales.module').then( m => m.EditLineasHistorialesPageModule)
   }
 
 

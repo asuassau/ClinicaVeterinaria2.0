@@ -1,0 +1,218 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle línea de historial</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-lineas-historiales"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="linea && !editMode">
+      <ion-button (click)="activarEdicion()">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Editar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item *ngIf="loading">
+    <ion-label>Cargando línea...</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="errorMsg" lines="none">
+    <ion-label style="color:red">{{ errorMsg }}</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="okMsg" lines="none">
+    <ion-label style="color:green">{{ okMsg }}</ion-label>
+  </ion-item>
+
+  <!-- ===================== -->
+  <!-- MODO DETALLE (VER) -->
+  <!-- ===================== -->
+  <div *ngIf="linea && !editMode && !loading">
+
+    <ion-list>
+
+      <ion-item>
+        <ion-label>
+          <h2>ID Línea</h2>
+          <p>{{ linea.idLineaHistorial }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Historial</h2>
+          <p>{{ linea.idHistorial }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Fecha/Hora creación -->
+      <ion-item>
+        <ion-label>
+          <h2>Fecha creación</h2>
+          <p>{{ fechaSolo(linea.fechaCreacion) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Hora creación</h2>
+          <p>{{ horaSolo(linea.fechaCreacion) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Fecha/Hora edición (si existe) -->
+      <ion-item>
+        <ion-label>
+          <h2>Fecha edición</h2>
+          <p>{{ fechaSolo(linea.fechaEdicion) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Hora edición</h2>
+          <p>{{ horaSolo(linea.fechaEdicion) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Autor</h2>
+          <p>{{ autorActualLabel() }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Peso</h2>
+          <p>{{ linea.peso ?? '-' }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Tipo</h2>
+          <p>{{ linea.tipo }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h2>Descripción</h2>
+          <p>{{ linea.descripcion }}</p>
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver al listado
+    </ion-button>
+
+  </div>
+
+  <!-- ===================== -->
+  <!-- MODO EDICIÓN -->
+  <!-- ===================== -->
+  <div *ngIf="linea && editMode && !loading">
+
+    <form #f="ngForm" (ngSubmit)="guardarCambios()">
+
+      <!-- ID (no editable) -->
+      <ion-item>
+        <ion-label>
+          <h2>ID Línea</h2>
+          <p>{{ linea.idLineaHistorial }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Fecha creación (no editable) -->
+      <ion-item>
+        <ion-label>
+          <h2>Fecha creación</h2>
+          <p>{{ fechaSolo(linea.fechaCreacion) }} {{ horaSolo(linea.fechaCreacion) }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Fecha edición (info) -->
+      <ion-item>
+        <ion-label>
+          <h2>Fecha edición</h2>
+          <p>Se actualizará automáticamente al guardar.</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Autor (info: será el usuario logueado al guardar) -->
+      <ion-item>
+        <ion-label>
+          <h2>Autor (al guardar)</h2>
+          <p>{{ autorLogueadoLabel() }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- PESO editable -->
+      <ion-item>
+        <ion-label position="floating">Peso (kg)</ion-label>
+        <ion-input
+          type="number"
+          inputmode="decimal"
+          name="peso"
+          [(ngModel)]="form.peso"
+          min="0"
+          step="0.01">
+        </ion-input>
+      </ion-item>
+
+      <!-- TIPO editable -->
+      <ion-item>
+        <ion-label position="floating">Tipo *</ion-label>
+        <ion-select name="tipo" [(ngModel)]="form.tipo" required #tipo="ngModel">
+          <ion-select-option *ngFor="let t of tipos" [value]="t">
+            {{ t }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-note color="danger" *ngIf="tipo.invalid && tipo.touched" style="margin-left:16px;">
+        Debes seleccionar un tipo.
+      </ion-note>
+
+      <!-- DESCRIPCIÓN editable -->
+      <ion-item>
+        <ion-label position="floating">Descripción *</ion-label>
+        <ion-textarea
+          name="descripcion"
+          [(ngModel)]="form.descripcion"
+          required
+          autoGrow="true"
+          #descripcion="ngModel">
+        </ion-textarea>
+      </ion-item>
+      <ion-note color="danger" *ngIf="descripcion.invalid && descripcion.touched" style="margin-left:16px;">
+        La descripción es obligatoria.
+      </ion-note>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="f.invalid || saving"
+        style="margin-top: 18px;">
+        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        type="button"
+        (click)="cancelarEdicion()">
+        Cancelar
+      </ion-button>
+
+    </form>
+  </div>
+
+</ion-content>
