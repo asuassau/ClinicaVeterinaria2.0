@@ -1,0 +1,130 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nueva factura</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-facturas"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <!-- Nº FACTURA (AUTO) -->
+    <ion-item lines="none">
+      <ion-label>
+        <h2>Nº Factura</h2>
+        <p>{{ nFacturaAuto || '-' }}</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- PAGADOR -->
+    <ion-item>
+      <ion-label position="floating">Pagador *</ion-label>
+      <ion-select
+        name="idUsuario_pagador"
+        [(ngModel)]="form.idUsuario_pagador"
+        required
+        #idUsuario_pagador="ngModel">
+
+        <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
+          {{ userLabel(u) }}
+        </ion-select-option>
+
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="idUsuario_pagador.invalid && idUsuario_pagador.touched" style="margin-left:16px;">
+      Debes seleccionar un pagador.
+    </ion-note>
+
+    <!-- ESTADO -->
+    <ion-item>
+      <ion-label position="floating">Estado *</ion-label>
+      <ion-select name="estado" [(ngModel)]="form.estado" required #estado="ngModel">
+        <ion-select-option *ngFor="let e of estados" [value]="e">
+          {{ e }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- FORMA PAGO -->
+    <ion-item>
+      <ion-label position="floating">Forma de pago</ion-label>
+      <ion-select name="formaPago" [(ngModel)]="form.formaPago">
+        <ion-select-option *ngFor="let fp of formasPago" [value]="fp">
+          {{ fp }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- DESCUENTO % -->
+    <ion-item>
+      <ion-label position="floating">Descuento (%)</ion-label>
+      <ion-input
+        type="number"
+        inputmode="decimal"
+        name="descPct"
+        [(ngModel)]="form.descPct"
+        min="0"
+        max="100"
+        step="0.01">
+      </ion-input>
+    </ion-item>
+
+    <!-- IMPUESTO % -->
+    <ion-item>
+      <ion-label position="floating">Impuesto (%)</ion-label>
+      <ion-input
+        type="number"
+        inputmode="decimal"
+        name="impuestoPct"
+        [(ngModel)]="form.impuestoPct"
+        min="0"
+        max="100"
+        step="0.01">
+      </ion-input>
+    </ion-item>
+
+    <!-- RESUMEN AUTO -->
+    <ion-card style="margin-top: 14px;">
+      <ion-card-header>
+        <ion-card-title>Datos automáticos</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><b>Fecha creación:</b> Se asigna automáticamente (ahora).</p>
+        <p><b>Total:</b> Se calcula automáticamente al añadir/eliminar líneas.</p>
+        <p><b>Fecha pago:</b> Se rellenará automáticamente cuando el estado pase a <b>Pagada</b>.</p>
+        <p><b>Emisor:</b> Usuario logueado.</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- MENSAJES -->
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <!-- BOTONES -->
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>

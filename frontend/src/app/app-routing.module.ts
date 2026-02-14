@@ -96,7 +96,15 @@ const routes: Routes = [
   path: 'edit-lineas-facturas/:id',
   loadChildren: () => import('./facturacion/lineasFacturas/edit-lineas-facturas/edit-lineas-facturas.module')
     .then(m => m.EditLineasFacturasPageModule)
-}
+},
+  {
+    path: 'form-facturas',
+    loadChildren: () => import('./facturacion/facturas/form-facturas/form-facturas.module').then( m => m.FormFacturasPageModule)
+  },
+  {
+    path: 'edit-facturas/:id',
+    loadChildren: () => import('./facturacion/facturas/edit-facturas/edit-facturas.module').then( m => m.EditFacturasPageModule)
+  }
 
 
 ];
