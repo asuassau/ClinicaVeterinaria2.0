@@ -6,8 +6,8 @@
       <ion-back-button defaultHref="/list-lineas-historiales"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="linea && !editMode">
-      <ion-button (click)="activarEdicion()">
+ <ion-buttons slot="end" *ngIf="linea && !editMode && canEditar">
+  <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
       </ion-button>

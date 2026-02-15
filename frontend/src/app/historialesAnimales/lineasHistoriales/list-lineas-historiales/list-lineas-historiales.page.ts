@@ -6,6 +6,9 @@ import { HistorialService, Historial } from 'src/app/services/historial.service'
 import { AnimalService, Animal } from 'src/app/services/animal.service';
 import { UsuarioService, Usuario } from 'src/app/services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 type AutorFiltro = number | 'todos';
 
 interface LineaVM {
@@ -52,8 +55,22 @@ export class ListLineasHistorialesPage {
     private lineaService: LineaHistorialService,
     private historialService: HistorialService,
     private animalService: AnimalService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private permisos: PermisosService
   ) {}
+
+get canNuevo(): boolean {
+  return this.permisos.can('lineasHistorial', 'nuevo');
+}
+
+get canEliminar(): boolean {
+  return this.permisos.can('lineasHistorial', 'eliminar');
+}
+
+get canEditar(): boolean {
+  return this.permisos.can('lineasHistorial', 'editar');
+}
+
 
   ionViewWillEnter() {
     const id = this.route.snapshot.queryParamMap.get('idHistorial');

@@ -11,6 +11,10 @@ import {
 import { AnimalService, Animal } from 'src/app/services/animal.service';
 import { UsuarioService, Usuario } from 'src/app/services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
+
 interface AnimalSelectVM {
   idAnimal: number;
   animalNombre: string;
@@ -54,8 +58,13 @@ export class EditHistorialesPage {
     private router: Router,
     private historialService: HistorialService,
     private animalService: AnimalService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private permisos: PermisosService
   ) {}
+
+get canEditar(): boolean {
+  return this.permisos.can('historiales', 'editar');
+}
 
   ionViewWillEnter() {
     const id = this.route.snapshot.paramMap.get('id');

@@ -7,6 +7,9 @@ import { LineaHistorialService } from 'src/app/services/linea-historial.service'
 import { UsuarioService, Usuario } from 'src/app/services/usuario.service';
 import { AnimalService, Animal } from 'src/app/services/animal.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 type EstadoHistorial = 'Activo' | 'Inactivo';
 type EstadoFiltro = EstadoHistorial | 'todos';
 
@@ -50,8 +53,31 @@ export class ListHistorialesPage {
     private lineaHistorialService: LineaHistorialService, // (no obligatorio aquí)
     private animalService: AnimalService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
   ) {}
+
+
+get canNuevo(): boolean {
+  return this.permisos.can('historiales', 'nuevo');
+}
+
+get canEliminar(): boolean {
+  return this.permisos.can('historiales', 'eliminar');
+}
+
+get canEditar(): boolean {
+  return this.permisos.can('historiales', 'editar');
+}
+
+get canVer(): boolean {
+  return this.permisos.can('historiales', 'ver');
+}
+
+
+
+
+
 
   ionViewWillEnter() {
     this.cargarTodo();

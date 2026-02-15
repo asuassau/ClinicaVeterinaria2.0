@@ -2,8 +2,8 @@
   <ion-toolbar color="primary">
     <ion-title>Líneas de historial</ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button (click)="crearLinea()">
+<ion-buttons slot="end" *ngIf="canNuevo">
+  <ion-button (click)="crearLinea()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -95,7 +95,7 @@
       </ion-button>
 
       <!-- ELIMINAR -->
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarLinea(vm)">
+     <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarLinea(vm)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 

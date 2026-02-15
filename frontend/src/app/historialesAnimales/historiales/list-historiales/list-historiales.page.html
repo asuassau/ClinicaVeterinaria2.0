@@ -2,8 +2,8 @@
   <ion-toolbar color="primary">
     <ion-title>Historiales</ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button (click)="crearHistorial()">
+ <ion-buttons slot="end" *ngIf="canNuevo">
+  <ion-button (click)="crearHistorial()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -74,7 +74,7 @@
       </ion-button>
 
       <!-- BORRAR -->
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarHistorial(vm)">
+      <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarHistorial(vm)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 

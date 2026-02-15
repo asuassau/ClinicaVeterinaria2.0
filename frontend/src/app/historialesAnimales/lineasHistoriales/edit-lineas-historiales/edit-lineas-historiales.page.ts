@@ -9,6 +9,9 @@ import {
   UpdateLineaHistorialDto
 } from 'src/app/services/linea-historial.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 @Component({
   selector: 'app-edit-lineas-historiales',
   templateUrl: './edit-lineas-historiales.page.html',
@@ -40,8 +43,13 @@ export class EditLineasHistorialesPage {
     private route: ActivatedRoute,
     private router: Router,
     private auth: AuthService,
-    private lineaService: LineaHistorialService
+    private lineaService: LineaHistorialService,
+    private permisos: PermisosService
   ) {}
+
+  get canEditar(): boolean {
+  return this.permisos.can('lineasHistorial', 'editar');
+}
 
   ionViewWillEnter() {
     const id = this.route.snapshot.paramMap.get('id');
