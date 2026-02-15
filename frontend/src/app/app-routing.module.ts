@@ -120,6 +120,14 @@ const routes: Routes = [
   {
     path: 'edit-lineas-historiales/:id',
     loadChildren: () => import('./historialesAnimales/lineasHistoriales/edit-lineas-historiales/edit-lineas-historiales.module').then( m => m.EditLineasHistorialesPageModule)
+  },
+  {
+    path: 'form-historiales',
+    loadChildren: () => import('./historialesAnimales/historiales/form-historiales/form-historiales.module').then( m => m.FormHistorialesPageModule)
+  },
+  {
+    path: 'edit-historiales/:id',
+    loadChildren: () => import('./historialesAnimales/historiales/edit-historiales/edit-historiales.module').then( m => m.EditHistorialesPageModule)
   }
 
 

@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nuevo historial</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-historiales"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form #f="ngForm" (ngSubmit)="guardar()">
+
+    <!-- ANIMAL -->
+    <ion-item>
+      <ion-label position="floating">Animal *</ion-label>
+      <ion-select
+        name="idAnimal"
+        [(ngModel)]="form.idAnimal"
+        required
+        #idAnimal="ngModel">
+
+        <ion-select-option *ngFor="let a of animalesVM" [value]="a.idAnimal">
+          {{ a.label }}
+        </ion-select-option>
+
+      </ion-select>
+    </ion-item>
+
+    <ion-note color="danger" *ngIf="idAnimal.invalid && idAnimal.touched" style="margin-left:16px;">
+      Debes seleccionar un animal.
+    </ion-note>
+
+    <!-- RESUMEN AUTO -->
+    <ion-card style="margin-top: 14px;">
+      <ion-card-header>
+        <ion-card-title>Datos automáticos</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><b>Fecha alta:</b> Se asigna automáticamente (hoy).</p>
+        <p><b>Estado:</b> Se crea automáticamente como <b>Activo</b>.</p>
+        <p><b>ID Historial:</b> Se genera automáticamente.</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- LOADING -->
+    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+    <!-- MENSAJES -->
+    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
+      {{ okMsg }}
+    </div>
+
+    <!-- BOTONES -->
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="f.invalid || loading"
+      style="margin-top: 18px;">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      (click)="cancelar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>
