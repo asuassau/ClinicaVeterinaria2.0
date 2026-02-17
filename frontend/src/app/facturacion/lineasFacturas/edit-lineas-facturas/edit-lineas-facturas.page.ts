@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
 
-import { LineaFacturaService, LineaFactura } from '../../../services/linea-factura.service';
+import {
+  LineaFacturaService,
+  LineaFactura,
+  UpdateLineaFacturaDto
+} from '../../../services/linea-factura.service';
 import { FacturaService, Factura } from '../../../services/factura.service';
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 
@@ -14,12 +17,24 @@ import { PermisosService } from 'src/app/seguridad/permisos.service';
 })
 export class EditLineasFacturasPage {
   loading = false;
+  saving = false; // ✅ añadido
   errorMsg = '';
+  okMsg = '';     // ✅ añadido
 
   linea: LineaFactura | null = null;
   factura: Factura | null = null;
 
   private idLineaFactura!: number;
+
+  // ✅ añadido: edición real
+  editMode = false;
+
+  // ✅ añadido: form mínimo (solo campos permitidos por UpdateLineaFacturaDto)
+  form: UpdateLineaFacturaDto = {
+    cantidad: 1,
+    precioUnitario: 0,
+    descuento: 0,
+  };
 
   constructor(
     private lfService: LineaFacturaService,
@@ -28,20 +43,6 @@ export class EditLineasFacturasPage {
     private router: Router,
     private permisos: PermisosService
   ) {}
-
-saving = false;
-okMsg = '';
-editMode = false;
-
-form: {
-  cantidad: number;
-  precioUnitario: number;
-  descuento: number;
-} = {
-  cantidad: 1,
-  precioUnitario: 0,
-  descuento: 0,
-};
 
   private get ctxFactura() {
     return { estadoFactura: this.factura?.estado };
@@ -57,6 +58,7 @@ form: {
 
   ionViewWillEnter() {
     // Bloqueo general (cliente no debe entrar nunca)
+    // (sin ctx porque aún no sabemos la factura)
     if (!this.permisos.can('lineasFactura', 'ver')) {
       this.router.navigate(['/menu']);
       return;
@@ -75,12 +77,15 @@ form: {
 
   cargar() {
     this.loading = true;
+    this.saving = false;
     this.errorMsg = '';
+    this.okMsg = '';
+    this.editMode = false;
 
-    // 1) Traer línea (incluye Elemento y Creador)
     this.lfService.getLineaById(this.idLineaFactura, true).subscribe({
       next: (linea) => {
         this.linea = linea;
+        this.precargarForm(); // ✅ añadido
 
         const idFactura = Number(linea?.idFactura);
         if (!idFactura) {
@@ -88,20 +93,20 @@ form: {
           return;
         }
 
-        // 2) Traer factura para disponer de ctx.estadoFactura
         this.facturaService.getFacturaById(idFactura, false).subscribe({
           next: (f) => {
             this.factura = f;
             this.loading = false;
 
-            // Revalidación opcional con ctx (si algún día cambias reglas por estado)
+            // Revalidación con ctx (estado factura)
             if (!this.canVer) {
               this.router.navigate(['/menu']);
               return;
             }
           },
-          error: () => {
+          error: (err) => {
             this.loading = false;
+            this.errorMsg = err?.error?.message || 'Error cargando la factura.';
           }
         });
       },
@@ -112,17 +117,68 @@ form: {
     });
   }
 
+  // ✅ añadido: precargar formulario desde la línea
+  private precargarForm() {
+    if (!this.linea) return;
+    this.form = {
+      cantidad: Number(this.linea.cantidad ?? 1),
+      precioUnitario: Number(this.linea.precioUnitario ?? 0),
+      descuento: Number(this.linea.descuento ?? 0),
+      // idElemento opcional si quieres permitirlo en update; ahora no lo tocamos
+    };
+  }
+
+  // ✅ añadido: activar edición
+  activarEdicion() {
+    if (!this.linea) return;
+    if (!this.canEditar) return;
+
+    this.editMode = true;
+    this.okMsg = '';
+    this.errorMsg = '';
+    this.precargarForm();
+  }
+
+  // ✅ añadido: cancelar edición
+  cancelarEdicion() {
+    this.editMode = false;
+    this.okMsg = '';
+    this.errorMsg = '';
+    this.precargarForm();
+  }
+
+  // ✅ añadido: guardar usando el service REAL updateLinea()
+  guardarCambios() {
+    if (!this.linea) return;
+    if (!this.canEditar) return;
+
+    this.saving = true;
+    this.errorMsg = '';
+    this.okMsg = '';
+
+    const payload: UpdateLineaFacturaDto = {
+      cantidad: Number(this.form.cantidad),
+      precioUnitario: Number(this.form.precioUnitario),
+      descuento: this.form.descuento === null || this.form.descuento === undefined
+        ? null
+        : Number(this.form.descuento),
+    };
+
+    this.lfService.updateLinea(this.idLineaFactura, payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.okMsg = 'Línea actualizada correctamente.';
+        this.editMode = false;
+        this.cargar();
+      },
+      error: (err) => {
+        this.saving = false;
+        this.errorMsg = err?.error?.message || 'Error guardando cambios.';
+      }
+    });
+  }
+
   // ---------- Helpers UI ----------
-
-private precargarForm() {
-  if (!this.linea) return;
-  this.form = {
-    cantidad: Number(this.linea.cantidad ?? 1),
-    precioUnitario: Number(this.linea.precioUnitario ?? 0),
-    descuento: Number(this.linea.descuento ?? 0),
-  };
-}
-
   elementoNombre(): string {
     const el = (this.linea as any)?.Elemento;
     return el?.nombre || '-';
@@ -172,6 +228,4 @@ private precargarForm() {
     if (!Number.isFinite(n)) return '-';
     return `${n.toFixed(2)} €`;
   }
-
-
 }

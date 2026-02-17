@@ -6,12 +6,18 @@
       <ion-back-button defaultHref="/list-lineas-facturas"></ion-back-button>
     </ion-buttons>
 
-    <!-- Si no hay edición real, lo mejor es NO mostrar nada.
-         Si quieres dejarlo "preparado", muéstralo SOLO si canEditar -->
-    <ion-buttons slot="end" *ngIf="linea && canEditar">
-      <ion-button disabled>
+    <!-- ✅ Editar real (antes estaba disabled y sin click) -->
+    <ion-buttons slot="end" *ngIf="linea && canEditar && !editMode">
+      <ion-button (click)="activarEdicion()" [disabled]="saving">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
+      </ion-button>
+    </ion-buttons>
+
+    <!-- ✅ Cancelar cuando estás editando -->
+    <ion-buttons slot="end" *ngIf="linea && editMode">
+      <ion-button fill="outline" (click)="cancelarEdicion()" [disabled]="saving">
+        Cancelar
       </ion-button>
     </ion-buttons>
 
@@ -28,92 +34,153 @@
     <ion-label style="color:red">{{ errorMsg }}</ion-label>
   </ion-item>
 
+  <ion-item *ngIf="okMsg" lines="none">
+    <ion-label style="color:green">{{ okMsg }}</ion-label>
+  </ion-item>
+
   <div *ngIf="linea && !loading">
 
-    <ion-list>
+    <!-- ========================= -->
+    <!-- MODO DETALLE -->
+    <!-- ========================= -->
+    <div *ngIf="!editMode">
 
-      <ion-item>
-        <ion-label>
-          <h2>ID Línea</h2>
-          <p>{{ linea.idLineaFactura }}</p>
-        </ion-label>
-      </ion-item>
+      <ion-list>
 
-      <ion-item>
-        <ion-label>
-          <h2>Factura</h2>
-          <p>{{ linea.idFactura }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>ID Línea</h2>
+            <p>{{ linea.idLineaFactura }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item *ngIf="factura">
-        <ion-label>
-          <h2>Estado de la factura</h2>
-          <p>{{ factura.estado }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Factura</h2>
+            <p>{{ linea.idFactura }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Fecha creación</h2>
-          <p>{{ fechaSolo() }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item *ngIf="factura">
+          <ion-label>
+            <h2>Estado de la factura</h2>
+            <p>{{ factura.estado }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Hora creación</h2>
-          <p>{{ horaSolo() }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Fecha creación</h2>
+            <p>{{ fechaSolo() }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Elemento</h2>
-          <p>{{ elementoNombre() }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Hora creación</h2>
+            <p>{{ horaSolo() }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Cantidad</h2>
-          <p>{{ linea.cantidad }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Elemento</h2>
+            <p>{{ elementoNombre() }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Precio unitario</h2>
-          <p>{{ formatMoney(linea.precioUnitario) }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Cantidad</h2>
+            <p>{{ linea.cantidad }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Descuento</h2>
-          <p>{{ formatMoney(linea.descuento ?? 0) }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Precio unitario</h2>
+            <p>{{ formatMoney(linea.precioUnitario) }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Importe</h2>
-          <p>{{ formatMoney(linea.importe) }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Descuento</h2>
+            <p>{{ formatMoney(linea.descuento ?? 0) }}</p>
+          </ion-label>
+        </ion-item>
 
-      <ion-item>
-        <ion-label>
-          <h2>Creado por</h2>
-          <p>{{ creadorNombre() }}</p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-label>
+            <h2>Importe</h2>
+            <p>{{ formatMoney(linea.importe) }}</p>
+          </ion-label>
+        </ion-item>
 
-    </ion-list>
+        <ion-item>
+          <ion-label>
+            <h2>Creado por</h2>
+            <p>{{ creadorNombre() }}</p>
+          </ion-label>
+        </ion-item>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
-    </ion-button>
+      </ion-list>
+
+      <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+        Volver al listado
+      </ion-button>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- MODO EDICIÓN (mínimo) -->
+    <!-- ========================= -->
+    <div *ngIf="editMode">
+
+      <ion-list>
+
+        <ion-item>
+          <ion-label position="stacked">Cantidad</ion-label>
+          <ion-input
+            type="number"
+            [(ngModel)]="form.cantidad"
+            name="cantidad">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Precio unitario</ion-label>
+          <ion-input
+            type="number"
+            [(ngModel)]="form.precioUnitario"
+            name="precioUnitario">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Descuento</ion-label>
+          <ion-input
+            type="number"
+            [(ngModel)]="form.descuento"
+            name="descuento">
+          </ion-input>
+        </ion-item>
+
+      </ion-list>
+
+      <ion-button expand="block" (click)="guardarCambios()" [disabled]="saving" style="margin-top:16px;">
+        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+      </ion-button>
+
+      <ion-button expand="block" fill="outline" (click)="cancelarEdicion()" [disabled]="saving">
+        Cancelar
+      </ion-button>
+
+      <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+        Volver al listado
+      </ion-button>
+
+    </div>
 
   </div>
 
