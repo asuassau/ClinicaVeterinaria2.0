@@ -5,10 +5,12 @@ import { forkJoin } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductoService, Producto } from 'src/app/services/producto.service';
 import { ServicioService, Servicio } from 'src/app/services/servicio.service';
+import { FacturaService, Factura } from 'src/app/services/factura.service';
 import {
   LineaFacturaService,
   CreateLineaFacturaDto
 } from 'src/app/services/linea-factura.service';
+import { PermisosService } from 'src/app/seguridad/permisos.service';
 
 interface ElementoMini {
   idElemento: number;
@@ -30,6 +32,8 @@ export class FormLineasFacturasPage {
 
   idFactura!: number;
 
+  factura: Factura | null = null;
+
   elementos: ElementoMini[] = [];
   elementoSeleccionado: ElementoMini | null = null;
 
@@ -45,8 +49,19 @@ export class FormLineasFacturasPage {
     private auth: AuthService,
     private productoService: ProductoService,
     private servicioService: ServicioService,
-    private lineaFacturaService: LineaFacturaService
+    private facturaService: FacturaService,
+    private lineaFacturaService: LineaFacturaService,
+    private permisos: PermisosService
   ) {}
+
+  private get ctxFactura() {
+    return { estadoFactura: this.factura?.estado };
+  }
+
+  // ✅ ahora depende del estado real de la factura
+  get canNuevo(): boolean {
+    return this.permisos.can('lineasFactura', 'nuevo', this.ctxFactura);
+  }
 
   ionViewWillEnter() {
     const id = this.route.snapshot.queryParamMap.get('idFactura');
@@ -57,11 +72,35 @@ export class FormLineasFacturasPage {
       return;
     }
 
-    this.cargarElementos();
+    // ✅ 1) cargar factura para conocer estado
+    this.loading = true;
+    this.errorMsg = '';
+    this.okMsg = '';
+
+    this.facturaService.getFacturaById(this.idFactura, false).subscribe({
+      next: (f) => {
+        this.factura = f;
+
+        // ✅ 2) aplicar permiso con ctx.estadoFactura
+        if (!this.canNuevo) {
+          // puedes navegar a menu o a la lista filtrada
+          this.router.navigate(['/list-lineas-facturas'], {
+            queryParams: { idFactura: this.idFactura }
+          });
+          return;
+        }
+
+        // ✅ 3) si tiene permiso, cargar elementos
+        this.cargarElementos();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMsg = err?.error?.message || 'Error cargando la factura.';
+      }
+    });
   }
 
   cargarElementos() {
-    this.loading = true;
     this.errorMsg = '';
     this.okMsg = '';
 
@@ -132,7 +171,6 @@ export class FormLineasFacturasPage {
     return Number((this.precioUnitario * c).toFixed(2));
   }
 
-  // backend espera descuento como IMPORTE a restar
   get descuentoImporte(): number {
     const pct = Number(this.form.descuentoPct ?? 0);
     const d = this.subtotal * (pct / 100);
@@ -147,6 +185,12 @@ export class FormLineasFacturasPage {
   guardar() {
     this.errorMsg = '';
     this.okMsg = '';
+
+    // ✅ seguridad extra: si alguien entra “a mano” por URL
+    if (!this.canNuevo) {
+      this.errorMsg = 'No tienes permisos para crear líneas en esta factura.';
+      return;
+    }
 
     const user = this.auth.getUser();
     const idUsuario = Number(user?.idUsuario);
@@ -172,8 +216,8 @@ export class FormLineasFacturasPage {
     const dto: CreateLineaFacturaDto = {
       fechaCreacion: new Date().toISOString(),
       cantidad,
-      descuento: this.descuentoImporte,     // ✅ importe de descuento
-      precioUnitario: this.precioUnitario, // ✅ precio del elemento
+      descuento: this.descuentoImporte,
+      precioUnitario: this.precioUnitario,
       idFactura: this.idFactura,
       idElemento: this.form.idElemento,
       idUsuario_creador: idUsuario,

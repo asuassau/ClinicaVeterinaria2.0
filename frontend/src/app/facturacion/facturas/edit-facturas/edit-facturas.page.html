@@ -6,7 +6,7 @@
       <ion-back-button defaultHref="/list-facturas"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="factura && !editMode">
+    <ion-buttons slot="end" *ngIf="factura && !editMode && canEditarFactura">
       <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
@@ -125,13 +125,12 @@
   </div>
 
   <!-- ===================== -->
-  <!-- MODO EDICIÓN -->
+  <!-- MODO EDICIÓN (solo si permiso) -->
   <!-- ===================== -->
-  <div *ngIf="factura && editMode">
+  <div *ngIf="factura && editMode && canEditarFactura">
 
     <form #f="ngForm" (ngSubmit)="guardarCambios()">
 
-      <!-- ID Factura (solo lectura) -->
       <ion-item>
         <ion-label>
           <h2>ID Factura</h2>
@@ -139,7 +138,6 @@
         </ion-label>
       </ion-item>
 
-      <!-- Nº Factura (solo lectura) -->
       <ion-item>
         <ion-label>
           <h2>Nº Factura</h2>
@@ -147,7 +145,6 @@
         </ion-label>
       </ion-item>
 
-      <!-- Fecha creación (solo lectura) -->
       <ion-item>
         <ion-label>
           <h2>Fecha creación</h2>
@@ -155,7 +152,6 @@
         </ion-label>
       </ion-item>
 
-      <!-- Fecha pago (solo lectura, auto) -->
       <ion-item>
         <ion-label>
           <h2>Fecha pago</h2>
@@ -166,7 +162,6 @@
         </ion-label>
       </ion-item>
 
-      <!-- Estado -->
       <ion-item>
         <ion-label position="floating">Estado *</ion-label>
         <ion-select name="estado" [(ngModel)]="form.estado" required>
@@ -176,7 +171,6 @@
         </ion-select>
       </ion-item>
 
-      <!-- FormaPago (bloqueada si ya está Pagada) -->
       <ion-item>
         <ion-label position="floating">Forma de pago</ion-label>
         <ion-select
@@ -192,7 +186,6 @@
         No se puede modificar la forma de pago si la factura está Pagada.
       </ion-note>
 
-      <!-- Descuento % (bloqueado si ya está Pagada) -->
       <ion-item>
         <ion-label position="floating">Descuento (%)</ion-label>
         <ion-input
@@ -207,7 +200,6 @@
         </ion-input>
       </ion-item>
 
-      <!-- Impuesto % (bloqueado si ya está Pagada) -->
       <ion-item>
         <ion-label position="floating">Impuesto (%)</ion-label>
         <ion-input
@@ -222,7 +214,6 @@
         </ion-input>
       </ion-item>
 
-      <!-- Total (solo lectura) -->
       <ion-item>
         <ion-label>
           <h2>Total</h2>
@@ -230,7 +221,6 @@
         </ion-label>
       </ion-item>
 
-      <!-- Emisor (solo lectura) -->
       <ion-item>
         <ion-label>
           <h2>Emisor</h2>
@@ -238,7 +228,6 @@
         </ion-label>
       </ion-item>
 
-      <!-- Pagador: select si NO está pagada -->
       <ion-item *ngIf="!isPagada">
         <ion-label position="floating">Pagador *</ion-label>
         <ion-select name="idUsuario_pagador" [(ngModel)]="form.idUsuario_pagador" required>
@@ -248,7 +237,6 @@
         </ion-select>
       </ion-item>
 
-      <!-- Pagador: texto si está pagada -->
       <ion-item *ngIf="isPagada">
         <ion-label>
           <h2>Pagador</h2>

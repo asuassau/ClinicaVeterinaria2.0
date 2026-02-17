@@ -1,0 +1,212 @@
+:host {
+  /* Paleta veterinaria (coral suave + teal clínico + neutros cálidos) */
+  --vet-primary: #1fb6aa;  /* teal suave */
+  --vet-coral: #ff6f7d;    /* coral suave (acento) */
+  --vet-ink: #1f2937;      /* texto principal */
+  --vet-muted: #6b7280;    /* texto secundario */
+  --vet-surface: #ffffff;  /* tarjetas */
+  --vet-bg: #f7fafc;       /* fondo general */
+  --vet-line: rgba(31, 41, 55, 0.10);
+
+  --vet-radius: 18px;
+  --vet-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+}
+
+ion-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--vet-primary), #7fe3db);
+  --color: #ffffff;
+}
+
+ion-title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+ion-button {
+  --color: #ffffff;
+  font-weight: 700;
+}
+
+ion-content {
+  --background: radial-gradient(900px 600px at 20% 0%, rgba(255, 111, 125, 0.18), transparent 60%),
+               radial-gradient(900px 600px at 90% 10%, rgba(31, 182, 170, 0.20), transparent 55%),
+               var(--vet-bg);
+}
+
+/* Hero / tarjeta de bienvenida */
+.welcome-card {
+  border-radius: var(--vet-radius);
+  box-shadow: var(--vet-shadow);
+  overflow: hidden;
+  background: var(--vet-surface);
+  border: 1px solid var(--vet-line);
+}
+
+.welcome-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.badge-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 111, 125, 0.14);
+  border: 1px solid rgba(255, 111, 125, 0.25);
+}
+
+.badge-icon ion-icon {
+  font-size: 22px;
+  color: var(--vet-coral);
+}
+
+.welcome-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--vet-ink);
+  margin: 0;
+}
+
+.welcome-subtitle {
+  font-size: 13px;
+  color: var(--vet-muted);
+  margin-top: 2px;
+}
+
+/* mensaje pequeño dentro de la tarjeta */
+.welcome-note {
+  margin-top: 10px;
+  color: var(--vet-muted);
+  font-size: 14px;
+}
+
+/* Chip de rol */
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(31, 182, 170, 0.12);
+  border: 1px solid rgba(31, 182, 170, 0.25);
+  color: var(--vet-primary);
+  font-weight: 800;
+  font-size: 12px;
+  width: fit-content;
+}
+
+.role-chip ion-icon {
+  font-size: 16px;
+}
+
+/* Sección */
+.section-title {
+  margin: 16px 4px 10px;
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--vet-ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-hint {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--vet-muted);
+}
+
+/* Lista como “cards” */
+.menu-list {
+  background: transparent;
+}
+
+.menu-item {
+  --background: var(--vet-surface);
+  --border-radius: var(--vet-radius);
+  --inner-padding-end: 14px;
+  --inner-padding-start: 14px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --min-height: 72px;
+
+  margin: 10px 0;
+  border: 1px solid var(--vet-line);
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.menu-item:active {
+  transform: scale(0.99);
+  box-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
+}
+
+/* Icono izquierdo en burbuja */
+.menu-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(31, 182, 170, 0.10);
+  border: 1px solid rgba(31, 182, 170, 0.20);
+  margin-right: 10px;
+}
+
+.menu-icon-wrap ion-icon {
+  font-size: 20px;
+  color: var(--vet-primary);
+}
+
+/* Tipografía dentro del item */
+.menu-item h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--vet-ink);
+}
+
+.menu-item p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--vet-muted);
+}
+
+/* Flechita (detail) más sutil */
+.menu-item ion-note,
+.menu-item .item-detail-icon {
+  color: rgba(31, 41, 55, 0.35);
+}
+
+/* Bloques informativos */
+.state-item {
+  --border-radius: var(--vet-radius);
+  margin-top: 12px;
+  border: 1px solid var(--vet-line);
+}
+
+.state-item ion-icon {
+  color: var(--vet-coral);
+}
+
+/* Botón salir con look “pill” */
+.logout-btn {
+  --background: rgba(255, 255, 255, 0.14);
+  --background-hover: rgba(255, 255, 255, 0.18);
+  --border-radius: 999px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Responsivo suave */
+@media (min-width: 768px) {
+  ion-content .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}

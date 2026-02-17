@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductoService, Producto, ProductoTipo } from '../../../services/producto.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
 type TipoFiltro = ProductoTipo | 'todos';
 
 @Component({
@@ -25,10 +27,29 @@ export class ListProductosPage {
 
   constructor(
     private productoService: ProductoService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
   ) {}
 
+  get canVer(): boolean {
+    return this.permisos.can('productos', 'ver');
+  }
+
+  get canNuevo(): boolean {
+    return this.permisos.can('productos', 'nuevo');
+  }
+
+  get canEliminar(): boolean {
+    return this.permisos.can('productos', 'eliminar');
+  }
+
   ionViewWillEnter() {
+    // ✅ protección de acceso a la vista (si alguien entra por URL)
+    if (!this.canVer) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     this.cargarProductos();
   }
 
@@ -84,6 +105,9 @@ export class ListProductosPage {
   }
 
   eliminarProducto(p: Producto) {
+    // ✅ doble-check (seguridad extra)
+    if (!this.canEliminar) return;
+
     const nombre = p.Elemento?.nombre || `ID ${p.idElemento}`;
     if (!confirm(`¿Seguro que quieres eliminar el producto "${nombre}"?`)) return;
 
@@ -96,12 +120,17 @@ export class ListProductosPage {
   }
 
   verDetalle(p: Producto) {
-    // Ajusta la ruta si la llamas distinto: edit-producto / detalle-producto / etc.
     this.router.navigate(['/edit-productos', p.idElemento]);
   }
 
   crearProducto() {
-    // Ajusta la ruta si la llamas distinto
+    // ✅ doble-check (seguridad extra)
+    if (!this.canNuevo) return;
+
     this.router.navigate(['/form-productos']);
+  }
+
+      volver() {
+    this.router.navigate(['/menu-catalogo']);  
   }
 }

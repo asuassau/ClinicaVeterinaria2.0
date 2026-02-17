@@ -2,7 +2,12 @@
   <ion-toolbar color="primary">
     <ion-title>Usuarios</ion-title>
 
-    <ion-buttons slot="end">
+        <ion-buttons slot="start">
+      <ion-back-button defaultHref="/menu"></ion-back-button>
+    </ion-buttons>
+
+
+    <ion-buttons slot="end" *ngIf="canNuevo">
       <ion-button (click)="crearUsuario()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
@@ -21,7 +26,8 @@
 
     <ion-card-content>
 
-      <ion-item>
+      <!-- ✅ Rol: oculto si Vet/Recep (solo clientes) -->
+      <ion-item *ngIf="!soloClientes">
         <ion-label>Rol</ion-label>
         <ion-select [(ngModel)]="filtroRol" (ionChange)="aplicarFiltros()">
           <ion-select-option value="todos">Todos</ion-select-option>
@@ -44,7 +50,6 @@
     </ion-card-content>
   </ion-card>
 
-
   <!-- LOADING -->
   <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
 
@@ -64,11 +69,13 @@
         <p><b>Rol:</b> {{u.rol}}</p>
       </ion-label>
 
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(u)">
+      <!-- ✅ VER (con permiso, por fila) -->
+      <ion-button *ngIf="canVerUsuario(u)" color="warning" fill="outline" slot="end" (click)="verDetalle(u)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarUsuario(u)">
+      <!-- ✅ ELIMINAR (solo si permitido y solo clientes para vet/recep) -->
+      <ion-button *ngIf="canEliminarUsuario(u)" color="danger" fill="outline" slot="end" (click)="eliminarUsuario(u)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 
@@ -76,8 +83,14 @@
 
   </ion-list>
 
+ 
   <ion-text *ngIf="usuariosFiltrados.length === 0 && !loading">
     <p>No hay usuarios para mostrar.</p>
   </ion-text>
+
+   <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver
+  </ion-button>
+
 
 </ion-content>

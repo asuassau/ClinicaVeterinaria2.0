@@ -6,7 +6,7 @@
       <ion-back-button defaultHref="/list-productos"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="producto && !editMode">
+    <ion-buttons slot="end" *ngIf="producto && !editMode && canEditar">
       <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
@@ -110,7 +110,12 @@
       <!-- Elemento -->
       <ion-item>
         <ion-label position="floating">Nombre *</ion-label>
-        <ion-input name="nombre" [(ngModel)]="form.nombre" required></ion-input>
+        <ion-input
+          name="nombre"
+          [(ngModel)]="form.nombre"
+          required
+          [disabled]="!canEditarCamposBase">
+        </ion-input>
       </ion-item>
 
       <ion-item>
@@ -118,7 +123,8 @@
         <ion-textarea
           name="descripcion"
           [(ngModel)]="form.descripcion"
-          autoGrow="true">
+          autoGrow="true"
+          [disabled]="!canEditarCamposBase">
         </ion-textarea>
       </ion-item>
 
@@ -131,20 +137,26 @@
           [(ngModel)]="form.precio"
           required
           min="0"
-          step="0.01">
+          step="0.01"
+          [disabled]="!canEditarCamposBase">
         </ion-input>
       </ion-item>
 
       <!-- Producto -->
       <ion-item>
         <ion-label position="floating">Tipo *</ion-label>
-        <ion-select name="tipo" [(ngModel)]="form.tipo" required>
+        <ion-select
+          name="tipo"
+          [(ngModel)]="form.tipo"
+          required
+          [disabled]="!canEditarCamposBase">
           <ion-select-option *ngFor="let t of tipos" [value]="t">
             {{ t }}
           </ion-select-option>
         </ion-select>
       </ion-item>
 
+      <!-- ✅ Stock editable para admin/vet/recep -->
       <ion-item>
         <ion-label position="floating">Stock *</ion-label>
         <ion-input
@@ -167,14 +179,20 @@
           [(ngModel)]="form.stockMinimo"
           required
           min="0"
-          step="1">
+          step="1"
+          [disabled]="!canEditarCamposBase">
         </ion-input>
       </ion-item>
 
+      <!-- ✅ Foto editable para admin/vet/recep -->
       <ion-item>
         <ion-label position="floating">Foto (URL o nombre)</ion-label>
         <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
       </ion-item>
+
+      <ion-note color="medium" *ngIf="!canEditarCamposBase" style="margin-left:16px;">
+        Solo puedes modificar <b>stock</b> y <b>foto</b> con tu rol.
+      </ion-note>
 
       <ion-button
         expand="block"

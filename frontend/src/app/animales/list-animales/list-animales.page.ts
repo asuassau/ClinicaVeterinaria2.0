@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { Animal, AnimalService } from '../../services/animal.service';
 import { Usuario, UsuarioService } from '../../services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+import { AuthService } from 'src/app/services/auth.service';
+
 @Component({
   selector: 'app-list-animales',
   templateUrl: './list-animales.page.html',
@@ -28,25 +31,67 @@ export class ListAnimalesPage {
   constructor(
     private animalService: AnimalService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService,
+    private auth: AuthService
   ) {}
 
+  get canVer(): boolean {
+    // Cliente: permisos.ts exige ctx.esPropietario=true
+    if (this.isCliente) {
+      return this.permisos.can('animales', 'ver', { esPropietario: true });
+    }
+    return this.permisos.can('animales', 'ver');
+  }
+
+  get canNuevo(): boolean {
+    return this.permisos.can('animales', 'nuevo');
+  }
+
+  get canEliminar(): boolean {
+    return this.permisos.can('animales', 'eliminar');
+  }
+
+  // ✅ helpers rol/usuario
+  get isCliente(): boolean {
+    return (this.auth.getUserRole() || '') === 'cliente';
+  }
+
+  get idUsuarioLogueado(): number {
+    return Number(this.auth.getUser()?.idUsuario ?? 0);
+  }
+
   ionViewWillEnter() {
+    // ✅ guard de acceso
+    if (!this.canVer) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+        if (this.isCliente && !this.idUsuarioLogueado) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     this.cargarDatos();
   }
 
-  private async cargarDatos() {
+  private cargarDatos() {
     this.loading = true;
     this.errorMsg = '';
 
-    // Cargamos usuarios y animales en paralelo
+    // Cargamos usuarios y animales
     this.usuarioService.getUsuarios().subscribe({
       next: (usuarios) => {
-        this.ownerNameById = this.buildOwnerMap(usuarios);
+        this.ownerNameById = this.buildOwnerMap(usuarios || []);
 
         this.animalService.getAnimales().subscribe({
           next: (animales) => {
-            this.animales = animales;
+            // ✅ filtro por propietario si es cliente
+            const all = (animales || []);
+            this.animales = this.isCliente
+              ? all.filter(a => Number(a.idUsuario) === this.idUsuarioLogueado)
+              : all;
+
             this.aplicarFiltros();
             this.loading = false;
           },
@@ -61,7 +106,11 @@ export class ListAnimalesPage {
         this.ownerNameById = {};
         this.animalService.getAnimales().subscribe({
           next: (animales) => {
-            this.animales = animales;
+            const all = (animales || []);
+            this.animales = this.isCliente
+              ? all.filter(a => Number(a.idUsuario) === this.idUsuarioLogueado)
+              : all;
+
             this.aplicarFiltros();
             this.loading = false;
             this.errorMsg =
@@ -122,6 +171,9 @@ export class ListAnimalesPage {
   }
 
   eliminarAnimal(animal: Animal) {
+    // ✅ seguridad extra (aunque el botón no salga)
+    if (!this.canEliminar) return;
+
     if (!confirm(`¿Seguro que quieres eliminar a ${animal.nombre}?`)) return;
 
     this.animalService.deleteAnimal(animal.idAnimal).subscribe({
@@ -131,12 +183,14 @@ export class ListAnimalesPage {
   }
 
   verDetalle(animal: Animal) {
-    // Ajusta esta ruta cuando crees el detalle
     this.router.navigate(['/edit-animales', animal.idAnimal]);
   }
 
   crearAnimal() {
-    // Ajusta esta ruta cuando crees el formulario
     this.router.navigate(['/form-animales']);
+  }
+
+      volver() {
+    this.router.navigate(['/menu']);  
   }
 }

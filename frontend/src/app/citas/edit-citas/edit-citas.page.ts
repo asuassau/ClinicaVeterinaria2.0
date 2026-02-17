@@ -5,6 +5,9 @@ import { CitaService, Cita, UpdateCitaDto } from '../../services/cita.service';
 import { AnimalService, Animal } from '../../services/animal.service';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 
+import { AuthService } from '../../services/auth.service';
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
 @Component({
   selector: 'app-edit-citas',
   templateUrl: './edit-citas.page.html',
@@ -50,11 +53,44 @@ export class EditCitasPage {
     private router: Router,
     private citaService: CitaService,
     private animalService: AnimalService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private auth: AuthService,
+    private permisos: PermisosService
   ) {}
 
+  // =========================
+  // Permisos
+  // =========================
+  
+  get canVer(): boolean {
+    return this.permisos.can('citas', 'ver');
+  }
+
+  // ✅ EDITAR contextual: para recepcionista bloquea si atendida (y vet/cliente nunca)
+  get canEditar(): boolean {
+    return this.permisos.can('citas', 'editar', { estadoCita: this.cita?.estado });
+  }
+
+  get isCliente(): boolean {
+    return (this.auth.getUserRole() || '') === 'cliente';
+  }
+
+  get idUsuarioLogueado(): number {
+    return Number(this.auth.getUser()?.idUsuario ?? 0);
+  }
+
   ionViewWillEnter() {
+  if (!this.isCliente && !this.canVer) {
+    this.router.navigate(['/menu']);
+    return;
+  }
+
     this.idCita = Number(this.route.snapshot.paramMap.get('id'));
+    if (!this.idCita) {
+      this.errorMsg = 'ID de cita inválido.';
+      return;
+    }
+
     this.cargarDatosBase();
   }
 
@@ -66,17 +102,17 @@ export class EditCitasPage {
     // 1) usuarios
     this.usuarioService.getUsuarios().subscribe({
       next: (users) => {
-        this.usuarios = users;
+        this.usuarios = users || [];
         this.usuariosById = new Map<number, Usuario>();
-        users.forEach(u => this.usuariosById.set(u.idUsuario, u));
+        (users || []).forEach(u => this.usuariosById.set(u.idUsuario, u));
 
-        this.veterinarios = users.filter(u => u.rol === 'veterinario');
-        this.programadores = users.filter(u => u.rol === 'administrador' || u.rol === 'recepcionista');
+        this.veterinarios = (users || []).filter(u => u.rol === 'veterinario');
+        this.programadores = (users || []).filter(u => u.rol === 'administrador' || u.rol === 'recepcionista');
 
         // 2) animales
         this.animalService.getAnimales().subscribe({
           next: (anis) => {
-            this.animales = anis;
+            this.animales = anis || [];
 
             // 3) cita
             this.cargarCita();
@@ -95,10 +131,28 @@ export class EditCitasPage {
   }
 
   private cargarCita() {
-    // OJO: si tu método se llama getCitaById, cambia aquí
     this.citaService.getCitaById(this.idCita).subscribe({
       next: (data) => {
         this.cita = data;
+
+        // ✅ Seguridad extra: si es cliente, solo puede ver sus citas
+        if (this.isCliente) {
+          const idAnimal = Number(data.idAnimal ?? 0);
+          const a = this.animales.find(x => Number(x.idAnimal) === idAnimal);
+
+            if (!a) {
+    this.router.navigate(['/menu']);
+    return;
+  }
+
+          const idDueno = Number((a as any)?.idUsuario ?? 0);
+
+          if (!idDueno || idDueno !== this.idUsuarioLogueado) {
+            this.router.navigate(['/menu']);
+            return;
+          }
+        }
+
         this.form = {
           fecha: data.fecha ?? '',
           HoraIni: data.HoraIni ?? '',
@@ -110,6 +164,12 @@ export class EditCitasPage {
           idUsuario_programa: data.idUsuario_programa as any,
           idUsuario_atiende: data.idUsuario_atiende as any,
         };
+
+        // ✅ si no tiene permiso de editar, jamás dejar editMode activo
+        if (!this.canEditar) {
+          this.editMode = false;
+        }
+
         this.loading = false;
       },
       error: (err) => {
@@ -120,6 +180,11 @@ export class EditCitasPage {
   }
 
   activarEdicion() {
+    if (!this.cita) return;
+
+    // ✅ bloqueo adicional por si se llama desde código
+    if (!this.canEditar) return;
+
     this.editMode = true;
     this.okMsg = '';
     this.errorMsg = '';
@@ -130,7 +195,6 @@ export class EditCitasPage {
     this.okMsg = '';
     this.errorMsg = '';
 
-    // restaurar form desde cita
     if (this.cita) {
       this.form = {
         fecha: this.cita.fecha ?? '',
@@ -149,6 +213,9 @@ export class EditCitasPage {
   guardarCambios() {
     if (!this.cita) return;
 
+    // ✅ seguridad: no permitir update si no puede editar
+    if (!this.canEditar) return;
+
     this.saving = true;
     this.errorMsg = '';
     this.okMsg = '';
@@ -159,13 +226,11 @@ export class EditCitasPage {
       notas: (this.form.notas ?? '').toString().trim() || null,
     };
 
-    // OJO: si tu método se llama updateCita o update, cambia aquí
     this.citaService.updateCita(this.idCita, payload).subscribe({
       next: () => {
         this.saving = false;
         this.okMsg = 'Cita actualizada correctamente';
         this.editMode = false;
-        // recargar para ver datos actualizados en modo detalle
         this.cargarCita();
       },
       error: (err) => {

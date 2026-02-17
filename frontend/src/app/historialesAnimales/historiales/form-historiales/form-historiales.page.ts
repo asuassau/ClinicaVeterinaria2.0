@@ -5,6 +5,9 @@ import { HistorialService, CreateHistorialDto } from 'src/app/services/historial
 import { AnimalService, Animal } from 'src/app/services/animal.service';
 import { UsuarioService, Usuario } from 'src/app/services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 interface AnimalSelectVM {
   idAnimal: number;
   animalNombre: string;
@@ -35,10 +38,21 @@ export class FormHistorialesPage {
     private router: Router,
     private historialService: HistorialService,
     private animalService: AnimalService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private permisos: PermisosService
   ) {}
 
+  get canNuevo(): boolean {
+    return this.permisos.can('historiales', 'nuevo');
+  }
+
   ionViewWillEnter() {
+
+    if (!this.canNuevo) {
+  this.router.navigate(['/menu']);
+  return;
+}
+
     this.cargarAnimalesConDueno();
   }
 

@@ -6,6 +6,9 @@ import {
   TipoServicio
 } from '../../../services/servicio.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 @Component({
   selector: 'app-form-servicios',
   templateUrl: './form-servicios.page.html',
@@ -28,8 +31,21 @@ export class FormServiciosPage {
 
   constructor(
     private servicioService: ServicioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
+
   ) {}
+
+get canNuevo(): boolean {
+  return this.permisos.can('servicios', 'nuevo');
+}
+
+  ionViewWillEnter() {
+if (!this.canNuevo) {
+  this.router.navigate(['/menu']);
+  return;
+}
+  }
 
   guardar() {
     this.loading = true;

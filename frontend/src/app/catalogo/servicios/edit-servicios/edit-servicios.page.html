@@ -6,7 +6,7 @@
       <ion-back-button defaultHref="/list-servicios"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="servicio && !editMode">
+    <ion-buttons slot="end" *ngIf="servicio && !editMode && canEditar">
       <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar

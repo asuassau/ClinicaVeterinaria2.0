@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { AnimalService, CreateAnimalDto } from '../../services/animal.service';
 import { Usuario, UsuarioService } from '../../services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 @Component({
   selector: 'app-form-animales',
   templateUrl: './form-animales.page.html',
@@ -31,10 +34,21 @@ export class FormAnimalesPage {
   constructor(
     private animalService: AnimalService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
+
   ) {}
 
+  get canNuevo(): boolean {
+  return this.permisos.can('animales', 'nuevo');
+}
+
   ionViewWillEnter() {
+if (!this.canNuevo) {
+  this.router.navigate(['/menu']);
+  return;
+}
+
     this.cargarUsuarios();
   }
 

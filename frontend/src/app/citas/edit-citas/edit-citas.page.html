@@ -6,7 +6,8 @@
       <ion-back-button defaultHref="/list-citas"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="cita && !editMode">
+    <!-- ✅ EDITAR solo si puede (y en recepcionista se bloquea si atendida) -->
+    <ion-buttons slot="end" *ngIf="cita && !editMode && canEditar">
       <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
@@ -28,6 +29,11 @@
   <ion-item *ngIf="okMsg" lines="none">
     <ion-label style="color:green">{{ okMsg }}</ion-label>
   </ion-item>
+
+  <!-- ✅ Nota informativa si no puede editar -->
+  <ion-text color="medium" *ngIf="cita && !editMode && !canEditar" style="display:block; margin: 8px 0;">
+    <p>Esta cita no se puede editar con tu perfil (o está en estado <b>atendida</b>).</p>
+  </ion-text>
 
   <!-- ===================== -->
   <!-- MODO DETALLE (VER) -->

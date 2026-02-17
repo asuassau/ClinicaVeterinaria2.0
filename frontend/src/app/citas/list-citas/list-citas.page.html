@@ -2,7 +2,12 @@
   <ion-toolbar color="primary">
     <ion-title>Citas</ion-title>
 
-    <ion-buttons slot="end">
+        <ion-buttons slot="start">
+      <ion-back-button defaultHref="/menu"></ion-back-button>
+    </ion-buttons>
+
+
+    <ion-buttons slot="end" *ngIf="canNuevo">
       <ion-button (click)="crearCita()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
@@ -21,7 +26,8 @@
 
     <ion-card-content>
 
-      <ion-item>
+      <!-- oculto para cliente -->
+      <ion-item *ngIf="!isCliente">
         <ion-label>Veterinario</ion-label>
         <ion-select [(ngModel)]="filtroVeterinario" (ionChange)="aplicarFiltros()">
           <ion-select-option value="todos">Todos</ion-select-option>
@@ -67,11 +73,11 @@
         <p><b>Veterinario:</b> {{ vm.veterinarioNombre }}</p>
       </ion-label>
 
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
+      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarCita(vm)">
+      <ion-button *ngIf="canEliminarVm(vm)" color="danger" fill="outline" slot="end" (click)="eliminarCita(vm)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 
@@ -79,8 +85,13 @@
 
   </ion-list>
 
+
   <ion-text *ngIf="citasFiltradas.length === 0 && !loading">
     <p>No hay citas para mostrar.</p>
   </ion-text>
+
+     <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver
+  </ion-button>
 
 </ion-content>

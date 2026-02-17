@@ -18,4 +18,8 @@ export class MenuCatalogoPage {
   irProductos() {
     this.router.navigate(['/list-productos']); // ajusta ruta si cambia
   }
+
+      volver() {
+    this.router.navigate(['/menu']);  
+  }
 }

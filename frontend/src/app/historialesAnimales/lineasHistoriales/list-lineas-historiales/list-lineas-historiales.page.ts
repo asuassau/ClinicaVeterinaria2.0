@@ -67,8 +67,8 @@ get canEliminar(): boolean {
   return this.permisos.can('lineasHistorial', 'eliminar');
 }
 
-get canEditar(): boolean {
-  return this.permisos.can('lineasHistorial', 'editar');
+get canVer(): boolean {
+  return this.permisos.can('lineasHistorial', 'ver');
 }
 
 

@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>Servicios</ion-title>
+ <ion-buttons slot="start">
+      <ion-back-button defaultHref="/menu-catalogo"></ion-back-button>
+    </ion-buttons>
 
-    <ion-buttons slot="end">
+<ion-buttons slot="end" *ngIf="canNuevo">
       <ion-button (click)="crearServicio()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
@@ -62,11 +65,11 @@
         <p><b>Tipo servicio:</b> {{ s.tipoServicio || '-' }}</p>
       </ion-label>
 
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(s)">
+      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(s)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarServicio(s)">
+      <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarServicio(s)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 
@@ -78,4 +81,7 @@
     <p>No hay servicios para mostrar.</p>
   </ion-text>
 
+    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver
+  </ion-button>
 </ion-content>

@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { FacturaService, Factura, FormaPago } from '../../../services/factura.service';
 import { UsuarioService, Usuario } from '../../../services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
 type FormaPagoFiltro = FormaPago | 'todos';
 
 interface FacturaVM {
@@ -42,8 +44,24 @@ export class ListFacturasPage {
   constructor(
     private facturaService: FacturaService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
   ) {}
+
+  get canNuevo(): boolean {
+    return this.permisos.can('facturas', 'nuevo');
+  }
+
+  get canVer(): boolean {
+    return this.permisos.can('facturas', 'ver');
+  }
+
+  // ✅ ahora es por factura (condicional por estado)
+  canEliminar(vm: FacturaVM): boolean {
+    return this.permisos.can('facturas', 'eliminar', {
+      estadoFactura: vm.estado
+    });
+  }
 
   ionViewWillEnter() {
     this.cargarTodo();
@@ -83,11 +101,10 @@ export class ListFacturasPage {
           pagadorNombre: this.labelUsuario(f.idUsuario_pagador),
         }));
 
-        // opcional: ordenar por fecha desc o id desc
+        // ordenar por id desc
         this.facturasVM.sort((a, b) => (b.idFactura ?? 0) - (a.idFactura ?? 0));
 
         this.aplicarFiltros();
-
         this.loading = false;
       },
       error: (err) => {
@@ -152,7 +169,6 @@ export class ListFacturasPage {
   }
 
   verLineas(vm: FacturaVM) {
-    // Navega a /list-lineas-facturas filtrando por esa factura
     this.router.navigate(['/list-lineas-facturas'], {
       queryParams: { idFactura: vm.idFactura }
     });
@@ -169,4 +185,8 @@ export class ListFacturasPage {
     if (Number.isNaN(n)) return '-';
     return n.toFixed(2);
   }
+    volver() {
+    this.router.navigate(['/menu']);  
+  }
+
 }

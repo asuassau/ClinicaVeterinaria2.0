@@ -6,6 +6,9 @@ import {
   TipoServicio
 } from '../../../services/servicio.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 type TipoFiltro = TipoServicio | 'todos';
 
 @Component({
@@ -30,8 +33,23 @@ export class ListServiciosPage {
 
   constructor(
     private servicioService: ServicioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
+
   ) {}
+
+  get canNuevo(): boolean {
+  return this.permisos.can('servicios', 'nuevo');
+}
+
+
+get canEliminar(): boolean {
+  return this.permisos.can('servicios', 'eliminar');
+}
+
+get canVer(): boolean {
+  return this.permisos.can('servicios', 'ver');
+}
 
   ionViewWillEnter() {
     this.cargarServicios();
@@ -97,4 +115,8 @@ export class ListServiciosPage {
       error: (err) => alert(err?.error?.message || 'Error eliminando servicio')
     });
   }
+    volver() {
+    this.router.navigate(['/menu-catalogo']);  
+  }
+
 }

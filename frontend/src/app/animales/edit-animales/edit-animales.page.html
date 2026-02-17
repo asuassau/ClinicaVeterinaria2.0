@@ -3,10 +3,10 @@
     <ion-title>Detalle de animal</ion-title>
 
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/list-animal"></ion-back-button>
+      <ion-back-button defaultHref="/list-animales"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="animal && !editMode">
+    <ion-buttons slot="end" *ngIf="animal && !editMode && canEditar">
       <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
@@ -107,8 +107,8 @@
 
     <form #f="ngForm" (ngSubmit)="guardarCambios()">
 
-      <!-- Dueño -->
-      <ion-item>
+      <!-- Dueño: solo NO-cliente -->
+      <ion-item *ngIf="!isCliente">
         <ion-label position="floating">Propietario (dueño)</ion-label>
         <ion-select name="idUsuario" [(ngModel)]="form.idUsuario" required>
           <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
@@ -117,44 +117,78 @@
         </ion-select>
       </ion-item>
 
+      <!-- Nombre -->
       <ion-item>
         <ion-label position="floating">Nombre *</ion-label>
-        <ion-input name="nombre" [(ngModel)]="form.nombre" required></ion-input>
+        <ion-input
+          name="nombre"
+          [(ngModel)]="form.nombre"
+          required
+          [disabled]="isCliente">
+        </ion-input>
       </ion-item>
 
+      <!-- Especie -->
       <ion-item>
         <ion-label position="floating">Especie *</ion-label>
-        <ion-input name="especie" [(ngModel)]="form.especie" required></ion-input>
+        <ion-input
+          name="especie"
+          [(ngModel)]="form.especie"
+          required
+          [disabled]="isCliente">
+        </ion-input>
       </ion-item>
 
+      <!-- Raza -->
       <ion-item>
         <ion-label position="floating">Raza</ion-label>
-        <ion-input name="raza" [(ngModel)]="form.raza"></ion-input>
+        <ion-input
+          name="raza"
+          [(ngModel)]="form.raza"
+          [disabled]="isCliente">
+        </ion-input>
       </ion-item>
 
+      <!-- Fecha nacimiento -->
       <ion-item>
         <ion-label position="floating">Fecha de nacimiento</ion-label>
-        <ion-input type="date" name="Fechanac" [(ngModel)]="form.Fechanac"></ion-input>
+        <ion-input
+          type="date"
+          name="Fechanac"
+          [(ngModel)]="form.Fechanac"
+          [disabled]="isCliente">
+        </ion-input>
       </ion-item>
 
+      <!-- Sexo -->
       <ion-item>
         <ion-label position="floating">Sexo</ion-label>
-        <ion-select name="sexo" [(ngModel)]="form.sexo">
+        <ion-select name="sexo" [(ngModel)]="form.sexo" [disabled]="isCliente">
           <ion-select-option [value]="null">-</ion-select-option>
           <ion-select-option value="M">M</ion-select-option>
           <ion-select-option value="H">H</ion-select-option>
         </ion-select>
       </ion-item>
 
+      <!-- Observaciones -->
       <ion-item>
         <ion-label position="floating">Observaciones</ion-label>
-        <ion-textarea name="observaciones" [(ngModel)]="form.observaciones"></ion-textarea>
+        <ion-textarea
+          name="observaciones"
+          [(ngModel)]="form.observaciones"
+          [disabled]="isCliente">
+        </ion-textarea>
       </ion-item>
 
+      <!-- Foto: SIEMPRE editable -->
       <ion-item>
         <ion-label position="floating">Foto (URL o nombre)</ion-label>
         <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
       </ion-item>
+
+      <ion-note color="medium" *ngIf="isCliente" style="margin-left:16px; margin-top:8px;">
+        Como cliente, solo puedes modificar la foto del animal.
+      </ion-note>
 
       <ion-button
         expand="block"

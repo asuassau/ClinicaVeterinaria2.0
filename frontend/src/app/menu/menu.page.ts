@@ -10,6 +10,7 @@ interface MenuItem {
   icon: string;
   roles: Role[];
   description?: string;
+  action?: 'miFicha';
 }
 
 const ALL_MENU_ITEMS: MenuItem[] = [
@@ -18,9 +19,20 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     
     url: '/list-usuario',
     icon: 'people',
-    roles: ['administrador', 'veterinario', 'recepcionista', 'cliente'],
+    roles: ['administrador', 'veterinario', 'recepcionista'],
     description: 'Gestión de usuarios',
   },
+
+  {
+    title: 'Datos personales',
+    
+    url: '',
+    icon: 'people',
+    roles: ['cliente'],
+    description: 'Gestión de datos personales',
+    action: 'miFicha',
+  },
+
   {
     title: 'Citas',
     url: '/list-citas',
@@ -98,9 +110,16 @@ export class MenuPage  {
     }
   }
 
-  goTo(item: MenuItem) {
-    this.router.navigate([item.url]);
+goTo(item: MenuItem) {
+  if (item.action === 'miFicha' && this.role === 'cliente') {
+    const me: any = (this.authService as any).getUser?.();
+    const myId = Number(me?.idUsuario);
+    this.router.navigate(myId ? ['/edit-usuario', myId] : ['/menu']);
+    return;
   }
+
+  this.router.navigate([item.url]);
+}
 
   logout() {
     // Ajusta a tu servicio: clearSession/logout/etc.

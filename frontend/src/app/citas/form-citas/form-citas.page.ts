@@ -5,6 +5,9 @@ import { CitaService, CreateCitaDto } from '../../services/cita.service';
 import { AnimalService, Animal } from '../../services/animal.service';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 @Component({
   selector: 'app-form-citas',
   templateUrl: './form-citas.page.html',
@@ -51,10 +54,20 @@ export class FormCitasPage {
     private citaService: CitaService,
     private animalService: AnimalService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
   ) {}
 
+  get canNuevo(): boolean {
+  return this.permisos.can('citas', 'nuevo');
+}
+  
   ionViewWillEnter() {
+
+    if (!this.canNuevo) {
+  this.router.navigate(['/menu']);
+  return;
+}
     this.cargarDatos();
   }
 

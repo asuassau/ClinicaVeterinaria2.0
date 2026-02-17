@@ -1,11 +1,12 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Detalle de usuario</ion-title>
+
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-usuario"></ion-back-button>
     </ion-buttons>
 
-    <ion-buttons slot="end" *ngIf="usuario && !editMode">
+    <ion-buttons slot="end" *ngIf="usuario && !editMode && canEditarUsuarioTarget()">
       <ion-button (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
@@ -91,12 +92,10 @@
         </ion-label>
       </ion-item>
 
-      <!-- ✅ Contraseña NO se muestra aquí -->
-
     </ion-list>
 
     <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
+      Volver
     </ion-button>
 
   </div>
@@ -123,14 +122,26 @@
         <ion-input type="email" name="email" [(ngModel)]="form.email"></ion-input>
       </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">Rol</ion-label>
-        <ion-select name="rol" [(ngModel)]="form.rol">
-          <ion-select-option *ngFor="let r of roles" [value]="r">
-            {{ r }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      <!-- ✅ ROL: solo Admin puede editarlo -->
+      <ng-container *ngIf="canEditarRol; else rolSoloLectura">
+        <ion-item>
+          <ion-label position="floating">Rol</ion-label>
+          <ion-select name="rol" [(ngModel)]="form.rol">
+            <ion-select-option *ngFor="let r of roles" [value]="r">
+              {{ r }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ng-container>
+
+      <ng-template #rolSoloLectura>
+        <ion-item>
+          <ion-label>
+            <h2>Rol</h2>
+            <p>{{ usuario.rol || '-' }}</p>
+          </ion-label>
+        </ion-item>
+      </ng-template>
 
       <ion-item>
         <ion-label position="floating">NIF</ion-label>
@@ -147,7 +158,6 @@
         <ion-input name="direccion" [(ngModel)]="form.direccion"></ion-input>
       </ion-item>
 
-      <!-- ✅ Contraseña SOLO en edición (vacía por defecto) -->
       <ion-item>
         <ion-label position="floating">Nueva contraseña (opcional)</ion-label>
         <ion-input
@@ -178,4 +188,3 @@
   </div>
 
 </ion-content>
-

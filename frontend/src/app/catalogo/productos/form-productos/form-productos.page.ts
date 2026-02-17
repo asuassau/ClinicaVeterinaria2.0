@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductoService, CreateProductoDto, ProductoTipo } from '../../../services/producto.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
 @Component({
   selector: 'app-form-productos',
   templateUrl: './form-productos.page.html',
@@ -27,10 +29,28 @@ export class FormProductosPage {
 
   constructor(
     private productoService: ProductoService,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
   ) {}
 
+  get canNuevo(): boolean {
+    return this.permisos.can('productos', 'nuevo');
+  }
+
+  ionViewWillEnter() {
+    if (!this.canNuevo) {
+      this.router.navigate(['/menu']);
+      return; // ✅ importante
+    }
+  }
+
   guardar() {
+    // ✅ doble blindaje (si alguien fuerza la acción)
+    if (!this.canNuevo) {
+      this.errorMsg = 'No tienes permisos para crear productos.';
+      return;
+    }
+
     this.errorMsg = '';
     this.okMsg = '';
     this.loading = true;

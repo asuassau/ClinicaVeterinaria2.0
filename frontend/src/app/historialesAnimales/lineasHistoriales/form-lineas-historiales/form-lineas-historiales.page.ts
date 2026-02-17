@@ -8,6 +8,9 @@ import {
   TipoLineaHistorial
 } from 'src/app/services/linea-historial.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 @Component({
   selector: 'app-form-lineas-historiales',
   templateUrl: './form-lineas-historiales.page.html',
@@ -36,10 +39,23 @@ export class FormLineasHistorialesPage {
     private route: ActivatedRoute,
     private router: Router,
     private auth: AuthService,
-    private lineaHistorialService: LineaHistorialService
+    private lineaHistorialService: LineaHistorialService,
+    private permisos: PermisosService
+
   ) {}
 
+  get canNuevo(): boolean {
+    return this.permisos.can('lineasHistorial', 'nuevo');
+  }
+
+
   ionViewWillEnter() {
+
+if (!this.canNuevo) {
+  this.router.navigate(['/menu']);
+  return;
+}
+
     const id = this.route.snapshot.queryParamMap.get('idHistorial');
     this.idHistorial = Number(id);
 

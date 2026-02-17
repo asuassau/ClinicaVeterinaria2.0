@@ -10,6 +10,8 @@ import {
   FormaPago
 } from 'src/app/services/factura.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
 interface UsuarioSelect {
   idUsuario: number;
   dni?: string;
@@ -58,10 +60,32 @@ export class EditFacturasPage {
     private route: ActivatedRoute,
     private router: Router,
     private facturaService: FacturaService,
-    private auth: AuthService
+    private auth: AuthService,
+    private permisos: PermisosService
   ) {}
 
+  // ---- Permisos base ----
+  get canVer(): boolean {
+    return this.permisos.can('facturas', 'ver');
+  }
+
+  /**
+   * Permiso de edición con contexto (estadoFactura).
+   * Aunque ahora mismo tu permisos.ts para facturas no depende del estado,
+   * esto deja el código preparado para reglas condicionales por estado.
+   */
+  get canEditarFactura(): boolean {
+    return this.permisos.can('facturas', 'editar', {
+      estadoFactura: this.factura?.estado
+    });
+  }
+
   ionViewWillEnter() {
+    if (!this.canVer) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     const id = this.route.snapshot.paramMap.get('id');
     this.idFactura = Number(id);
 
@@ -74,7 +98,7 @@ export class EditFacturasPage {
   }
 
   get isPagada(): boolean {
-    return (this.factura?.estado === 'Pagada');
+    return this.factura?.estado === 'Pagada';
   }
 
   cargarUsuariosYFactura() {
@@ -93,12 +117,14 @@ export class EditFacturasPage {
           email: u.email ?? ''
         }));
 
-        // Luego factura con include para traer Pagador/Emisor si lo tienes
         this.facturaService.getFacturaById(this.idFactura, true).subscribe({
           next: (f) => {
             this.factura = f;
             this.precargarForm(f);
             this.loading = false;
+
+            // Si alguien entra aquí sin permiso real de edición, forzamos modo vista
+            if (!this.canEditarFactura) this.editMode = false;
           },
           error: (err) => {
             this.loading = false;
@@ -115,6 +141,14 @@ export class EditFacturasPage {
 
   activarEdicion() {
     if (!this.factura) return;
+
+    if (!this.canEditarFactura) {
+      this.errorMsg = 'No tienes permisos para editar facturas.';
+      this.okMsg = '';
+      this.editMode = false;
+      return;
+    }
+
     this.editMode = true;
     this.okMsg = '';
     this.errorMsg = '';
@@ -185,6 +219,13 @@ export class EditFacturasPage {
   guardarCambios() {
     if (!this.factura) return;
 
+    if (!this.canEditarFactura) {
+      this.errorMsg = 'No tienes permisos para editar facturas.';
+      this.okMsg = '';
+      this.editMode = false;
+      return;
+    }
+
     this.saving = true;
     this.errorMsg = '';
     this.okMsg = '';
@@ -198,10 +239,7 @@ export class EditFacturasPage {
 
     const dto: UpdateFacturaDto & { idUsuario_pagador?: number; FechaPago?: string } = {
       estado: this.form.estado,
-      // solo enviar formaPago si no está pagada (o si la factura aún no está pagada)
       formaPago: this.isPagada ? undefined : (this.form.formaPago ?? null),
-
-      // bloquear desc/impuesto si ya está pagada
       descPct: this.isPagada ? undefined : Number(this.form.descPct ?? 0),
       impuestoPct: this.isPagada ? undefined : Number(this.form.impuestoPct ?? 7),
     };
@@ -211,7 +249,7 @@ export class EditFacturasPage {
       dto.idUsuario_pagador = Number(this.form.idUsuario_pagador);
     }
 
-    // FechaPago automática al cambiar a Pagada (si antes no estaba Pagada y no tiene FechaPago)
+    // FechaPago automática al cambiar a Pagada
     const before = this.factura.estado;
     const alreadyHasFechaPago = !!this.factura.FechaPago;
 
@@ -231,7 +269,6 @@ export class EditFacturasPage {
         this.okMsg = 'Factura actualizada correctamente.';
         this.editMode = false;
 
-        // recargar para ver total/FechaPago actualizados
         this.facturaService.getFacturaById(this.idFactura, true).subscribe({
           next: (f) => {
             this.factura = f;

@@ -2,7 +2,11 @@
   <ion-toolbar color="primary">
     <ion-title>Animales</ion-title>
 
-    <ion-buttons slot="end">
+        <ion-buttons slot="start">
+      <ion-back-button defaultHref="/menu"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="canNuevo">
       <ion-button (click)="crearAnimal()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
@@ -62,19 +66,24 @@
         <p><b>Raza:</b> {{ a.raza || '-' }}</p>
       </ion-label>
 
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(a)">
+      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(a)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarAnimal(a)">
+      <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarAnimal(a)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 
     </ion-item>
   </ion-list>
 
+
   <ion-text *ngIf="animalesFiltrados.length === 0 && !loading">
     <p>No hay animales para mostrar.</p>
   </ion-text>
+
+      <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver
+  </ion-button>
 
 </ion-content>

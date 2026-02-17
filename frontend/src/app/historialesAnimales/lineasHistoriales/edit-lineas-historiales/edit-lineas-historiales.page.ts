@@ -51,7 +51,17 @@ export class EditLineasHistorialesPage {
   return this.permisos.can('lineasHistorial', 'editar');
 }
 
+get canVer(): boolean {
+  return this.permisos.can('lineasHistorial', 'ver');
+} 
+
   ionViewWillEnter() {
+
+if (!this.canVer) {
+  this.router.navigate(['/menu']);
+  return;
+}
+
     const id = this.route.snapshot.paramMap.get('id');
     this.idLineaHistorial = Number(id);
 

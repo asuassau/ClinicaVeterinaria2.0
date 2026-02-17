@@ -46,18 +46,40 @@
       Introduce un email válido.
     </ion-note>
 
-    <ion-item>
-      <ion-label position="floating">Rol *</ion-label>
-      <ion-select name="rol" [(ngModel)]="form.rol" required #rol="ngModel">
-        <ion-select-option value="administrador">Administrador</ion-select-option>
-        <ion-select-option value="veterinario">Veterinario</ion-select-option>
-        <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
-        <ion-select-option value="cliente">Cliente</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="rol.invalid && rol.touched" style="margin-left:16px;">
-      El rol es obligatorio.
-    </ion-note>
+    <!-- ✅ ROL: Admin select / resto solo lectura -->
+    <ng-container *ngIf="canElegirRol; else rolSoloLectura">
+      <ion-item>
+        <ion-label position="floating">Rol *</ion-label>
+        <ion-select
+          name="rol"
+          [(ngModel)]="form.rol"
+          required
+          #rol="ngModel"
+          (ionChange)="onRolChange()">
+          <ion-select-option value="administrador">Administrador</ion-select-option>
+          <ion-select-option value="veterinario">Veterinario</ion-select-option>
+          <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
+          <ion-select-option value="cliente">Cliente</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-note color="danger" *ngIf="rol.invalid && rol.touched" style="margin-left:16px;">
+        El rol es obligatorio.
+      </ion-note>
+    </ng-container>
+
+    <ng-template #rolSoloLectura>
+      <ion-item>
+        <ion-label>
+          <h2>Rol</h2>
+          <p>cliente</p>
+        </ion-label>
+      </ion-item>
+      <ion-text color="medium">
+        <p style="margin: 6px 16px 0 16px;">
+          * Tu rol no permite crear usuarios con otros roles.
+        </p>
+      </ion-text>
+    </ng-template>
 
     <ion-item>
       <ion-label position="floating">NIF</ion-label>

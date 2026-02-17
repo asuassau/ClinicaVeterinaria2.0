@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+
 import { LineaFacturaService, LineaFactura } from '../../../services/linea-factura.service';
 import { FacturaService, Factura } from '../../../services/factura.service';
+import { PermisosService } from 'src/app/seguridad/permisos.service';
 
 @Component({
   selector: 'app-list-lineas-facturas',
@@ -16,17 +19,44 @@ export class ListLineasFacturasPage {
   idFactura!: number;
 
   lineas: LineaFactura[] = [];
-  factura: Factura | null = null; // opcional para mostrar total/estado
+  factura: Factura | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private lineaService: LineaFacturaService,
-    private facturaService: FacturaService
+    private facturaService: FacturaService,
+    private permisos: PermisosService
   ) {}
 
+  // ---- ctx dinámico (estado de la factura) ----
+  private get ctxFactura() {
+    return { estadoFactura: this.factura?.estado };
+  }
+
+  get canVer(): boolean {
+    return this.permisos.can('lineasFactura', 'ver', this.ctxFactura);
+  }
+
+  get canNuevoLinea(): boolean {
+    return this.permisos.can('lineasFactura', 'nuevo', this.ctxFactura);
+  }
+
+  get canEliminarLinea(): boolean {
+    return this.permisos.can('lineasFactura', 'eliminar', this.ctxFactura);
+  }
+
+  get facturaCerrada(): boolean {
+    return String(this.factura?.estado ?? '').trim().toLowerCase() === 'pagada';
+  }
+
   ionViewWillEnter() {
-    // ✅ viene por queryParams: /list-lineas-facturas?idFactura=123
+    // Cliente NO debe entrar aquí (según permisos.ts)
+    if (!this.permisos.can('lineasFactura', 'ver')) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     const id = this.route.snapshot.queryParamMap.get('idFactura');
     this.idFactura = Number(id);
 
@@ -42,22 +72,26 @@ export class ListLineasFacturasPage {
     this.loading = true;
     this.errorMsg = '';
 
-    // líneas (incluye Elemento)
-    this.lineaService.getLineasByFactura(this.idFactura, true).subscribe({
-      next: (data) => {
-        this.lineas = data || [];
+    forkJoin({
+      factura: this.facturaService.getFacturaById(this.idFactura, false),
+      lineas: this.lineaService.getLineasByFactura(this.idFactura, true),
+    }).subscribe({
+      next: ({ factura, lineas }) => {
+        this.factura = factura;
+        this.lineas = lineas || [];
         this.loading = false;
+
+        // si por lo que sea no tiene permiso real al final (ej: cambios de rol), fuera
+        if (!this.canVer) {
+          this.router.navigate(['/menu']);
+          return;
+        }
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err?.error?.message || 'Error cargando líneas de factura.';
+        this.errorMsg =
+          err?.error?.message || 'Error cargando factura o líneas de factura.';
       }
-    });
-
-    // opcional: traer factura para mostrar total calculado
-    this.facturaService.getFacturaById(this.idFactura, false).subscribe({
-      next: (f) => (this.factura = f),
-      error: () => {}
     });
   }
 
@@ -75,6 +109,11 @@ export class ListLineasFacturasPage {
   }
 
   eliminarLinea(l: LineaFactura) {
+    if (!this.canEliminarLinea) {
+      alert('No tienes permisos para eliminar líneas de factura.');
+      return;
+    }
+
     const nombre = this.nombreElemento(l);
     if (!confirm(`¿Eliminar la línea "${nombre}"?`)) return;
 
@@ -85,10 +124,17 @@ export class ListLineasFacturasPage {
   }
 
   verDetalle(l: LineaFactura) {
-    this.router.navigate(['/edit-lineas-facturas', l.idLineaFactura]);
+    this.router.navigate(['/edit-lineas-facturas', l.idLineaFactura], {
+      queryParams: { idFactura: this.idFactura }
+    });
   }
 
   crearLinea() {
+    if (!this.canNuevoLinea) {
+      alert('No tienes permisos para crear líneas de factura.');
+      return;
+    }
+
     this.router.navigate(['/form-lineas-facturas'], {
       queryParams: { idFactura: this.idFactura }
     });

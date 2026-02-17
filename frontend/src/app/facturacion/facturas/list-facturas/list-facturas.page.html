@@ -2,7 +2,11 @@
   <ion-toolbar color="primary">
     <ion-title>Facturas</ion-title>
 
-    <ion-buttons slot="end">
+        <ion-buttons slot="start">
+      <ion-back-button defaultHref="/menu"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="canNuevo">
       <ion-button (click)="crearFactura()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
@@ -69,12 +73,12 @@
       </ion-label>
 
       <!-- VER -->
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
+      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <!-- BORRAR -->
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarFactura(vm)">
+      <!-- BORRAR (condicional por estado) -->
+      <ion-button *ngIf="canEliminar(vm)" color="danger" fill="outline" slot="end" (click)="eliminarFactura(vm)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
 
@@ -90,5 +94,7 @@
   <ion-text *ngIf="facturasFiltradas.length === 0 && !loading">
     <p>No hay facturas para mostrar.</p>
   </ion-text>
-
+ <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
+      Volver
+  </ion-button>
 </ion-content>

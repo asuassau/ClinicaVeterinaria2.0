@@ -2,6 +2,11 @@
   <ion-toolbar color="primary">
     <ion-title>Líneas de historial</ion-title>
 
+        <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-historiales"></ion-back-button>
+    </ion-buttons>
+
+
 <ion-buttons slot="end" *ngIf="canNuevo">
   <ion-button (click)="crearLinea()">
         <ion-icon name="add" slot="start"></ion-icon>
@@ -90,7 +95,7 @@
       </ion-label>
 
       <!-- VER DETALLE -->
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
+      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 

@@ -66,21 +66,15 @@ get canEliminar(): boolean {
   return this.permisos.can('historiales', 'eliminar');
 }
 
-get canEditar(): boolean {
-  return this.permisos.can('historiales', 'editar');
-}
-
 get canVer(): boolean {
   return this.permisos.can('historiales', 'ver');
 }
 
 
-
-
-
-
   ionViewWillEnter() {
+
     this.cargarTodo();
+
   }
 
   private cargarTodo() {
@@ -227,5 +221,9 @@ get canVer(): boolean {
 
     const left = dni ? dni : String(u.idUsuario);
     return `${left} - ${nombre || '(sin nombre)'}`;
+  }
+
+      volver() {
+    this.router.navigate(['/menu']);  
   }
 }

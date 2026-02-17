@@ -2,7 +2,12 @@
   <ion-toolbar color="primary">
     <ion-title>Líneas de factura</ion-title>
 
-    <ion-buttons slot="end">
+        <ion-buttons slot="start">
+      <ion-back-button defaultHref="/list-facturas"></ion-back-button>
+    </ion-buttons>
+
+
+    <ion-buttons slot="end" *ngIf="canNuevoLinea">
       <ion-button (click)="crearLinea()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
@@ -13,7 +18,7 @@
 
 <ion-content class="ion-padding">
 
-  <!-- INFO FACTURA (opcional) -->
+  <!-- INFO FACTURA -->
   <ion-card *ngIf="factura">
     <ion-card-header>
       <ion-card-title>Factura #{{ factura.idFactura }}</ion-card-title>
@@ -22,6 +27,13 @@
     <ion-card-content>
       <p><b>Estado:</b> {{ factura.estado }}</p>
       <p><b>Total (calculado):</b> {{ factura.total }}</p>
+
+      <!-- aviso útil -->
+      <ion-text color="medium" *ngIf="!canNuevoLinea">
+        <p style="margin-top:10px;">
+          No se pueden crear líneas en esta factura (solo permitido si está <b>Pagada</b> según permisos).
+        </p>
+      </ion-text>
     </ion-card-content>
   </ion-card>
 
@@ -45,11 +57,13 @@
         <p><b>Importe:</b> {{ importeLinea(l) }}</p>
       </ion-label>
 
-      <ion-button color="warning" fill="outline" slot="end" (click)="verDetalle(l)">
+      <!-- Ver detalle (esto es "ver") -->
+      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(l)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <ion-button color="danger" fill="outline" slot="end" (click)="eliminarLinea(l)">
+      <!-- Eliminar (solo si permiso con ctx estadoFactura) -->
+      <ion-button *ngIf="canEliminarLinea" color="danger" fill="outline" slot="end" (click)="eliminarLinea(l)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
     </ion-item>

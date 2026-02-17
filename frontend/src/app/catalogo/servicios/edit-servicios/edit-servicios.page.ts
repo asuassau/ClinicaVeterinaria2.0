@@ -7,6 +7,9 @@ import {
   TipoServicio
 } from '../../../services/servicio.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 @Component({
   selector: 'app-edit-servicios',
   templateUrl: './edit-servicios.page.html',
@@ -38,10 +41,28 @@ export class EditServiciosPage {
   constructor(
     private servicioService: ServicioService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private permisos: PermisosService
+
   ) {}
 
+  get canVer(): boolean {
+  return this.permisos.can('servicios', 'ver');
+}
+
+
+get canEditar(): boolean {
+  return this.permisos.can('servicios', 'editar');
+}
+
+
   ionViewWillEnter() {
+
+if (!this.canVer) {
+  this.router.navigate(['/menu']);
+  return;
+} 
+
     const id = this.route.snapshot.paramMap.get('id');
     this.idElemento = Number(id);
 

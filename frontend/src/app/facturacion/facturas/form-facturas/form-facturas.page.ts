@@ -9,6 +9,9 @@ import {
   FormaPago
 } from 'src/app/services/factura.service';
 
+import { PermisosService } from 'src/app/seguridad/permisos.service';
+
+
 interface UsuarioSelect {
   idUsuario: number;
   dni?: string;
@@ -52,10 +55,25 @@ export class FormFacturasPage {
   constructor(
     private router: Router,
     private auth: AuthService,
-    private facturaService: FacturaService
+    private facturaService: FacturaService,
+    private permisos: PermisosService
+
   ) {}
 
+get canNuevo(): boolean {
+  return this.permisos.can('facturas', 'nuevo');
+}
+
+
+
   ionViewWillEnter() {
+
+    if (!this.canNuevo) {
+  this.router.navigate(['/menu']);
+  return;
+}
+
+
     const user = this.auth.getUser();
     this.idUsuario_emisor = Number(user?.idUsuario);
 

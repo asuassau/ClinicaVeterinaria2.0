@@ -9,6 +9,21 @@
 
 <ion-content class="ion-padding">
 
+  <!-- INFO FACTURA -->
+  <ion-card *ngIf="factura">
+    <ion-card-header>
+      <ion-card-title>Factura #{{ factura.idFactura }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><b>Estado:</b> {{ factura.estado }}</p>
+      <ion-text color="danger" *ngIf="!canNuevo">
+        <p style="margin-top:10px;">
+          No tienes permiso para crear líneas en esta factura.
+        </p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+
   <form #f="ngForm" (ngSubmit)="guardar()">
 
     <!-- ELEMENTO -->
@@ -19,7 +34,8 @@
         [(ngModel)]="form.idElemento"
         required
         (ionChange)="onElementoChange()"
-        #idElemento="ngModel">
+        #idElemento="ngModel"
+        [disabled]="!canNuevo">
 
         <ion-select-option *ngFor="let e of elementos" [value]="e.idElemento">
           {{ elementoLabel(e) }}
@@ -42,7 +58,8 @@
         required
         min="1"
         step="1"
-        #cantidad="ngModel">
+        #cantidad="ngModel"
+        [disabled]="!canNuevo">
       </ion-input>
     </ion-item>
     <ion-note color="danger" *ngIf="cantidad.invalid && cantidad.touched" style="margin-left:16px;">
@@ -59,7 +76,8 @@
         [(ngModel)]="form.descuentoPct"
         min="0"
         max="100"
-        step="0.01">
+        step="0.01"
+        [disabled]="!canNuevo">
       </ion-input>
     </ion-item>
 
@@ -95,7 +113,7 @@
     <ion-button
       expand="block"
       type="submit"
-      [disabled]="f.invalid || loading"
+      [disabled]="!canNuevo || f.invalid || loading"
       style="margin-top: 18px;">
       {{ loading ? 'Guardando...' : 'Guardar' }}
     </ion-button>
