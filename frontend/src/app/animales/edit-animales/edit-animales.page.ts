@@ -6,6 +6,9 @@ import { Usuario, UsuarioService } from '../../services/usuario.service';
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 import { AuthService } from 'src/app/services/auth.service';
 
+import { PhotoService } from '../../services/photo.service';
+
+
 type Sexo = 'M' | 'H' | '';
 
 @Component({
@@ -45,8 +48,15 @@ export class EditAnimalesPage {
     private animalService: AnimalService,
     private usuarioService: UsuarioService,
     private permisos: PermisosService,
-    private auth: AuthService
+    private auth: AuthService,
+    private photoService: PhotoService,
+
   ) {}
+
+  capturedPhoto: string = "";
+  originalPhoto: string = "";
+
+  removeImage = false;
 
   /* ================== PERMISOS ================== */
 
@@ -139,9 +149,17 @@ get canVer(): boolean {
       Fechanac: this.animal.Fechanac ?? null,
       sexo: this.animal.sexo ?? null,
       observaciones: this.animal.observaciones ?? '',
-      foto: this.animal.foto ?? '',
       idUsuario: this.animal.idUsuario ?? undefined,
     };
+if (this.animal.foto) {
+  const url = 'http://localhost:8080/images/' + this.animal.foto;
+  this.originalPhoto = url;
+  this.capturedPhoto = url; // 👈 importante: siempre URL para el <ion-img>
+} else {
+  this.originalPhoto = '';
+  this.capturedPhoto = '';
+}
+this.removeImage = false; // resetea estado al cargar
   }
 
   ownerLabelById(idUsuario: number | null | undefined): string {
@@ -163,18 +181,21 @@ get canVer(): boolean {
     this.rellenarFormDesdeAnimal();
   }
 
-  guardarCambios() {
+  async guardarCambios() {
     if (!this.animal) return;
 
     this.saving = true;
+
+    let blob: Blob | null = null;
+
 
     let payload: UpdateAnimalDto;
 
     // 🔒 CLIENTE solo puede modificar FOTO
     if (this.isCliente) {
       payload = {
-        foto: this.form.foto?.trim() || null
       };
+      (payload as any).removeImage = this.removeImage;
     } else {
       payload = {
         ...this.form,
@@ -182,11 +203,15 @@ get canVer(): boolean {
         sexo: this.form.sexo || null,
         raza: this.form.raza?.trim() || null,
         observaciones: this.form.observaciones?.trim() || null,
-        foto: this.form.foto?.trim() || null,
       };
+      (payload as any).removeImage = this.removeImage;
     }
+if (!this.removeImage && this.capturedPhoto && this.capturedPhoto !== this.originalPhoto) {
+  const response = await fetch(this.capturedPhoto);
+  blob = await response.blob();
+}
 
-    this.animalService.updateAnimal(this.idAnimal, payload).subscribe({
+    this.animalService.updateAnimal(this.idAnimal, payload,  blob ?? undefined).subscribe({
       next: () => {
         this.saving = false;
         this.okMsg = 'Animal actualizado correctamente.';
@@ -207,6 +232,29 @@ private get isPropietarioAnimal(): boolean {
   if (!this.isCliente) return false;
   return !!this.animal && Number(this.animal.idUsuario) === this.idUsuarioLogueado;
 }
+
+  //metodos para las gestión de la foto 
+  takePhoto() {
+
+    this.photoService.takePhoto().then(data => {
+      this.capturedPhoto = data.webPath ? data.webPath : "";
+      this.removeImage = false;
+    });
+  }
+
+  pickImage() {
+
+    this.photoService.pickImage().then(data => {
+      this.capturedPhoto = data.webPath;
+      this.removeImage = false;
+    });
+  }
+
+  discardImage() {
+
+    this.capturedPhoto = "";
+    this.removeImage = true;
+  }
 
 
 }

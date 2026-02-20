@@ -6,6 +6,12 @@ exports.create = async (req, res) => {
     if (!req.body.nombre || !req.body.idUsuario) {
       return res.status(400).send({ message: "nombre e idUsuario son obligatorios." });
     }
+    if (req.file) {
+      req.body.foto = req.file.filename;
+    } else {
+      req.body.foto = "";
+    }
+
     const data = await Animal.create(req.body);
     return res.send(data);
   } catch (err) {
@@ -36,6 +42,18 @@ exports.findOne = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
+
+      const removeImage =
+    req.body.removeImage === true ||
+    req.body.removeImage === 'true' ||
+    req.body.removeImage === '1' ||
+    req.body.removeImage === 1;
+    if (req.file) {
+      req.body.foto = req.file.filename;
+    } 
+    if (removeImage) {
+      req.body.foto = null;
+  }
     const [num] = await Animal.update(req.body, { where: { idAnimal: id } });
     if (num === 1) return res.send({ message: "Animal actualizado correctamente." });
     return res.send({ message: `No ha sido posible actualizar Animal id=${id}.` });

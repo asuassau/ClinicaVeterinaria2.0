@@ -6,10 +6,53 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content class="ion-padding">
-  <form #f="ngForm" (ngSubmit)="guardar()">
 
+ <ion-grid class="photo-grid">
+        <ion-row class="ion-align-items-center">
+          <ion-col size="12" size-md="6">
+            <div class="photo-box" (click)="takePhoto()">
+              <ion-img
+                *ngIf="capturedPhoto"
+                class="photo-frame"
+                [src]="capturedPhoto">
+              </ion-img>
+
+              <ion-img
+                *ngIf="!capturedPhoto"
+                class="photo-frame placeholder"
+                src="../../assets/No-Image-Placeholder.svg">
+              </ion-img>
+
+              <div class="photo-hint">
+                <ion-icon name="camera-outline"></ion-icon>
+                <span>Toca para cambiar</span>
+              </div>
+            </div>
+          </ion-col>
+
+          <ion-col size="12" size-md="6">
+            <div class="photo-actions">
+              <ion-button class="action-btn" fill="outline" (click)="takePhoto()">
+                <ion-icon slot="start" name="camera-outline"></ion-icon>
+                Take a photo
+              </ion-button>
+
+              <ion-button class="action-btn" fill="outline" (click)="pickImage()">
+                <ion-icon slot="start" name="image-outline"></ion-icon>
+                Pick an image
+              </ion-button>
+
+              <ion-button class="action-btn danger" fill="outline" (click)="discardImage()">
+                <ion-icon slot="start" name="aperture"></ion-icon>
+                Discard image
+              </ion-button>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+  <form #f="ngForm" (ngSubmit)="guardar()">
     <!-- PROPIETARIO -->
     <ion-item>
       <ion-label position="floating">Propietario *</ion-label>
@@ -87,11 +130,11 @@
       </ion-textarea>
     </ion-item>
 
-    <!-- FOTO (URL o nombre de archivo, según tu backend) -->
+    <!-- FOTO (URL o nombre de archivo, según tu backend)
     <ion-item>
       <ion-label position="floating">Foto (opcional)</ion-label>
       <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
-    </ion-item>
+    </ion-item> -->
 
     <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
       {{ errorMsg }}

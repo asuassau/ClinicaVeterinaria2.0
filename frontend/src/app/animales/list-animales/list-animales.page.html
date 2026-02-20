@@ -59,6 +59,19 @@
   <ion-list *ngIf="!loading">
     <ion-item *ngFor="let a of animalesFiltrados">
 
+<ion-avatar class="fleet-avatar" slot="start">
+          <img
+            *ngIf="a.foto; else placeholder"
+            src="http://localhost:8080/images/{{a.foto}}"
+            alt="image"
+          />
+          <ng-template #placeholder>
+            <div class="avatar-placeholder">
+              <ion-icon name="camera-outline"></ion-icon>
+            </div>
+          </ng-template>
+        </ion-avatar>
+
       <ion-label>
         <h2>{{ a.nombre }}</h2>
         <p><b>Propietario:</b> {{ getOwnerName(a.idUsuario) }}</p>

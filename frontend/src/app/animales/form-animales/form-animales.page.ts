@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnimalService, CreateAnimalDto } from '../../services/animal.service';
 import { Usuario, UsuarioService } from '../../services/usuario.service';
+import { PhotoService } from '../../services/photo.service';
 
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 
@@ -27,7 +28,7 @@ export class FormAnimalesPage {
     Fechanac: null,
     sexo: null,
     observaciones: '',
-    foto: null,
+    //foto: null,
     idUsuario: null as any, // lo dejamos null hasta seleccionar
   };
 
@@ -35,9 +36,16 @@ export class FormAnimalesPage {
     private animalService: AnimalService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private permisos: PermisosService
-
+    private permisos: PermisosService,
+    private photoService: PhotoService,
   ) {}
+
+  capturedPhoto: string = "";
+  originalPhoto: string = "";
+
+  removeImage = false;
+
+
 
   get canNuevo(): boolean {
   return this.permisos.can('animales', 'nuevo');
@@ -70,10 +78,21 @@ if (!this.canNuevo) {
     return `${u.idUsuario} - ${name}`;
   }
 
-  guardar() {
+  async guardar() {
     this.errorMsg = '';
     this.okMsg = '';
     this.loading = true;
+
+     let blob: Blob | null = null;
+
+if (this.capturedPhoto && this.capturedPhoto !== this.originalPhoto) {
+  try {
+    const response = await fetch(this.capturedPhoto);
+    blob = await response.blob();
+  } catch (e) {
+    blob = null;
+  }
+}
 
     // Normaliza datos antes de enviar
     const payload: CreateAnimalDto = {
@@ -84,11 +103,11 @@ if (!this.canNuevo) {
       observaciones: (this.form.observaciones ?? '').trim() || null,
       Fechanac: this.form.Fechanac || null,
       sexo: this.form.sexo || null,
-      foto: this.form.foto || null,
+      //foto: this.form.foto || null,
       idUsuario: Number(this.form.idUsuario),
     };
 
-    this.animalService.createAnimal(payload).subscribe({
+    this.animalService.createAnimal(payload, blob ?? undefined).subscribe({
       next: () => {
         this.loading = false;
         this.okMsg = 'Animal creado correctamente';
@@ -104,5 +123,28 @@ if (!this.canNuevo) {
 
   cancelar() {
     this.router.navigate(['/list-animales']);
+  }
+
+    //metodos para las gestión de la foto 
+  takePhoto() {
+
+    this.photoService.takePhoto().then(data => {
+      this.capturedPhoto = data.webPath ? data.webPath : "";
+      this.removeImage = false;
+    });
+  }
+
+  pickImage() {
+
+    this.photoService.pickImage().then(data => {
+      this.capturedPhoto = data.webPath;
+      this.removeImage = false;
+    });
+  }
+
+  discardImage() {
+
+    this.capturedPhoto = "";
+    this.removeImage = true;
   }
 }
