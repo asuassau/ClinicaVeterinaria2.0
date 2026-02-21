@@ -119,7 +119,7 @@ export class FormCitasPage {
   animalLabel(a: Animal): string {
     const dueno = this.usuariosById.get(a.idUsuario);
     const duenoNombre = dueno
-      ? `${dueno.nombre}${dueno.apellidos ? ' ' + dueno.apellidos : ''}`.trim()
+      ? `${dueno.nombre}${dueno.apellidos ? ' ' + dueno.apellidos : ''}${dueno.nif ? ' (' + dueno.nif + ')' : ''}`.trim()
       : `idUsuario ${a.idUsuario}`;
 
     return `${a.idAnimal} - ${a.nombre} (Dueño: ${duenoNombre})`;

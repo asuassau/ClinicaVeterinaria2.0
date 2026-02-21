@@ -148,7 +148,7 @@ export class ListFacturasPage {
     const u = this.usuarios.find(x => x.idUsuario === idUsuario);
     if (!u) return `${idUsuario} - (sin datos)`;
     const nombre = `${u.nombre || ''} ${u.apellidos || ''}`.trim();
-    return `${u.idUsuario} - ${nombre || '(sin nombre)'}`;
+    return `${u.nif} - ${nombre || '(sin nombre)'}`;
   }
 
   crearFactura() {

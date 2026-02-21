@@ -14,6 +14,7 @@ interface CitaVM {
 
   animalNombre: string;
   propietarioNombre: string;
+  nifPropietario: string;
   veterinarioNombre: string;
 
   fecha: string;
@@ -125,6 +126,8 @@ export class ListCitasPage {
             propietarioNombre: dueno
               ? `${dueno.nombre ?? ''} ${dueno.apellidos ?? ''}`.trim()
               : '—',
+            nifPropietario: dueno
+              ?.nif ?? '—',    
             veterinarioNombre: vet
               ? `${vet.nombre ?? ''} ${vet.apellidos ?? ''}`.trim()
               : '—',
@@ -163,7 +166,7 @@ export class ListCitasPage {
           : vm.idUsuario_atiende === this.filtroVeterinario;
 
       const searchable =
-        `${vm.propietarioNombre} ${vm.animalNombre} ${vm.veterinarioNombre} ${vm.fecha} ${vm.horaIni} ${vm.estado}`
+        `${vm.propietarioNombre} ${vm.animalNombre} ${vm.veterinarioNombre} ${vm.fecha} ${vm.horaIni} ${vm.estado}${vm.nifPropietario}`
           .toLowerCase();
 
       const okTxt = txt === '' ? true : searchable.includes(txt);

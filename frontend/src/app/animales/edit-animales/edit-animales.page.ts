@@ -166,7 +166,7 @@ this.removeImage = false; // resetea estado al cargar
     if (!idUsuario) return '-';
     const u = this.usuariosMap.get(idUsuario);
     if (!u) return `${idUsuario}`;
-    return `${u.idUsuario} - ${u.nombre ?? ''} ${u.apellidos ?? ''}`.trim();
+    return `${u.nif} - ${u.nombre ?? ''} ${u.apellidos ?? ''}`.trim();
   }
 
   activarEdicion() {

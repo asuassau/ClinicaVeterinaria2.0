@@ -129,7 +129,7 @@ export class ListAnimalesPage {
   private buildOwnerMap(usuarios: Usuario[]): Record<number, string> {
     const map: Record<number, string> = {};
     for (const u of usuarios) {
-      const fullName = `${u.nombre ?? ''} ${u.apellidos ?? ''}`.trim();
+      const fullName = `${u.nombre ?? ''} ${u.apellidos ?? ''}${u.nif ? ' (' + u.nif + ')' : ''}`.trim();
       map[u.idUsuario] = fullName || u.email || `Usuario ${u.idUsuario}`;
     }
     return map;

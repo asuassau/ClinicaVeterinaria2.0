@@ -75,7 +75,7 @@ if (!this.canNuevo) {
   ownerLabel(u: Usuario): string {
     const fullName = `${u.nombre ?? ''} ${u.apellidos ?? ''}`.trim();
     const name = fullName || u.email || `Usuario ${u.idUsuario}`;
-    return `${u.idUsuario} - ${name}`;
+    return `${u.nif} - ${name}`;
   }
 
   async guardar() {

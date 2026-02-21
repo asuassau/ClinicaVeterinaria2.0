@@ -181,7 +181,7 @@
         <ion-label position="floating">Propietario (dueño)</ion-label>
         <ion-select name="idUsuario" [(ngModel)]="form.idUsuario" required>
           <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
-            {{ u.idUsuario }} - {{ (u.nombre || '') }} {{ (u.apellidos || '') }}
+            {{ u.nif }} - {{ (u.nombre || '') }} {{ (u.apellidos || '') }}
           </ion-select-option>
         </ion-select>
       </ion-item>

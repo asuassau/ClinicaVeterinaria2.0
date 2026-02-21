@@ -114,7 +114,7 @@ export class ListUsuarioPage {
           : (this.filtroRol === 'todos' ? true : u.rol === this.filtroRol);
 
       const textoUsuario =
-        `${u.nombre ?? ''} ${u.apellidos ?? ''} ${u.email ?? ''}`.toLowerCase();
+        `${u.nombre ?? ''} ${u.apellidos ?? ''} ${u.email ?? ''}${u.nif}`.toLowerCase();
 
       const coincideNombre =
         nombreFiltro === '' ? true : textoUsuario.includes(nombreFiltro);
