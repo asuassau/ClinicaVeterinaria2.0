@@ -21,6 +21,13 @@ exports.create = async (req, res) => {
       });
     }
 
+    let fotoNombre = null;
+
+    if (req.file) {
+      fotoNombre = req.file.filename;
+    }
+
+
     const elemento = await Elemento.create({
       nombre: req.body.nombre,
       descripcion: req.body.descripcion,
@@ -32,7 +39,7 @@ exports.create = async (req, res) => {
       stock: req.body.stock,
       stockMinimo: req.body.stockMinimo,
       tipo: req.body.tipo,
-      foto: req.body.foto
+      foto: fotoNombre
     }, { transaction: t });
 
     await t.commit();
@@ -77,6 +84,23 @@ exports.update = async (req, res) => {
   try {
     const id = req.params.id;
 
+    let fotoNombre = null;
+
+
+    if (req.file) {
+      fotoNombre = req.file.filename;
+    }
+
+  const removeImage =
+  req.body.removeImage === true ||
+  req.body.removeImage === 'true' ||
+  req.body.removeImage === '1' ||
+  req.body.removeImage === 1;
+
+if (removeImage) {
+  fotoNombre = null;
+}
+
     const elementoData = pickDefined({
       nombre: req.body.nombre,
       descripcion: req.body.descripcion,
@@ -87,7 +111,7 @@ exports.update = async (req, res) => {
       stock: req.body.stock,
       stockMinimo: req.body.stockMinimo,
       tipo: req.body.tipo,
-      foto: req.body.foto
+      foto: fotoNombre
     });
 
     // Actualiza Elemento si vienen campos

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductoService, CreateProductoDto, ProductoTipo } from '../../../services/producto.service';
+import { PhotoService } from '../../../services/photo.service';
 
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 
@@ -30,8 +31,15 @@ export class FormProductosPage {
   constructor(
     private productoService: ProductoService,
     private router: Router,
-    private permisos: PermisosService
+    private permisos: PermisosService,
+    public photoService: PhotoService
   ) {}
+
+  capturedPhoto: string = "";
+  originalPhoto: string = "";
+
+  removeImage = false;
+
 
   get canNuevo(): boolean {
     return this.permisos.can('productos', 'nuevo');
@@ -44,8 +52,8 @@ export class FormProductosPage {
     }
   }
 
-  guardar() {
-    // ✅ doble blindaje (si alguien fuerza la acción)
+  async guardar() {
+      // ✅ doble blindaje (si alguien fuerza la acción)
     if (!this.canNuevo) {
       this.errorMsg = 'No tienes permisos para crear productos.';
       return;
@@ -55,6 +63,17 @@ export class FormProductosPage {
     this.okMsg = '';
     this.loading = true;
 
+     let blob: Blob | null = null;
+
+if (this.capturedPhoto && this.capturedPhoto !== this.originalPhoto) {
+  try {
+    const response = await fetch(this.capturedPhoto);
+    blob = await response.blob();
+  } catch (e) {
+    blob = null;
+  }
+}
+
     // Normaliza campos numéricos (por si llegan como string desde ion-input)
     const payload: CreateProductoDto = {
       ...this.form,
@@ -62,11 +81,11 @@ export class FormProductosPage {
       stock: Number(this.form.stock),
       stockMinimo: Number(this.form.stockMinimo),
       // si foto viene vacía, mándala como undefined para no ensuciar
-      foto: (this.form.foto || '').trim() ? (this.form.foto || '').trim() : undefined,
+      //foto: (this.form.foto || '').trim() ? (this.form.foto || '').trim() : undefined,
       descripcion: (this.form.descripcion || '').trim() ? (this.form.descripcion || '').trim() : undefined,
     };
 
-    this.productoService.createProducto(payload).subscribe({
+    this.productoService.createProducto(payload, blob ?? undefined).subscribe({
       next: () => {
         this.loading = false;
         this.okMsg = 'Producto creado correctamente';
@@ -82,4 +101,27 @@ export class FormProductosPage {
   cancelar() {
     this.router.navigate(['/list-productos']);
   }
+    //metodos para las gestión de la foto 
+  takePhoto() {
+
+    this.photoService.takePhoto().then(data => {
+      this.capturedPhoto = data.webPath ? data.webPath : "";
+      this.removeImage = false;
+    });
+  }
+
+  pickImage() {
+
+    this.photoService.pickImage().then(data => {
+      this.capturedPhoto = data.webPath;
+      this.removeImage = false;
+    });
+  }
+
+  discardImage() {
+
+    this.capturedPhoto = "";
+    this.removeImage = true;
+  }
+  
 }
