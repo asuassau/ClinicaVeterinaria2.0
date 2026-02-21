@@ -1,12 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Servicios</ion-title>
- <ion-buttons slot="start">
+<ion-header class="services-header">
+  <ion-toolbar class="services-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu-catalogo"></ion-back-button>
     </ion-buttons>
 
-<ion-buttons slot="end" *ngIf="canNuevo">
-      <ion-button (click)="crearServicio()">
+    <ion-title class="services-title">Servicios</ion-title>
+
+    <ion-buttons slot="end" *ngIf="canNuevo">
+      <ion-button class="new-btn" (click)="crearServicio()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -14,74 +15,142 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="services-content">
+  <div class="services-shell">
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
+    <!-- Encabezado de sección -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="pricetags-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
+        <div>
+          <div class="page-title">Catálogo de servicios</div>
+          <div class="page-subtitle">
+            Filtra por tipo y busca por nombre o precio.
+          </div>
+        </div>
+      </div>
 
-      <ion-item>
-        <ion-label>Tipo de servicio</ion-label>
-        <ion-select [(ngModel)]="filtroTipo" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todos">Todos</ion-select-option>
-          <ion-select-option *ngFor="let t of tiposServicio" [value]="t">
-            {{ t }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      <div class="page-head-right" *ngIf="serviciosFiltrados && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ serviciosFiltrados.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-      <ion-item>
-        <ion-label position="floating">Buscar por nombre o precio</ion-label>
-        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+    <div class="services-layout">
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+      <!-- Panel filtros -->
+      <aside class="filters-panel">
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Ajusta el listado por tipo y búsqueda.</p>
+          </div>
 
-    </ion-card-content>
-  </ion-card>
+          <div class="filters-body">
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+            <ion-item class="field" lines="inset">
+              <ion-label>Tipo de servicio</ion-label>
+              <ion-select [(ngModel)]="filtroTipo" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todos">Todos</ion-select-option>
+                <ion-select-option *ngFor="let t of tiposServicio" [value]="t">
+                  {{ t }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">Buscar por nombre o precio</ion-label>
+              <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
 
-    <ion-item *ngFor="let s of serviciosFiltrados">
+          </div>
+        </div>
+      </aside>
 
-      <ion-label>
-        <h2>{{ s.Elemento?.nombre || 'Sin nombre' }}</h2>
-        <p><b>Precio:</b> {{ s.Elemento?.precio ?? '-' }}</p>
-        <p><b>Tipo servicio:</b> {{ s.tipoServicio || '-' }}</p>
-      </ion-label>
+      <!-- Listado -->
+      <section class="list-panel">
 
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(s)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando servicios…</span>
+        </div>
 
-      <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarServicio(s)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
 
-    </ion-item>
+        <!-- LISTADO -->
+        <ion-list class="services-list" *ngIf="!loading">
+          <ion-item class="service-item" lines="none" *ngFor="let s of serviciosFiltrados">
 
-  </ion-list>
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="briefcase-outline"></ion-icon>
+            </div>
 
-  <ion-text *ngIf="serviciosFiltrados.length === 0 && !loading">
-    <p>No hay servicios para mostrar.</p>
-  </ion-text>
+            <ion-label class="ion-text-wrap">
+              <h2>{{ s.Elemento?.nombre || 'Sin nombre' }}</h2>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
+              <div class="meta">
+                <div class="meta-row">
+                  <span class="k">Precio:</span>
+                  <span class="v">{{ s.Elemento?.precio ?? '-' }}</span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="k">Tipo:</span>
+                  <span class="type-pill">{{ s.tipoServicio || '-' }}</span>
+                </div>
+              </div>
+            </ion-label>
+
+            <!-- Acciones -->
+            <div class="actions" slot="end">
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(s)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
+
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminar"
+                fill="outline"
+                (click)="eliminarServicio(s)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+
+          </ion-item>
+        </ion-list>
+
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="serviciosFiltrados.length === 0 && !loading">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">No hay servicios para mostrar.</div>
+        </div>
+
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+
+      </section>
+    </div>
+
+  </div>
 </ion-content>

@@ -1,14 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Usuarios</ion-title>
-
-        <ion-buttons slot="start">
+<ion-header class="users-header">
+  <ion-toolbar class="users-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="users-title">Usuarios</ion-title>
 
     <ion-buttons slot="end" *ngIf="canNuevo">
-      <ion-button (click)="crearUsuario()">
+      <ion-button class="new-btn" (click)="crearUsuario()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -16,82 +15,143 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="users-content">
+  <div class="users-shell">
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
+    <!-- Encabezado de sección (desktop-friendly) -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
+        <div>
+          <div class="page-title">Gestión de usuarios</div>
+          <div class="page-subtitle">
+            Filtra, consulta y administra usuarios según tu rol.
+          </div>
+        </div>
+      </div>
 
-      <!-- ✅ Rol: oculto si Vet/Recep (solo clientes) -->
-      <ion-item *ngIf="!soloClientes">
-        <ion-label>Rol</ion-label>
-        <ion-select [(ngModel)]="filtroRol" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todos">Todos</ion-select-option>
-          <ion-select-option value="administrador">Administrador</ion-select-option>
-          <ion-select-option value="veterinario">Veterinario</ion-select-option>
-          <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
-          <ion-select-option value="cliente">Cliente</ion-select-option>
-        </ion-select>
-      </ion-item>
+      <div class="page-head-right" *ngIf="usuariosFiltrados && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ usuariosFiltrados.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-      <ion-item>
-        <ion-label position="floating">Buscar por nombre o email</ion-label>
-        <ion-input [(ngModel)]="filtroNombre" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+    <div class="users-layout">
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+      <!-- Panel filtros (desktop: izquierda) -->
+      <aside class="filters-panel">
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Ajusta el listado por rol y búsqueda.</p>
+          </div>
 
-    </ion-card-content>
-  </ion-card>
+          <div class="filters-body">
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+            <!-- ✅ Rol: oculto si Vet/Recep (solo clientes) -->
+            <ion-item class="field" lines="inset" *ngIf="!soloClientes">
+              <ion-label>Rol</ion-label>
+              <ion-select [(ngModel)]="filtroRol" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todos">Todos</ion-select-option>
+                <ion-select-option value="administrador">Administrador</ion-select-option>
+                <ion-select-option value="veterinario">Veterinario</ion-select-option>
+                <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
+                <ion-select-option value="cliente">Cliente</ion-select-option>
+              </ion-select>
+            </ion-item>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">Buscar por nombre o email</ion-label>
+              <ion-input [(ngModel)]="filtroNombre" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
 
-    <ion-item *ngFor="let u of usuariosFiltrados">
+          </div>
+        </div>
+      </aside>
 
-      <ion-label>
-        <h2>{{u.nombre}} {{u.apellidos}}</h2>
-        <p><b>Nif:</b> {{u.nif}}</p>
-        <p><b>Email:</b> {{u.email}}</p>
-        <p><b>Rol:</b> {{u.rol}}</p>
-      </ion-label>
+      <!-- Listado (desktop: derecha) -->
+      <section class="list-panel">
 
-      <!-- ✅ VER (con permiso, por fila) -->
-      <ion-button *ngIf="canVerUsuario(u)" color="warning" fill="outline" slot="end" (click)="verDetalle(u)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando usuarios…</span>
+        </div>
 
-      <!-- ✅ ELIMINAR (solo si permitido y solo clientes para vet/recep) -->
-      <ion-button *ngIf="canEliminarUsuario(u)" color="danger" fill="outline" slot="end" (click)="eliminarUsuario(u)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
 
-    </ion-item>
+        <!-- LISTADO -->
+        <ion-list class="users-list" *ngIf="!loading">
+          <ion-item class="user-item" lines="none" *ngFor="let u of usuariosFiltrados">
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="person-outline"></ion-icon>
+            </div>
 
-  </ion-list>
+            <ion-label class="ion-text-wrap">
+              <h2>{{u.nombre}} {{u.apellidos}}</h2>
 
- 
-  <ion-text *ngIf="usuariosFiltrados.length === 0 && !loading">
-    <p>No hay usuarios para mostrar.</p>
-  </ion-text>
+              <div class="meta">
+                <div class="meta-row"><span class="k">Nif:</span> <span class="v">{{u.nif}}</span></div>
+                <div class="meta-row"><span class="k">Email:</span> <span class="v">{{u.email}}</span></div>
+                <div class="meta-row">
+                  <span class="k">Rol:</span>
+                  <span class="role-pill">{{u.rol}}</span>
+                </div>
+              </div>
+            </ion-label>
 
-   <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
+            <!-- Acciones -->
+            <div class="actions" slot="end">
+              <!-- ✅ VER (con permiso, por fila) -->
+              <ion-button
+                class="action-btn"
+                *ngIf="canVerUsuario(u)"
+                fill="outline"
+                (click)="verDetalle(u)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
 
+              <!-- ✅ ELIMINAR -->
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminarUsuario(u)"
+                fill="outline"
+                (click)="eliminarUsuario(u)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-item>
+        </ion-list>
 
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="usuariosFiltrados.length === 0 && !loading">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay usuarios para mostrar.
+          </div>
+        </div>
+
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+
+      </section>
+    </div>
+
+  </div>
 </ion-content>

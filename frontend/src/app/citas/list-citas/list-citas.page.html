@@ -1,14 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Citas</ion-title>
-
-        <ion-buttons slot="start">
+<ion-header class="citas-header">
+  <ion-toolbar class="citas-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="citas-title">Citas</ion-title>
 
     <ion-buttons slot="end" *ngIf="canNuevo">
-      <ion-button (click)="crearCita()">
+      <ion-button class="new-btn" (click)="crearCita()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -16,83 +15,143 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="citas-content">
+  <div class="citas-shell">
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
+    <!-- Encabezado de sección -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
+        <div>
+          <div class="page-title">Gestión de citas</div>
+          <div class="page-subtitle">
+            Filtra, consulta y administra citas según tu rol.
+          </div>
+        </div>
+      </div>
 
-      <!-- oculto para cliente -->
-      <ion-item *ngIf="!isCliente">
-        <ion-label>Veterinario</ion-label>
-        <ion-select [(ngModel)]="filtroVeterinario" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todos">Todos</ion-select-option>
+      <div class="page-head-right" *ngIf="citasFiltradas && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ citasFiltradas.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-          <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
-            {{ v.idUsuario }} - {{ v.nombre }} {{ v.apellidos }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+    <div class="citas-layout">
 
-      <ion-item>
-        <ion-label position="floating">
-          Buscar (dueño, animal, veterinario, fecha, hora, estado)
-        </ion-label>
-        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+      <!-- Panel filtros -->
+      <aside class="filters-panel">
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Acota por veterinario y texto libre.</p>
+          </div>
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+          <div class="filters-body">
 
-    </ion-card-content>
-  </ion-card>
+            <!-- oculto para cliente -->
+            <ion-item class="field" lines="inset" *ngIf="!isCliente">
+              <ion-label>Veterinario</ion-label>
+              <ion-select [(ngModel)]="filtroVeterinario" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todos">Todos</ion-select-option>
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+                <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
+                  {{ v.idUsuario }} - {{ v.nombre }} {{ v.apellidos }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">
+                Buscar (dueño, animal, veterinario, fecha, hora, estado)
+              </ion-label>
+              <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
 
-    <ion-item *ngFor="let vm of citasFiltradas">
+          </div>
+        </div>
+      </aside>
 
-      <ion-label>
-        <h2>{{ vm.fecha }} - {{ vm.horaIni }} ({{ vm.estado }})</h2>
+      <!-- Listado -->
+      <section class="list-panel">
 
-        <p><b>Animal:</b> {{ vm.animalNombre }}</p>
-        <p><b>Propietario:</b> {{ vm.propietarioNombre }}</p>
-        <p><b>NIF:</b> {{ vm.nifPropietario }}</p>
-        <p><b>Veterinario:</b> {{ vm.veterinarioNombre }}</p>
-      </ion-label>
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando citas…</span>
+        </div>
 
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
 
-      <ion-button *ngIf="canEliminarVm(vm)" color="danger" fill="outline" slot="end" (click)="eliminarCita(vm)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+        <!-- LISTADO -->
+        <ion-list class="citas-list" *ngIf="!loading">
+          <ion-item class="cita-item" lines="none" *ngFor="let vm of citasFiltradas">
 
-    </ion-item>
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="time-outline"></ion-icon>
+            </div>
 
-  </ion-list>
+            <ion-label class="ion-text-wrap">
+              <h2>{{ vm.fecha }} - {{ vm.horaIni }} <span class="estado-pill">{{ vm.estado }}</span></h2>
 
+              <div class="meta">
+                <div class="meta-row"><span class="k">Animal:</span> <span class="v">{{ vm.animalNombre }}</span></div>
+                <div class="meta-row"><span class="k">Propietario:</span> <span class="v">{{ vm.propietarioNombre }}</span></div>
+                <div class="meta-row"><span class="k">NIF:</span> <span class="v">{{ vm.nifPropietario }}</span></div>
+                <div class="meta-row"><span class="k">Veterinario:</span> <span class="v">{{ vm.veterinarioNombre }}</span></div>
+              </div>
+            </ion-label>
 
-  <ion-text *ngIf="citasFiltradas.length === 0 && !loading">
-    <p>No hay citas para mostrar.</p>
-  </ion-text>
+            <!-- Acciones -->
+            <div class="actions" slot="end">
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(vm)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
 
-     <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminarVm(vm)"
+                fill="outline"
+                (click)="eliminarCita(vm)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
 
+          </ion-item>
+        </ion-list>
+
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="citasFiltradas.length === 0 && !loading">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay citas para mostrar.
+          </div>
+        </div>
+
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+
+      </section>
+    </div>
+
+  </div>
 </ion-content>

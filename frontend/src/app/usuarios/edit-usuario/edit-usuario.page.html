@@ -1,13 +1,13 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Detalle de usuario</ion-title>
-
+<ion-header class="user-detail-header">
+  <ion-toolbar class="user-detail-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-usuario"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="user-detail-title">Detalle de usuario</ion-title>
+
     <ion-buttons slot="end" *ngIf="usuario && !editMode && canEditarUsuarioTarget()">
-      <ion-button (click)="activarEdicion()">
+      <ion-button class="edit-btn" (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
       </ion-button>
@@ -15,176 +15,280 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="user-detail-content">
+  <div class="user-detail-shell">
 
-  <ion-item *ngIf="loading">
-    <ion-label>Cargando usuario...</ion-label>
-  </ion-item>
+    <!-- Estados -->
+    <div class="state-row" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando usuario…</span>
+    </div>
 
-  <ion-item *ngIf="errorMsg" lines="none">
-    <ion-label style="color:red">{{ errorMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert error" *ngIf="errorMsg">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ errorMsg }}</div>
+    </div>
 
-  <ion-item *ngIf="okMsg" lines="none">
-    <ion-label style="color:green">{{ okMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert ok" *ngIf="okMsg">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ okMsg }}</div>
+    </div>
 
-  <!-- ===================== -->
-  <!-- MODO DETALLE (VER) -->
-  <!-- ===================== -->
-  <div *ngIf="usuario && !editMode">
+    <!-- Contenido -->
+    <div *ngIf="usuario" class="layout">
 
-    <ion-list>
+      <!-- Panel lateral (desktop) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Nombre</h2>
-          <p>{{ usuario.nombre || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-copy">
+            <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
+            <p class="ion-text-wrap">
+              {{ editMode
+                ? 'Actualiza la información del usuario y guarda los cambios.'
+                : 'Revisa los datos del usuario y edita si tienes permisos.' }}
+            </p>
 
-      <ion-item>
-        <ion-label>
-          <h2>Apellidos</h2>
-          <p>{{ usuario.apellidos || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip" *ngIf="!editMode">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Datos protegidos</span>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Email</h2>
-          <p>{{ usuario.email || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip warn" *ngIf="editMode && !canEditarRol">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <span>Rol no editable</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Rol</h2>
-          <p>{{ usuario.rol || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
 
-      <ion-item>
-        <ion-label>
-          <h2>NIF</h2>
-          <p>{{ usuario.nif || '-' }}</p>
-        </ion-label>
-      </ion-item>
+      <!-- Panel principal -->
+      <section class="main-panel">
 
-      <ion-item>
-        <ion-label>
-          <h2>Teléfono</h2>
-          <p>{{ usuario.telefono || '-' }}</p>
-        </ion-label>
-      </ion-item>
+        <!-- ===================== -->
+        <!-- MODO DETALLE (VER) -->
+        <!-- ===================== -->
+        <div *ngIf="!editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge" aria-hidden="true">
+                <ion-icon name="person-circle-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Información del usuario</div>
+                <div class="card-subtitle">
+                  {{ usuario.email || '—' }}
+                </div>
+              </div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Dirección</h2>
-          <p>{{ usuario.direccion || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="role-pill">
+              <ion-icon name="person-outline"></ion-icon>
+              <span>{{ usuario.rol || '-' }}</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Foto</h2>
-          <p>{{ usuario.foto || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="kv-grid">
+            <div class="kv">
+              <div class="k">Nombre</div>
+              <div class="v">{{ usuario.nombre || '-' }}</div>
+            </div>
 
-    </ion-list>
+            <div class="kv">
+              <div class="k">Apellidos</div>
+              <div class="v">{{ usuario.apellidos || '-' }}</div>
+            </div>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-    </ion-button>
+            <div class="kv">
+              <div class="k">Email</div>
+              <div class="v">{{ usuario.email || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Rol</div>
+              <div class="v">{{ usuario.rol || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">NIF</div>
+              <div class="v">{{ usuario.nif || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Teléfono</div>
+              <div class="v">{{ usuario.telefono || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Dirección</div>
+              <div class="v">{{ usuario.direccion || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Foto</div>
+              <div class="v">{{ usuario.foto || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- MODO EDICIÓN -->
+        <!-- ===================== -->
+        <div *ngIf="editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge edit" aria-hidden="true">
+                <ion-icon name="create-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Editar usuario</div>
+                <div class="card-subtitle">Modifica los campos y guarda.</div>
+              </div>
+            </div>
+
+            <div class="role-pill soft">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Permisos aplicados</span>
+            </div>
+          </div>
+
+          <form #f="ngForm" (ngSubmit)="guardarCambios()" class="user-form">
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="id-card-outline"></ion-icon>
+                <span>Datos principales</span>
+              </div>
+
+              <div class="grid-2">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Nombre</ion-label>
+                  <ion-input name="nombre" [(ngModel)]="form.nombre"></ion-input>
+                </ion-item>
+
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Apellidos</ion-label>
+                  <ion-input name="apellidos" [(ngModel)]="form.apellidos"></ion-input>
+                </ion-item>
+              </div>
+
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Email</ion-label>
+                <ion-input type="email" name="email" [(ngModel)]="form.email"></ion-input>
+              </ion-item>
+
+              <!-- ✅ ROL: solo Admin puede editarlo -->
+              <ng-container *ngIf="canEditarRol; else rolSoloLectura">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Rol</ion-label>
+                  <ion-select name="rol" [(ngModel)]="form.rol">
+                    <ion-select-option *ngFor="let r of roles" [value]="r">
+                      {{ r }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ng-container>
+
+              <ng-template #rolSoloLectura>
+                <div class="readonly-card">
+                  <div class="readonly-row">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <div>
+                      <div class="readonly-title">Rol</div>
+                      <div class="readonly-value">{{ usuario.rol || '-' }}</div>
+                    </div>
+                  </div>
+
+                  <div class="readonly-note">
+                    * Tu rol no permite modificar el rol de este usuario.
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="call-outline"></ion-icon>
+                <span>Contacto</span>
+              </div>
+
+              <div class="grid-2">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">NIF</ion-label>
+                  <ion-input name="nif" [(ngModel)]="form.nif"></ion-input>
+                </ion-item>
+
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Teléfono</ion-label>
+                  <ion-input name="telefono" [(ngModel)]="form.telefono"></ion-input>
+                </ion-item>
+              </div>
+
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Dirección</ion-label>
+                <ion-input name="direccion" [(ngModel)]="form.direccion"></ion-input>
+              </ion-item>
+            </div>
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <span>Seguridad</span>
+              </div>
+
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Nueva contraseña (opcional)</ion-label>
+                <ion-input
+                  type="password"
+                  name="contrasena"
+                  [(ngModel)]="form.contrasena"
+                  placeholder="Dejar en blanco para no cambiarla">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="saving">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+
+      </section>
+    </div>
 
   </div>
-
-  <!-- ===================== -->
-  <!-- MODO EDICIÓN -->
-  <!-- ===================== -->
-  <div *ngIf="usuario && editMode">
-
-    <form #f="ngForm" (ngSubmit)="guardarCambios()">
-
-      <ion-item>
-        <ion-label position="floating">Nombre</ion-label>
-        <ion-input name="nombre" [(ngModel)]="form.nombre"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Apellidos</ion-label>
-        <ion-input name="apellidos" [(ngModel)]="form.apellidos"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Email</ion-label>
-        <ion-input type="email" name="email" [(ngModel)]="form.email"></ion-input>
-      </ion-item>
-
-      <!-- ✅ ROL: solo Admin puede editarlo -->
-      <ng-container *ngIf="canEditarRol; else rolSoloLectura">
-        <ion-item>
-          <ion-label position="floating">Rol</ion-label>
-          <ion-select name="rol" [(ngModel)]="form.rol">
-            <ion-select-option *ngFor="let r of roles" [value]="r">
-              {{ r }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ng-container>
-
-      <ng-template #rolSoloLectura>
-        <ion-item>
-          <ion-label>
-            <h2>Rol</h2>
-            <p>{{ usuario.rol || '-' }}</p>
-          </ion-label>
-        </ion-item>
-      </ng-template>
-
-      <ion-item>
-        <ion-label position="floating">NIF</ion-label>
-        <ion-input name="nif" [(ngModel)]="form.nif"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Teléfono</ion-label>
-        <ion-input name="telefono" [(ngModel)]="form.telefono"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Dirección</ion-label>
-        <ion-input name="direccion" [(ngModel)]="form.direccion"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Nueva contraseña (opcional)</ion-label>
-        <ion-input
-          type="password"
-          name="contrasena"
-          [(ngModel)]="form.contrasena"
-          placeholder="Dejar en blanco para no cambiarla">
-        </ion-input>
-      </ion-item>
-
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="saving"
-        style="margin-top: 18px;">
-        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        type="button"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </ion-button>
-
-    </form>
-  </div>
-
 </ion-content>

@@ -1,212 +1,373 @@
 :host {
-  /* Paleta veterinaria (coral suave + teal clínico + neutros cálidos) */
-  --vet-primary: #1fb6aa;  /* teal suave */
-  --vet-coral: #ff6f7d;    /* coral suave (acento) */
-  --vet-ink: #1f2937;      /* texto principal */
-  --vet-muted: #6b7280;    /* texto secundario */
-  --vet-surface: #ffffff;  /* tarjetas */
-  --vet-bg: #f7fafc;       /* fondo general */
-  --vet-line: rgba(31, 41, 55, 0.10);
+  /* Misma base que login */
+  --bg: #f7fafb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: rgba(15, 23, 42, 0.10);
 
-  --vet-radius: 18px;
-  --vet-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  --accent: #0ea5a6;         /* teal */
+  --accent-2: #2563eb;
+  --accent-soft: rgba(14, 165, 166, 0.12);
+
+  --shadow: 0 18px 55px rgba(15, 23, 42, 0.10);
+  --radius: 18px;
 }
 
-ion-header ion-toolbar {
-  --background: linear-gradient(135deg, var(--vet-primary), #7fe3db);
-  --color: #ffffff;
+/* Header */
+.menu-header {
+  ion-toolbar.menu-toolbar {
+    --background: #ffffff;
+    --color: var(--text);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .menu-title {
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
 }
 
-ion-title {
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
-
-ion-button {
-  --color: #ffffff;
+.logout-btn {
+  --color: var(--text);
+  --background: transparent;
+  --background-hover: rgba(15, 23, 42, 0.06);
+  --border-radius: 12px;
   font-weight: 700;
+
+  ion-icon {
+    color: var(--accent);
+  }
 }
 
-ion-content {
-  --background: radial-gradient(900px 600px at 20% 0%, rgba(255, 111, 125, 0.18), transparent 60%),
-               radial-gradient(900px 600px at 90% 10%, rgba(31, 182, 170, 0.20), transparent 55%),
-               var(--vet-bg);
+.menu-content {
+  --background: var(--bg);
 }
 
-/* Hero / tarjeta de bienvenida */
-.welcome-card {
-  border-radius: var(--vet-radius);
-  box-shadow: var(--vet-shadow);
+.menu-shell {
+  min-height: 100%;
+  display: grid;
+  place-items: start center;
+  padding: clamp(16px, 2.6vw, 34px);
+}
+
+.menu-layout {
+  width: min(1200px, 100%);
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr;
+  gap: clamp(16px, 2.6vw, 28px);
+  align-items: start;
+}
+
+/* Panel Marca (izquierda) */
+.brand-panel {
+  position: sticky;
+  top: 18px; /* se queda visible en desktop */
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 60%, var(--accent-soft) 140%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(18px, 2.8vw, 28px);
   overflow: hidden;
-  background: var(--vet-surface);
-  border: 1px solid var(--vet-line);
 }
 
-.welcome-header {
+.brand-top {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 14px;
+}
+
+.brand-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.10));
+  animation: logoFloat 3.8s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.brand-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.brand-copy {
+  margin-top: 18px;
+  max-width: 520px;
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 750;
+    color: var(--text);
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+}
+
+.brand-decor {
+  position: absolute;
+  right: -120px;
+  bottom: -120px;
+  width: 360px;
+  height: 360px;
+  border: 2px solid rgba(14, 165, 166, 0.18);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 10px rgba(14, 165, 166, 0.06);
+  transform: rotate(8deg);
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 44px;
+    border: 2px dashed rgba(14, 165, 166, 0.14);
+    border-radius: 999px;
+  }
+}
+
+/* Panel derecho */
+.main-panel {
+  display: grid;
+  gap: 14px;
+}
+
+/* Welcome Card (custom div, no ion-card para tener control total) */
+.welcome-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(16px, 2.4vw, 22px);
+}
+
+.welcome-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.welcome-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .badge-icon {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 14px;
   display: grid;
   place-items: center;
-  background: rgba(255, 111, 125, 0.14);
-  border: 1px solid rgba(255, 111, 125, 0.25);
-}
+  background: rgba(14, 165, 166, 0.10);
+  border: 1px solid rgba(14, 165, 166, 0.18);
 
-.badge-icon ion-icon {
-  font-size: 22px;
-  color: var(--vet-coral);
+  ion-icon {
+    font-size: 20px;
+    color: var(--accent);
+  }
 }
 
 .welcome-title {
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--vet-ink);
-  margin: 0;
+  font-weight: 850;
+  color: var(--text);
+  font-size: 16px;
 }
 
 .welcome-subtitle {
-  font-size: 13px;
-  color: var(--vet-muted);
   margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
-/* mensaje pequeño dentro de la tarjeta */
-.welcome-note {
-  margin-top: 10px;
-  color: var(--vet-muted);
-  font-size: 14px;
-}
-
-/* Chip de rol */
 .role-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
-  padding: 6px 10px;
+  padding: 8px 10px;
   border-radius: 999px;
-  background: rgba(31, 182, 170, 0.12);
-  border: 1px solid rgba(31, 182, 170, 0.25);
-  color: var(--vet-primary);
-  font-weight: 800;
-  font-size: 12px;
-  width: fit-content;
-}
-
-.role-chip ion-icon {
-  font-size: 16px;
-}
-
-/* Sección */
-.section-title {
-  margin: 16px 4px 10px;
-  font-weight: 900;
-  font-size: 14px;
-  color: var(--vet-ink);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.section-hint {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  color: #1e3a8a;
+  font-size: 13px;
   font-weight: 700;
-  font-size: 12px;
-  color: var(--vet-muted);
+  white-space: nowrap;
+
+  ion-icon {
+    font-size: 16px;
+    color: var(--accent-2);
+  }
 }
 
-/* Lista como “cards” */
+.welcome-note {
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* Estado (custom card) */
+.state-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  padding: 12px 14px;
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .state-text {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  &.warning {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.18);
+
+    ion-icon {
+      color: #b45309;
+    }
+
+    .state-text {
+      color: #92400e;
+    }
+  }
+}
+
+/* Título de sección */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 2px;
+  margin-top: 6px;
+
+  span:first-child {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.2px;
+  }
+
+  .section-hint {
+    font-size: 12px;
+    color: var(--muted);
+  }
+}
+
+/* Lista */
 .menu-list {
   background: transparent;
+  padding: 0;
 }
 
+/* Items */
 .menu-item {
-  --background: var(--vet-surface);
-  --border-radius: var(--vet-radius);
-  --inner-padding-end: 14px;
-  --inner-padding-start: 14px;
-  --padding-start: 14px;
-  --padding-end: 14px;
-  --min-height: 72px;
+  --background: #ffffff;
+  --color: var(--text);
+  --border-radius: 16px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
 
+  border: 1px solid var(--line);
+  border-radius: 16px;
   margin: 10px 0;
-  border: 1px solid var(--vet-line);
-  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06);
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(14, 165, 166, 0.25);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  }
+
+  ion-label h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 850;
+    color: var(--text);
+  }
+
+  ion-label p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
 }
 
-.menu-item:active {
-  transform: scale(0.99);
-  box-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
-}
-
-/* Icono izquierdo en burbuja */
 .menu-icon-wrap {
   width: 42px;
   height: 42px;
   border-radius: 14px;
   display: grid;
   place-items: center;
-  background: rgba(31, 182, 170, 0.10);
-  border: 1px solid rgba(31, 182, 170, 0.20);
-  margin-right: 10px;
+  background: rgba(14, 165, 166, 0.10);
+  border: 1px solid rgba(14, 165, 166, 0.18);
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--accent);
+  }
 }
 
-.menu-icon-wrap ion-icon {
-  font-size: 20px;
-  color: var(--vet-primary);
+/* ✅ Responsive */
+@media (max-width: 980px) {
+  .menu-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-panel {
+    position: relative;
+    top: auto;
+  }
+
+  .brand-decor {
+    right: -170px;
+    bottom: -170px;
+    opacity: 0.6;
+  }
 }
 
-/* Tipografía dentro del item */
-.menu-item h2 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--vet-ink);
-}
+@media (max-width: 420px) {
+  .brand-logo {
+    width: 48px;
+    height: 48px;
+  }
 
-.menu-item p {
-  margin: 4px 0 0;
-  font-size: 12.5px;
-  color: var(--vet-muted);
-}
+  .brand-title {
+    font-size: 22px;
+  }
 
-/* Flechita (detail) más sutil */
-.menu-item ion-note,
-.menu-item .item-detail-icon {
-  color: rgba(31, 41, 55, 0.35);
-}
-
-/* Bloques informativos */
-.state-item {
-  --border-radius: var(--vet-radius);
-  margin-top: 12px;
-  border: 1px solid var(--vet-line);
-}
-
-.state-item ion-icon {
-  color: var(--vet-coral);
-}
-
-/* Botón salir con look “pill” */
-.logout-btn {
-  --background: rgba(255, 255, 255, 0.14);
-  --background-hover: rgba(255, 255, 255, 0.18);
-  --border-radius: 999px;
-  --padding-start: 14px;
-  --padding-end: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-/* Responsivo suave */
-@media (min-width: 768px) {
-  ion-content .container {
-    max-width: 720px;
-    margin: 0 auto;
+  .role-chip {
+    white-space: normal;
   }
 }

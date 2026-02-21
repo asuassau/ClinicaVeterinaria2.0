@@ -1,14 +1,14 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Detalle de cita</ion-title>
-
+<ion-header class="cita-detail-header">
+  <ion-toolbar class="cita-detail-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-citas"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="cita-detail-title">Detalle de cita</ion-title>
+
     <!-- ✅ EDITAR solo si puede (y en recepcionista se bloquea si atendida) -->
     <ion-buttons slot="end" *ngIf="cita && !editMode && canEditar">
-      <ion-button (click)="activarEdicion()">
+      <ion-button class="edit-btn" (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
       </ion-button>
@@ -16,197 +16,290 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="cita-detail-content">
+  <div class="cita-detail-shell">
 
-  <ion-item *ngIf="loading">
-    <ion-label>Cargando cita...</ion-label>
-  </ion-item>
+    <!-- Estados -->
+    <div class="state-row" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando cita…</span>
+    </div>
 
-  <ion-item *ngIf="errorMsg" lines="none">
-    <ion-label style="color:red">{{ errorMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert error" *ngIf="errorMsg">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ errorMsg }}</div>
+    </div>
 
-  <ion-item *ngIf="okMsg" lines="none">
-    <ion-label style="color:green">{{ okMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert ok" *ngIf="okMsg">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ okMsg }}</div>
+    </div>
 
-  <!-- ✅ Nota informativa si no puede editar -->
-  <ion-text color="medium" *ngIf="cita && !editMode && !canEditar" style="display:block; margin: 8px 0;">
-    <p>Esta cita no se puede editar con tu perfil (o está en estado <b>atendida</b>).</p>
-  </ion-text>
+    <!-- ✅ Nota informativa si no puede editar -->
+    <div class="state-alert warn" *ngIf="cita && !editMode && !canEditar">
+      <ion-icon name="lock-closed-outline"></ion-icon>
+      <div class="ion-text-wrap">
+        Esta cita no se puede editar con tu perfil (o está en estado <b>atendida</b>).
+      </div>
+    </div>
 
-  <!-- ===================== -->
-  <!-- MODO DETALLE (VER) -->
-  <!-- ===================== -->
-  <div *ngIf="cita && !editMode">
+    <!-- Contenido -->
+    <div *ngIf="cita" class="layout">
 
-    <ion-list>
+      <!-- Panel lateral (desktop) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Animal</h2>
-          <p>{{ animalLabelById(cita.idAnimal) }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-copy">
+            <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
+            <p class="ion-text-wrap">
+              {{ editMode
+                ? 'Modifica la información de la cita y guarda los cambios.'
+                : 'Revisa los datos de la cita y edita si tienes permisos.' }}
+            </p>
 
-      <ion-item>
-        <ion-label>
-          <h2>Usuario que asigna</h2>
-          <p>{{ userLabelById(cita.idUsuario_programa) }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip" *ngIf="!editMode">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>Detalle de cita</span>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Veterinario que atiende</h2>
-          <p>{{ userLabelById(cita.idUsuario_atiende) }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip warn" *ngIf="editMode && !canEditar">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <span>Edición bloqueada</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Fecha</h2>
-          <p>{{ cita.fecha || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
 
-      <ion-item>
-        <ion-label>
-          <h2>Hora inicio</h2>
-          <p>{{ cita.HoraIni || '-' }}</p>
-        </ion-label>
-      </ion-item>
+      <!-- Panel principal -->
+      <section class="main-panel">
 
-      <ion-item>
-        <ion-label>
-          <h2>Hora fin</h2>
-          <p>{{ cita.HoraFin || '-' }}</p>
-        </ion-label>
-      </ion-item>
+        <!-- ===================== -->
+        <!-- MODO DETALLE (VER) -->
+        <!-- ===================== -->
+        <div *ngIf="!editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge" aria-hidden="true">
+                <ion-icon name="calendar-clear-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Información de la cita</div>
+                <div class="card-subtitle">
+                  {{ cita.fecha || '—' }} · {{ cita.HoraIni || '--:--' }} - {{ cita.HoraFin || '--:--' }}
+                </div>
+              </div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Estado</h2>
-          <p>{{ cita.estado || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="role-pill">
+              <ion-icon name="pulse-outline"></ion-icon>
+              <span>{{ cita.estado || '-' }}</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Motivo</h2>
-          <p>{{ cita.motivo || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="kv-grid">
+            <div class="kv">
+              <div class="k">Animal</div>
+              <div class="v">{{ animalLabelById(cita.idAnimal) }}</div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Notas</h2>
-          <p>{{ cita.notas || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="kv">
+              <div class="k">Usuario que asigna</div>
+              <div class="v">{{ userLabelById(cita.idUsuario_programa) }}</div>
+            </div>
 
-    </ion-list>
+            <div class="kv">
+              <div class="k">Veterinario que atiende</div>
+              <div class="v">{{ userLabelById(cita.idUsuario_atiende) }}</div>
+            </div>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
-    </ion-button>
+            <div class="kv">
+              <div class="k">Fecha</div>
+              <div class="v">{{ cita.fecha || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Hora inicio</div>
+              <div class="v">{{ cita.HoraIni || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Hora fin</div>
+              <div class="v">{{ cita.HoraFin || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Motivo</div>
+              <div class="v">{{ cita.motivo || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Notas</div>
+              <div class="v">{{ cita.notas || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver al listado
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- MODO EDICIÓN -->
+        <!-- ===================== -->
+        <div *ngIf="editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge edit" aria-hidden="true">
+                <ion-icon name="create-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Editar cita</div>
+                <div class="card-subtitle">Modifica los campos y guarda.</div>
+              </div>
+            </div>
+
+            <div class="role-pill soft">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Permisos aplicados</span>
+            </div>
+          </div>
+
+          <form #f="ngForm" (ngSubmit)="guardarCambios()" class="cita-form">
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="paw-outline"></ion-icon>
+                <span>Asignación</span>
+              </div>
+
+              <!-- ANIMAL -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Animal *</ion-label>
+                <ion-select name="idAnimal" [(ngModel)]="form.idAnimal" required>
+                  <ion-select-option *ngFor="let a of animales" [value]="a.idAnimal">
+                    {{ animalOptionLabel(a) }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <!-- USUARIO QUE PROGRAMA -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Usuario que asigna *</ion-label>
+                <ion-select name="idUsuario_programa" [(ngModel)]="form.idUsuario_programa" required>
+                  <ion-select-option *ngFor="let u of programadores" [value]="u.idUsuario">
+                    {{ userOptionLabel(u) }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <!-- VETERINARIO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Veterinario que atiende *</ion-label>
+                <ion-select name="idUsuario_atiende" [(ngModel)]="form.idUsuario_atiende" required>
+                  <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
+                    {{ userOptionLabel(v) }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>Horario</span>
+              </div>
+
+              <div class="grid-2">
+                <!-- FECHA -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Fecha *</ion-label>
+                  <ion-input type="date" name="fecha" [(ngModel)]="form.fecha" required></ion-input>
+                </ion-item>
+
+                <!-- ESTADO -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Estado *</ion-label>
+                  <ion-select name="estado" [(ngModel)]="form.estado" required>
+                    <ion-select-option *ngFor="let e of estados" [value]="e">
+                      {{ e }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <div class="grid-2">
+                <!-- HORA INI -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Hora inicio *</ion-label>
+                  <ion-input type="time" name="HoraIni" [(ngModel)]="form.HoraIni" required></ion-input>
+                </ion-item>
+
+                <!-- HORA FIN -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Hora fin *</ion-label>
+                  <ion-input type="time" name="HoraFin" [(ngModel)]="form.HoraFin" required></ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="document-text-outline"></ion-icon>
+                <span>Detalles</span>
+              </div>
+
+              <!-- MOTIVO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Motivo</ion-label>
+                <ion-input name="motivo" [(ngModel)]="form.motivo"></ion-input>
+              </ion-item>
+
+              <!-- NOTAS -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Notas</ion-label>
+                <ion-textarea name="notas" [(ngModel)]="form.notas" autoGrow="true"></ion-textarea>
+              </ion-item>
+            </div>
+
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || saving">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+
+      </section>
+    </div>
 
   </div>
-
-  <!-- ===================== -->
-  <!-- MODO EDICIÓN -->
-  <!-- ===================== -->
-  <div *ngIf="cita && editMode">
-
-    <form #f="ngForm" (ngSubmit)="guardarCambios()">
-
-      <!-- ANIMAL -->
-      <ion-item>
-        <ion-label position="floating">Animal *</ion-label>
-        <ion-select name="idAnimal" [(ngModel)]="form.idAnimal" required>
-          <ion-select-option *ngFor="let a of animales" [value]="a.idAnimal">
-            {{ animalOptionLabel(a) }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- USUARIO QUE PROGRAMA -->
-      <ion-item>
-        <ion-label position="floating">Usuario que asigna *</ion-label>
-        <ion-select name="idUsuario_programa" [(ngModel)]="form.idUsuario_programa" required>
-          <ion-select-option *ngFor="let u of programadores" [value]="u.idUsuario">
-            {{ userOptionLabel(u) }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- VETERINARIO -->
-      <ion-item>
-        <ion-label position="floating">Veterinario que atiende *</ion-label>
-        <ion-select name="idUsuario_atiende" [(ngModel)]="form.idUsuario_atiende" required>
-          <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
-            {{ userOptionLabel(v) }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- FECHA -->
-      <ion-item>
-        <ion-label position="floating">Fecha *</ion-label>
-        <ion-input type="date" name="fecha" [(ngModel)]="form.fecha" required></ion-input>
-      </ion-item>
-
-      <!-- HORA INI -->
-      <ion-item>
-        <ion-label position="floating">Hora inicio *</ion-label>
-        <ion-input type="time" name="HoraIni" [(ngModel)]="form.HoraIni" required></ion-input>
-      </ion-item>
-
-      <!-- HORA FIN -->
-      <ion-item>
-        <ion-label position="floating">Hora fin *</ion-label>
-        <ion-input type="time" name="HoraFin" [(ngModel)]="form.HoraFin" required></ion-input>
-      </ion-item>
-
-      <!-- ESTADO -->
-      <ion-item>
-        <ion-label position="floating">Estado *</ion-label>
-        <ion-select name="estado" [(ngModel)]="form.estado" required>
-          <ion-select-option *ngFor="let e of estados" [value]="e">
-            {{ e }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- MOTIVO -->
-      <ion-item>
-        <ion-label position="floating">Motivo</ion-label>
-        <ion-input name="motivo" [(ngModel)]="form.motivo"></ion-input>
-      </ion-item>
-
-      <!-- NOTAS -->
-      <ion-item>
-        <ion-label position="floating">Notas</ion-label>
-        <ion-textarea name="notas" [(ngModel)]="form.notas" autoGrow="true"></ion-textarea>
-      </ion-item>
-
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="f.invalid || saving"
-        style="margin-top: 18px;">
-        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        type="button"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </ion-button>
-
-    </form>
-  </div>
-
 </ion-content>

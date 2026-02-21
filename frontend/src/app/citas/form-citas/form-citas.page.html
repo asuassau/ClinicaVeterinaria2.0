@@ -1,162 +1,265 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Nueva cita</ion-title>
+<ion-header class="appt-form-header">
+  <ion-toolbar class="appt-form-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-citas"></ion-back-button>
     </ion-buttons>
+
+    <ion-title class="appt-form-title">Nueva cita</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <form #f="ngForm" (ngSubmit)="guardar()">
+<ion-content class="appt-form-content">
+  <div class="appt-form-shell">
 
-    <!-- ANIMAL -->
-    <ion-item>
-      <ion-label position="floating">Animal *</ion-label>
-      <ion-select
-        name="idAnimal"
-        [(ngModel)]="form.idAnimal"
-        required
-        #idAnimal="ngModel">
-        <ion-select-option *ngFor="let a of animales" [value]="a.idAnimal">
-          {{ animalLabel(a) }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="idAnimal.invalid && idAnimal.touched" style="margin-left:16px;">
-      Debes seleccionar un animal.
-    </ion-note>
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
 
-    <!-- USUARIO QUE PROGRAMA -->
-    <ion-item>
-      <ion-label position="floating">Usuario que asigna *</ion-label>
-      <ion-select
-        name="idUsuario_programa"
-        [(ngModel)]="form.idUsuario_programa"
-        required
-        #idUsuario_programa="ngModel">
-        <ion-select-option *ngFor="let u of programadores" [value]="u.idUsuario">
-          {{ userLabel(u) }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="idUsuario_programa.invalid && idUsuario_programa.touched" style="margin-left:16px;">
-      Debes seleccionar quién asigna la cita.
-    </ion-note>
+        <div>
+          <div class="page-title">Alta de cita</div>
+          <div class="page-subtitle">
+            Completa los datos para programar una cita en el sistema.
+          </div>
+        </div>
+      </div>
 
-    <!-- VETERINARIO QUE ATIENDE -->
-    <ion-item>
-      <ion-label position="floating">Veterinario que atiende *</ion-label>
-      <ion-select
-        name="idUsuario_atiende"
-        [(ngModel)]="form.idUsuario_atiende"
-        required
-        #idUsuario_atiende="ngModel">
-        <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
-          {{ userLabel(v) }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="idUsuario_atiende.invalid && idUsuario_atiende.touched" style="margin-left:16px;">
-      Debes seleccionar un veterinario.
-    </ion-note>
-
-    <!-- FECHA -->
-    <ion-item>
-      <ion-label position="floating">Fecha *</ion-label>
-      <ion-input
-        type="date"
-        name="fecha"
-        [(ngModel)]="form.fecha"
-        required
-        #fecha="ngModel">
-      </ion-input>
-    </ion-item>
-    <ion-note color="danger" *ngIf="fecha.invalid && fecha.touched" style="margin-left:16px;">
-      La fecha es obligatoria.
-    </ion-note>
-
-    <!-- HORA INICIO -->
-    <ion-item>
-      <ion-label position="floating">Hora inicio *</ion-label>
-      <ion-input
-        type="time"
-        name="HoraIni"
-        [(ngModel)]="form.HoraIni"
-        required
-        #HoraIni="ngModel">
-      </ion-input>
-    </ion-item>
-    <ion-note color="danger" *ngIf="HoraIni.invalid && HoraIni.touched" style="margin-left:16px;">
-      Hora inicio es obligatoria.
-    </ion-note>
-
-    <!-- HORA FIN -->
-    <ion-item>
-      <ion-label position="floating">Hora fin *</ion-label>
-      <ion-input
-        type="time"
-        name="HoraFin"
-        [(ngModel)]="form.HoraFin"
-        required
-        #HoraFin="ngModel">
-      </ion-input>
-    </ion-item>
-    <ion-note color="danger" *ngIf="HoraFin.invalid && HoraFin.touched" style="margin-left:16px;">
-      Hora fin es obligatoria.
-    </ion-note>
-
-    <!-- ESTADO -->
-    <ion-item>
-      <ion-label position="floating">Estado *</ion-label>
-      <ion-select name="estado" [(ngModel)]="form.estado" required #estado="ngModel">
-        <ion-select-option *ngFor="let e of estados" [value]="e">
-          {{ e }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="estado.invalid && estado.touched" style="margin-left:16px;">
-      El estado es obligatorio.
-    </ion-note>
-
-    <!-- MOTIVO -->
-    <ion-item>
-      <ion-label position="floating">Motivo</ion-label>
-      <ion-input name="motivo" [(ngModel)]="form.motivo"></ion-input>
-    </ion-item>
-
-    <!-- NOTAS -->
-    <ion-item>
-      <ion-label position="floating">Notas</ion-label>
-      <ion-textarea
-        name="notas"
-        [(ngModel)]="form.notas"
-        autoGrow="true">
-      </ion-textarea>
-    </ion-item>
-
-    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
-      {{ errorMsg }}
-    </div>
-    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
-      {{ okMsg }}
+      <div class="page-head-right">
+        <div class="hint-chip">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>Campos obligatorios (*)</span>
+        </div>
+      </div>
     </div>
 
-    <ion-button
-      expand="block"
-      type="submit"
-      [disabled]="f.invalid || loading"
-      style="margin-top: 18px;">
-      {{ loading ? 'Guardando...' : 'Guardar' }}
-    </ion-button>
+    <!-- Layout (desktop: 2 columnas) -->
+    <div class="form-layout">
 
-    <ion-button
-      expand="block"
-      fill="outline"
-      type="button"
-      (click)="cancelar()">
-      Cancelar
-    </ion-button>
+      <!-- Panel informativo (desktop: izquierda) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img
+              class="brand-logo"
+              src="../../assets/marca/imagen corporativa.png"
+              alt="DGM"
+            />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-  </form>
+          <div class="side-copy">
+            <h3>Consejos</h3>
+            <ul>
+              <li>Verifica el animal y el veterinario antes de guardar.</li>
+              <li>Evita solapar horas con otra cita.</li>
+              <li>Usa “Notas” para información relevante.</li>
+            </ul>
+          </div>
+
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
+
+      <!-- Formulario (desktop: derecha) -->
+      <section class="form-panel">
+        <div class="form-card">
+
+          <form #f="ngForm" (ngSubmit)="guardar()" class="appt-form">
+
+            <!-- Datos principales -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="clipboard-outline"></ion-icon>
+                <span>Datos de la cita</span>
+              </div>
+
+              <!-- ANIMAL -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Animal *</ion-label>
+                <ion-select
+                  name="idAnimal"
+                  [(ngModel)]="form.idAnimal"
+                  required
+                  #idAnimal="ngModel">
+                  <ion-select-option *ngFor="let a of animales" [value]="a.idAnimal">
+                    {{ animalLabel(a) }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div class="field-error" *ngIf="idAnimal.invalid && idAnimal.touched">
+                Debes seleccionar un animal.
+              </div>
+
+              <!-- USUARIO QUE PROGRAMA -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Usuario que asigna *</ion-label>
+                <ion-select
+                  name="idUsuario_programa"
+                  [(ngModel)]="form.idUsuario_programa"
+                  required
+                  #idUsuario_programa="ngModel">
+                  <ion-select-option *ngFor="let u of programadores" [value]="u.idUsuario">
+                    {{ userLabel(u) }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div class="field-error" *ngIf="idUsuario_programa.invalid && idUsuario_programa.touched">
+                Debes seleccionar quién asigna la cita.
+              </div>
+
+              <!-- VETERINARIO QUE ATIENDE -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Veterinario que atiende *</ion-label>
+                <ion-select
+                  name="idUsuario_atiende"
+                  [(ngModel)]="form.idUsuario_atiende"
+                  required
+                  #idUsuario_atiende="ngModel">
+                  <ion-select-option *ngFor="let v of veterinarios" [value]="v.idUsuario">
+                    {{ userLabel(v) }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div class="field-error" *ngIf="idUsuario_atiende.invalid && idUsuario_atiende.touched">
+                Debes seleccionar un veterinario.
+              </div>
+
+              <!-- FECHA -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Fecha *</ion-label>
+                <ion-input
+                  type="date"
+                  name="fecha"
+                  [(ngModel)]="form.fecha"
+                  required
+                  #fecha="ngModel">
+                </ion-input>
+              </ion-item>
+              <div class="field-error" *ngIf="fecha.invalid && fecha.touched">
+                La fecha es obligatoria.
+              </div>
+
+              <!-- HORAS: 2 columnas en desktop -->
+              <div class="grid-2">
+                <!-- HORA INICIO -->
+                <div>
+                  <ion-item class="field" lines="inset">
+                    <ion-label position="floating">Hora inicio *</ion-label>
+                    <ion-input
+                      type="time"
+                      name="HoraIni"
+                      [(ngModel)]="form.HoraIni"
+                      required
+                      #HoraIni="ngModel">
+                    </ion-input>
+                  </ion-item>
+                  <div class="field-error" *ngIf="HoraIni.invalid && HoraIni.touched">
+                    Hora inicio es obligatoria.
+                  </div>
+                </div>
+
+                <!-- HORA FIN -->
+                <div>
+                  <ion-item class="field" lines="inset">
+                    <ion-label position="floating">Hora fin *</ion-label>
+                    <ion-input
+                      type="time"
+                      name="HoraFin"
+                      [(ngModel)]="form.HoraFin"
+                      required
+                      #HoraFin="ngModel">
+                    </ion-input>
+                  </ion-item>
+                  <div class="field-error" *ngIf="HoraFin.invalid && HoraFin.touched">
+                    Hora fin es obligatoria.
+                  </div>
+                </div>
+              </div>
+
+              <!-- ESTADO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Estado *</ion-label>
+                <ion-select
+                  name="estado"
+                  [(ngModel)]="form.estado"
+                  required
+                  #estado="ngModel">
+                  <ion-select-option *ngFor="let e of estados" [value]="e">
+                    {{ e }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div class="field-error" *ngIf="estado.invalid && estado.touched">
+                El estado es obligatorio.
+              </div>
+            </div>
+
+            <!-- Detalles -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                <span>Detalles</span>
+              </div>
+
+              <!-- MOTIVO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Motivo</ion-label>
+                <ion-input name="motivo" [(ngModel)]="form.motivo"></ion-input>
+              </ion-item>
+
+              <!-- NOTAS -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Notas</ion-label>
+                <ion-textarea
+                  name="notas"
+                  [(ngModel)]="form.notas"
+                  autoGrow="true">
+                </ion-textarea>
+              </ion-item>
+            </div>
+
+            <!-- Mensajes -->
+            <div class="server-error" *ngIf="errorMsg">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ errorMsg }}</div>
+            </div>
+
+            <div class="server-ok" *ngIf="okMsg">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ okMsg }}</div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || loading">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ loading ? 'Guardando...' : 'Guardar' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelar()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </div>
 </ion-content>

@@ -1,13 +1,13 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Detalle de animal</ion-title>
-
+<ion-header class="animal-detail-header">
+  <ion-toolbar class="animal-detail-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-animales"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="animal-detail-title">Detalle de animal</ion-title>
+
     <ion-buttons slot="end" *ngIf="animal && !editMode && canEditar">
-      <ion-button (click)="activarEdicion()">
+      <ion-button class="edit-btn" (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
       </ion-button>
@@ -15,267 +15,358 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  
+<ion-content class="animal-detail-content">
+  <div class="animal-detail-shell">
 
-  <ion-item *ngIf="loading">
-    <ion-label>Cargando animal...</ion-label>
-  </ion-item>
+    <!-- Estados -->
+    <div class="state-row" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando animal…</span>
+    </div>
 
-  <ion-item *ngIf="errorMsg" lines="none">
-    <ion-label style="color:red">{{ errorMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert error" *ngIf="errorMsg">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ errorMsg }}</div>
+    </div>
 
-  <ion-item *ngIf="okMsg" lines="none">
-    <ion-label style="color:green">{{ okMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert ok" *ngIf="okMsg">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ okMsg }}</div>
+    </div>
 
-  <!-- ===================== -->
-  <!-- MODO DETALLE (VER) -->
-  <!-- ===================== -->
+    <!-- Contenido -->
+    <div *ngIf="animal" class="layout">
 
+      <!-- Panel lateral (desktop) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
+          <div class="side-copy">
+            <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
+            <p class="ion-text-wrap">
+              {{ editMode
+                ? 'Actualiza la información del animal y guarda los cambios.'
+                : 'Revisa los datos del animal y edita si tienes permisos.' }}
+            </p>
 
-  
-  <div *ngIf="animal && !editMode">
+            <div class="chip" *ngIf="!editMode">
+              <ion-icon name="paw-outline"></ion-icon>
+              <span>Ficha del animal</span>
+            </div>
 
-  <ion-grid class="photo-grid">
-    <ion-row class="ion-align-items-center">
-      <ion-col size="12">
-        <div class="photo-box">
-          <ion-img
-            *ngIf="originalPhoto"
-            class="photo-frame"
-            [src]="originalPhoto">
-          </ion-img>
+            <div class="chip warn" *ngIf="editMode && isCliente">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <span>Solo foto editable</span>
+            </div>
+          </div>
 
-          <ion-img
-            *ngIf="!originalPhoto"
-            class="photo-frame placeholder"
-            src="../../assets/No-Image-Placeholder.svg">
-          </ion-img>
+          <div class="side-decor" aria-hidden="true"></div>
         </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      </aside>
 
-    <ion-list>
+      <!-- Panel principal -->
+      <section class="main-panel">
 
-      <ion-item>
-        <ion-label>
-          <h2>Propietario</h2>
-          <p>{{ ownerLabelById(animal.idUsuario) }}</p>
-        </ion-label>
-      </ion-item>
+        <!-- ===================== -->
+        <!-- MODO DETALLE (VER) -->
+        <!-- ===================== -->
+        <div *ngIf="!editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge" aria-hidden="true">
+                <ion-icon name="paw-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Información del animal</div>
+                <div class="card-subtitle">
+                  {{ animal.nombre || '—' }} · {{ animal.especie || '—' }}
+                </div>
+              </div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Nombre</h2>
-          <p>{{ animal.nombre || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="role-pill">
+              <ion-icon name="person-outline"></ion-icon>
+              <span>{{ ownerLabelById(animal.idUsuario) }}</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Especie</h2>
-          <p>{{ animal.especie || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Raza</h2>
-          <p>{{ animal.raza || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Fecha de nacimiento</h2>
-          <p>{{ animal.Fechanac || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Sexo</h2>
-          <p>{{ animal.sexo || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Observaciones</h2>
-          <p>{{ animal.observaciones || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Foto</h2>
-          <p>{{ animal.foto || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-    </ion-list>
-
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
-    </ion-button>
-
-  </div>
-
-  <!-- ===================== -->
-  <!-- MODO EDICIÓN -->
-  <!-- ===================== -->
-  <div *ngIf="animal && editMode">
-
- <ion-grid class="photo-grid">
-        <ion-row class="ion-align-items-center">
-          <ion-col size="12" size-md="6">
-            <div class="photo-box" (click)="takePhoto()">
+          <!-- Foto (vista) -->
+          <div class="photo-wrap">
+            <div class="photo-box">
               <ion-img
-                *ngIf="capturedPhoto"
+                *ngIf="originalPhoto"
                 class="photo-frame"
-                [src]="capturedPhoto">
+                [src]="originalPhoto">
               </ion-img>
 
               <ion-img
-                *ngIf="!capturedPhoto"
+                *ngIf="!originalPhoto"
                 class="photo-frame placeholder"
                 src="../../assets/No-Image-Placeholder.svg">
               </ion-img>
+            </div>
+          </div>
 
-              <div class="photo-hint">
-                <ion-icon name="camera-outline"></ion-icon>
-                <span>Toca para cambiar</span>
+          <!-- Datos (kv-grid) -->
+          <div class="kv-grid">
+            <div class="kv full">
+              <div class="k">Propietario</div>
+              <div class="v">{{ ownerLabelById(animal.idUsuario) }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Nombre</div>
+              <div class="v">{{ animal.nombre || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Especie</div>
+              <div class="v">{{ animal.especie || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Raza</div>
+              <div class="v">{{ animal.raza || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Fecha de nacimiento</div>
+              <div class="v">{{ animal.Fechanac || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Sexo</div>
+              <div class="v">{{ animal.sexo || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Observaciones</div>
+              <div class="v">{{ animal.observaciones || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Foto</div>
+              <div class="v">{{ animal.foto || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver al listado
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- MODO EDICIÓN -->
+        <!-- ===================== -->
+        <div *ngIf="editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge edit" aria-hidden="true">
+                <ion-icon name="create-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Editar animal</div>
+                <div class="card-subtitle">Modifica los campos y guarda.</div>
               </div>
             </div>
-          </ion-col>
 
-          <ion-col size="12" size-md="6">
-            <div class="photo-actions">
-              <ion-button class="action-btn" fill="outline" (click)="takePhoto()">
-                <ion-icon slot="start" name="camera-outline"></ion-icon>
-                Take a photo
+            <div class="role-pill soft">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Permisos aplicados</span>
+            </div>
+          </div>
+
+          <!-- Foto (edición) -->
+          <div class="block">
+            <div class="block-title">
+              <ion-icon name="camera-outline"></ion-icon>
+              <span>Foto</span>
+            </div>
+
+            <ion-grid class="photo-grid">
+              <ion-row class="ion-align-items-center">
+                <ion-col size="12" size-md="6">
+                  <div class="photo-box" (click)="takePhoto()">
+                    <ion-img
+                      *ngIf="capturedPhoto"
+                      class="photo-frame"
+                      [src]="capturedPhoto">
+                    </ion-img>
+
+                    <ion-img
+                      *ngIf="!capturedPhoto"
+                      class="photo-frame placeholder"
+                      src="../../assets/No-Image-Placeholder.svg">
+                    </ion-img>
+
+                    <div class="photo-hint">
+                      <ion-icon name="camera-outline"></ion-icon>
+                      <span>Toca para cambiar</span>
+                    </div>
+                  </div>
+                </ion-col>
+
+                <ion-col size="12" size-md="6">
+                  <div class="photo-actions">
+                    <ion-button class="action-btn" fill="outline" (click)="takePhoto()">
+                      <ion-icon slot="start" name="camera-outline"></ion-icon>
+                      Take a photo
+                    </ion-button>
+
+                    <ion-button class="action-btn" fill="outline" (click)="pickImage()">
+                      <ion-icon slot="start" name="image-outline"></ion-icon>
+                      Pick an image
+                    </ion-button>
+
+                    <ion-button class="action-btn danger" fill="outline" (click)="discardImage()">
+                      <ion-icon slot="start" name="aperture"></ion-icon>
+                      Discard image
+                    </ion-button>
+                  </div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+
+          <form #f="ngForm" (ngSubmit)="guardarCambios()" class="animal-form">
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="id-card-outline"></ion-icon>
+                <span>Datos principales</span>
+              </div>
+
+              <!-- Dueño: solo NO-cliente -->
+              <ion-item class="field" lines="inset" *ngIf="!isCliente">
+                <ion-label position="floating">Propietario (dueño)</ion-label>
+                <ion-select name="idUsuario" [(ngModel)]="form.idUsuario" required>
+                  <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
+                    {{ u.nif }} - {{ (u.nombre || '') }} {{ (u.apellidos || '') }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <!-- Nombre -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Nombre *</ion-label>
+                <ion-input
+                  name="nombre"
+                  [(ngModel)]="form.nombre"
+                  required
+                  [disabled]="isCliente">
+                </ion-input>
+              </ion-item>
+
+              <div class="grid-2">
+                <!-- Especie -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Especie *</ion-label>
+                  <ion-input
+                    name="especie"
+                    [(ngModel)]="form.especie"
+                    required
+                    [disabled]="isCliente">
+                  </ion-input>
+                </ion-item>
+
+                <!-- Raza -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Raza</ion-label>
+                  <ion-input
+                    name="raza"
+                    [(ngModel)]="form.raza"
+                    [disabled]="isCliente">
+                  </ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>Información adicional</span>
+              </div>
+
+              <div class="grid-2">
+                <!-- Fecha nacimiento -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Fecha de nacimiento</ion-label>
+                  <ion-input
+                    type="date"
+                    name="Fechanac"
+                    [(ngModel)]="form.Fechanac"
+                    [disabled]="isCliente">
+                  </ion-input>
+                </ion-item>
+
+                <!-- Sexo -->
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Sexo</ion-label>
+                  <ion-select name="sexo" [(ngModel)]="form.sexo" [disabled]="isCliente">
+                    <ion-select-option [value]="null">-</ion-select-option>
+                    <ion-select-option value="M">M</ion-select-option>
+                    <ion-select-option value="H">H</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <!-- Observaciones -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Observaciones</ion-label>
+                <ion-textarea
+                  name="observaciones"
+                  [(ngModel)]="form.observaciones"
+                  [disabled]="isCliente">
+                </ion-textarea>
+              </ion-item>
+
+              <!-- Foto: SIEMPRE editable -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Foto (URL o nombre)</ion-label>
+                <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
+              </ion-item>
+
+              <div class="readonly-note" *ngIf="isCliente">
+                * Como cliente, solo puedes modificar la foto del animal.
+              </div>
+            </div>
+
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || saving">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ saving ? 'Guardando...' : 'Guardar cambios' }}
               </ion-button>
 
-              <ion-button class="action-btn" fill="outline" (click)="pickImage()">
-                <ion-icon slot="start" name="image-outline"></ion-icon>
-                Pick an image
-              </ion-button>
-
-              <ion-button class="action-btn danger" fill="outline" (click)="discardImage()">
-                <ion-icon slot="start" name="aperture"></ion-icon>
-                Discard image
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
               </ion-button>
             </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
 
-    <form #f="ngForm" (ngSubmit)="guardarCambios()">
+          </form>
+        </div>
 
-      <!-- Dueño: solo NO-cliente -->
-      <ion-item *ngIf="!isCliente">
-        <ion-label position="floating">Propietario (dueño)</ion-label>
-        <ion-select name="idUsuario" [(ngModel)]="form.idUsuario" required>
-          <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
-            {{ u.nif }} - {{ (u.nombre || '') }} {{ (u.apellidos || '') }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      </section>
+    </div>
 
-      <!-- Nombre -->
-      <ion-item>
-        <ion-label position="floating">Nombre *</ion-label>
-        <ion-input
-          name="nombre"
-          [(ngModel)]="form.nombre"
-          required
-          [disabled]="isCliente">
-        </ion-input>
-      </ion-item>
-
-      <!-- Especie -->
-      <ion-item>
-        <ion-label position="floating">Especie *</ion-label>
-        <ion-input
-          name="especie"
-          [(ngModel)]="form.especie"
-          required
-          [disabled]="isCliente">
-        </ion-input>
-      </ion-item>
-
-      <!-- Raza -->
-      <ion-item>
-        <ion-label position="floating">Raza</ion-label>
-        <ion-input
-          name="raza"
-          [(ngModel)]="form.raza"
-          [disabled]="isCliente">
-        </ion-input>
-      </ion-item>
-
-      <!-- Fecha nacimiento -->
-      <ion-item>
-        <ion-label position="floating">Fecha de nacimiento</ion-label>
-        <ion-input
-          type="date"
-          name="Fechanac"
-          [(ngModel)]="form.Fechanac"
-          [disabled]="isCliente">
-        </ion-input>
-      </ion-item>
-
-      <!-- Sexo -->
-      <ion-item>
-        <ion-label position="floating">Sexo</ion-label>
-        <ion-select name="sexo" [(ngModel)]="form.sexo" [disabled]="isCliente">
-          <ion-select-option [value]="null">-</ion-select-option>
-          <ion-select-option value="M">M</ion-select-option>
-          <ion-select-option value="H">H</ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- Observaciones -->
-      <ion-item>
-        <ion-label position="floating">Observaciones</ion-label>
-        <ion-textarea
-          name="observaciones"
-          [(ngModel)]="form.observaciones"
-          [disabled]="isCliente">
-        </ion-textarea>
-      </ion-item>
-
-      <!-- Foto: SIEMPRE editable -->
-      <ion-item>
-        <ion-label position="floating">Foto (URL o nombre)</ion-label>
-        <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
-      </ion-item>
-
-      <ion-note color="medium" *ngIf="isCliente" style="margin-left:16px; margin-top:8px;">
-        Como cliente, solo puedes modificar la foto del animal.
-      </ion-note>
-
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="f.invalid || saving"
-        style="margin-top: 18px;">
-        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        type="button"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </ion-button>
-
-    </form>
   </div>
-
 </ion-content>

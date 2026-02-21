@@ -1,47 +1,88 @@
-<!-- frontend/src/app/login/login.page.html -->
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Iniciar sesión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="login-content">
+  <div class="login-shell">
 
-<ion-content class="ion-padding">
-  <form (ngSubmit)="login()" #loginForm="ngForm">
-    <ion-item>
-      <ion-label position="floating">Email</ion-label>
-      <ion-input
-        type="email"
-        required
-        name="email"
-        [(ngModel)]="email"
-        #emailInput="ngModel">
-      </ion-input>
-    </ion-item>
+    <div class="login-layout">
+      <!-- Panel Marca / Visual (PC: izquierda) -->
+      <aside class="brand-panel">
+        <div class="brand-top">
+          <!-- Pon tu logo (trazos) aquí -->
+          <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
 
-    <div *ngIf="emailInput.invalid && emailInput.touched" style="color:red; margin-left: 16px;">
-      El email es obligatorio.
+          <div class="brand-text">
+            <div class="brand-title">DGM</div>
+            <div class="brand-subtitle">Gestión veterinaria</div>
+          </div>
+        </div>
+
+        <div class="brand-copy">
+          <h2>Acceso seguro</h2>
+          <p>
+            Gestión clínica y portal del cliente.
+          </p>
+        </div>
+
+        <!-- Decoración suave (line art) -->
+        <div class="brand-decor" aria-hidden="true"></div>
+      </aside>
+
+      <!-- Card Login (PC: derecha) -->
+      <section class="card-panel">
+        <div class="login-card">
+          <header class="login-head">
+            <h1>Iniciar sesión</h1>
+            <p>Introduce tus credenciales para continuar.</p>
+          </header>
+
+          <form (ngSubmit)="login()" #loginForm="ngForm" class="login-form">
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">Email</ion-label>
+              <ion-input
+                type="email"
+                required
+                name="email"
+                [(ngModel)]="email"
+                #emailInput="ngModel">
+              </ion-input>
+            </ion-item>
+
+            <div class="field-error" *ngIf="emailInput.invalid && emailInput.touched">
+              El email es obligatorio.
+            </div>
+
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">Contraseña</ion-label>
+              <ion-input
+                type="password"
+                required
+                name="password"
+                [(ngModel)]="password"
+                #passwordInput="ngModel">
+              </ion-input>
+            </ion-item>
+
+            <div class="field-error" *ngIf="passwordInput.invalid && passwordInput.touched">
+              La contraseña es obligatoria.
+            </div>
+
+            <ion-button
+              class="submit-btn"
+              expand="block"
+              type="submit"
+              [disabled]="loginForm.invalid || loading">
+              {{ loading ? 'Entrando…' : 'Entrar' }}
+            </ion-button>
+
+            <div class="loading" *ngIf="loading">Cargando…</div>
+            <div class="server-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+          </form>
+
+          <footer class="login-foot">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            <span>Conexión segura</span>
+          </footer>
+        </div>
+      </section>
     </div>
 
-    <ion-item>
-      <ion-label position="floating">Contraseña</ion-label>
-      <ion-input
-        type="password"
-        required
-        name="password"
-        [(ngModel)]="password"
-        #passwordInput="ngModel">
-      </ion-input>
-    </ion-item>
-
-    <div *ngIf="passwordInput.invalid && passwordInput.touched" style="color:red; margin-left: 16px;">
-      La contraseña es obligatoria.
-    </div>
-
-    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || loading">
-      Entrar
-    </ion-button>
-
-    <div *ngIf="loading" style="text-align:center; margin-top:8px;">Cargando...</div>
-    <div *ngIf="errorMsg" style="color:red; margin:16px 0;">{{errorMsg}}</div>
-  </form>
+  </div>
 </ion-content>

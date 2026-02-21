@@ -1,13 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Animales</ion-title>
-
-        <ion-buttons slot="start">
+<ion-header class="animals-header">
+  <ion-toolbar class="animals-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="animals-title">Animales</ion-title>
+
     <ion-buttons slot="end" *ngIf="canNuevo">
-      <ion-button (click)="crearAnimal()">
+      <ion-button class="new-btn" (click)="crearAnimal()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -15,88 +15,156 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="animals-content">
+  <div class="animals-shell">
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
+    <!-- Encabezado de sección -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="paw-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
+        <div>
+          <div class="page-title">Gestión de animales</div>
+          <div class="page-subtitle">
+            Filtra por especie y busca por nombre, raza o propietario.
+          </div>
+        </div>
+      </div>
 
-      <ion-item>
-        <ion-label>Especie</ion-label>
-        <ion-select [(ngModel)]="filtroEspecie" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todas">Todas</ion-select-option>
-          <ion-select-option *ngFor="let e of especiesDisponibles" [value]="e">
-            {{ e }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      <div class="page-head-right" *ngIf="animalesFiltrados && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ animalesFiltrados.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-      <ion-item>
-        <ion-label position="floating">Buscar por animal, raza o propietario</ion-label>
-        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+    <div class="animals-layout">
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+      <!-- Panel filtros -->
+      <aside class="filters-panel">
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Ajusta el listado por especie y búsqueda.</p>
+          </div>
 
-    </ion-card-content>
-  </ion-card>
+          <div class="filters-body">
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+            <ion-item class="field" lines="inset">
+              <ion-label>Especie</ion-label>
+              <ion-select [(ngModel)]="filtroEspecie" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todas">Todas</ion-select-option>
+                <ion-select-option *ngFor="let e of especiesDisponibles" [value]="e">
+                  {{ e }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">Buscar por animal, raza o propietario</ion-label>
+              <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
-    <ion-item *ngFor="let a of animalesFiltrados">
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
 
-<ion-avatar class="fleet-avatar" slot="start">
-          <img
-            *ngIf="a.foto; else placeholder"
-            src="http://localhost:8080/images/{{a.foto}}"
-            alt="image"
-          />
-          <ng-template #placeholder>
-            <div class="avatar-placeholder">
-              <ion-icon name="camera-outline"></ion-icon>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Listado -->
+      <section class="list-panel">
+
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando animales…</span>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
+
+        <!-- LISTADO -->
+        <ion-list class="animals-list" *ngIf="!loading">
+          <ion-item class="animal-item" lines="none" *ngFor="let a of animalesFiltrados">
+
+            <ion-avatar class="animal-avatar" slot="start">
+              <img
+                *ngIf="a.foto; else placeholder"
+                src="http://localhost:8080/images/{{a.foto}}"
+                alt="image"
+              />
+              <ng-template #placeholder>
+                <div class="avatar-placeholder">
+                  <ion-icon name="camera-outline"></ion-icon>
+                </div>
+              </ng-template>
+            </ion-avatar>
+
+            <ion-label class="ion-text-wrap">
+              <h2>{{ a.nombre }}</h2>
+
+              <div class="meta">
+                <div class="meta-row">
+                  <span class="k">Propietario:</span>
+                  <span class="v">{{ getOwnerName(a.idUsuario) }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="k">Especie:</span>
+                  <span class="v">{{ a.especie }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="k">Raza:</span>
+                  <span class="v">{{ a.raza || '-' }}</span>
+                </div>
+              </div>
+            </ion-label>
+
+            <!-- Acciones -->
+            <div class="actions" slot="end">
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(a)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
+
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminar"
+                fill="outline"
+                (click)="eliminarAnimal(a)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
             </div>
-          </ng-template>
-        </ion-avatar>
 
-      <ion-label>
-        <h2>{{ a.nombre }}</h2>
-        <p><b>Propietario:</b> {{ getOwnerName(a.idUsuario) }}</p>
-        <p><b>Especie:</b> {{ a.especie }}</p>
-        <p><b>Raza:</b> {{ a.raza || '-' }}</p>
-      </ion-label>
+          </ion-item>
+        </ion-list>
 
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(a)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="animalesFiltrados.length === 0 && !loading">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay animales para mostrar.
+          </div>
+        </div>
 
-      <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarAnimal(a)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
 
-    </ion-item>
-  </ion-list>
+      </section>
+    </div>
 
-
-  <ion-text *ngIf="animalesFiltrados.length === 0 && !loading">
-    <p>No hay animales para mostrar.</p>
-  </ion-text>
-
-      <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
-
+  </div>
 </ion-content>
