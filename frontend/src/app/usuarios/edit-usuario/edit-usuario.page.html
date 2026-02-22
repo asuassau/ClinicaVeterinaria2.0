@@ -287,7 +287,7 @@
                 class="submit-btn"
                 expand="block"
                 type="submit"
-                [disabled]="saving">
+                [disabled]="f.invalid || saving">
                 <ion-icon name="save-outline" slot="start"></ion-icon>
                 {{ saving ? 'Guardando...' : 'Guardar cambios' }}
               </ion-button>
