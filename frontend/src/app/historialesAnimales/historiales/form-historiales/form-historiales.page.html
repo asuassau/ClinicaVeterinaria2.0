@@ -1,77 +1,174 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Nuevo historial</ion-title>
+<ion-header class="hist-form-header">
+  <ion-toolbar class="hist-form-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-historiales"></ion-back-button>
     </ion-buttons>
+
+    <ion-title class="hist-form-title">Nuevo historial</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="hist-form-content">
+  <div class="hist-form-shell">
 
-  <form #f="ngForm" (ngSubmit)="guardar()">
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </div>
 
-    <!-- ANIMAL -->
-    <ion-item>
-      <ion-label position="floating">Animal *</ion-label>
-      <ion-select
-        name="idAnimal"
-        [(ngModel)]="form.idAnimal"
-        required
-        #idAnimal="ngModel">
+        <div>
+          <div class="page-title">Alta de historial</div>
+          <div class="page-subtitle">
+            Selecciona el animal y crea el historial clínico.
+          </div>
+        </div>
+      </div>
 
-        <ion-select-option *ngFor="let a of animalesVM" [value]="a.idAnimal">
-          {{ a.label }}
-        </ion-select-option>
-
-      </ion-select>
-    </ion-item>
-
-    <ion-note color="danger" *ngIf="idAnimal.invalid && idAnimal.touched" style="margin-left:16px;">
-      Debes seleccionar un animal.
-    </ion-note>
-
-    <!-- RESUMEN AUTO -->
-    <ion-card style="margin-top: 14px;">
-      <ion-card-header>
-        <ion-card-title>Datos automáticos</ion-card-title>
-      </ion-card-header>
-
-      <ion-card-content>
-        <p><b>Fecha alta:</b> Se asigna automáticamente (hoy).</p>
-        <p><b>Estado:</b> Se crea automáticamente como <b>Activo</b>.</p>
-        <p><b>ID Historial:</b> Se genera automáticamente.</p>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- LOADING -->
-    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
-
-    <!-- MENSAJES -->
-    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
-      {{ errorMsg }}
-    </div>
-    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
-      {{ okMsg }}
+      <div class="page-head-right">
+        <div class="hint-chip">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <span>Campos obligatorios (*)</span>
+        </div>
+      </div>
     </div>
 
-    <!-- BOTONES -->
-    <ion-button
-      expand="block"
-      type="submit"
-      [disabled]="f.invalid || loading"
-      style="margin-top: 18px;">
-      {{ loading ? 'Guardando...' : 'Guardar' }}
-    </ion-button>
+    <!-- Layout (desktop 2 columnas) -->
+    <div class="form-layout">
 
-    <ion-button
-      expand="block"
-      fill="outline"
-      type="button"
-      (click)="cancelar()">
-      Cancelar
-    </ion-button>
+      <!-- Panel lateral -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-  </form>
+          <div class="side-copy">
+            <h3>Información</h3>
+            <ul>
+              <li>El historial se crea como <b>Activo</b>.</li>
+              <li>La fecha de alta se asigna automáticamente.</li>
+              <li>El ID del historial se genera al guardar.</li>
+            </ul>
 
+            <div class="chip">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Datos automáticos</span>
+            </div>
+          </div>
+
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
+
+      <!-- Formulario -->
+      <section class="form-panel">
+        <div class="form-card">
+
+          <form #f="ngForm" (ngSubmit)="guardar()" class="hist-form">
+
+            <!-- Bloque: Selección -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="paw-outline"></ion-icon>
+                <span>Selección</span>
+              </div>
+
+              <!-- ANIMAL -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Animal *</ion-label>
+                <ion-select
+                  name="idAnimal"
+                  [(ngModel)]="form.idAnimal"
+                  required
+                  #idAnimal="ngModel">
+                  <ion-select-option *ngFor="let a of animalesVM" [value]="a.idAnimal">
+                    {{ a.label }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <div class="field-error" *ngIf="idAnimal.invalid && idAnimal.touched">
+                Debes seleccionar un animal.
+              </div>
+            </div>
+
+            <!-- Bloque: Datos automáticos (tu card, estilizada) -->
+            <div class="auto-card">
+              <div class="auto-head">
+                <div class="auto-icon" aria-hidden="true">
+                  <ion-icon name="sparkles-outline"></ion-icon>
+                </div>
+                <div>
+                  <div class="auto-title">Datos automáticos</div>
+                  <div class="auto-subtitle">Se completan al crear el historial.</div>
+                </div>
+              </div>
+
+              <div class="auto-body">
+                <div class="auto-row">
+                  <span class="k">Fecha alta:</span>
+                  <span class="v">Se asigna automáticamente (hoy).</span>
+                </div>
+                <div class="auto-row">
+                  <span class="k">Estado:</span>
+                  <span class="v">Se crea automáticamente como <b>Activo</b>.</span>
+                </div>
+                <div class="auto-row">
+                  <span class="k">ID Historial:</span>
+                  <span class="v">Se genera automáticamente.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- LOADING -->
+            <div class="state-row" *ngIf="loading">
+              <ion-spinner name="crescent"></ion-spinner>
+              <span>Guardando historial…</span>
+            </div>
+
+            <!-- MENSAJES -->
+            <div class="server-error" *ngIf="errorMsg">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ errorMsg }}</div>
+            </div>
+
+            <div class="server-ok" *ngIf="okMsg">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ okMsg }}</div>
+            </div>
+
+            <!-- ACCIONES -->
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || loading">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ loading ? 'Guardando...' : 'Guardar' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelar()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </div>
 </ion-content>

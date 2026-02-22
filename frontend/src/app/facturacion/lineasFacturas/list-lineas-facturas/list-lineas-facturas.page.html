@@ -1,14 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Líneas de factura</ion-title>
-
-        <ion-buttons slot="start">
+<ion-header class="bill-lines-header">
+  <ion-toolbar class="bill-lines-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-facturas"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="bill-lines-title">Líneas de factura</ion-title>
 
     <ion-buttons slot="end" *ngIf="canNuevoLinea">
-      <ion-button (click)="crearLinea()">
+      <ion-button class="new-btn" (click)="crearLinea()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -16,66 +15,150 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="bill-lines-content">
+  <div class="bill-lines-shell">
 
-  <!-- INFO FACTURA -->
-  <ion-card *ngIf="factura">
-    <ion-card-header>
-      <ion-card-title>Factura #{{ factura.idFactura }}</ion-card-title>
-    </ion-card-header>
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="list-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
-      <p><b>Estado:</b> {{ factura.estado }}</p>
-      <p><b>Total (calculado):</b> {{ factura.total }}</p>
+        <div>
+          <div class="page-title">Gestión de líneas</div>
+          <div class="page-subtitle">
+            Consulta y administra las líneas asociadas a una factura.
+          </div>
+        </div>
+      </div>
 
-      <!-- aviso útil -->
-      <ion-text color="medium" *ngIf="!canNuevoLinea">
-        <p style="margin-top:10px;">
-          No se pueden crear líneas en esta factura (solo permitido si está <b>Pagada</b> según permisos).
-        </p>
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
+      <div class="page-head-right" *ngIf="lineas && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ lineas.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+    <div class="bill-lines-layout">
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+      <!-- Panel info (izquierda) -->
+      <aside class="info-panel">
+        <div class="info-card">
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+          <div class="info-head">
+            <h2>Factura</h2>
+            <p>Resumen y estado actual.</p>
+          </div>
 
-    <ion-item *ngFor="let l of lineas">
-      <ion-label>
-        <h2>{{ nombreElemento(l) }}</h2>
+          <div class="info-body">
 
-        <p><b>Cantidad:</b> {{ l.cantidad }}</p>
-        <p><b>Precio unitario:</b> {{ precioElemento(l) }}</p>
-        <p><b>Importe:</b> {{ importeLinea(l) }}</p>
-      </ion-label>
+            <div class="kv" *ngIf="factura">
+              <div class="k">Factura</div>
+              <div class="v">#{{ factura.idFactura }}</div>
+            </div>
 
-      <!-- Ver detalle (esto es "ver") -->
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(l)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+            <div class="kv" *ngIf="factura">
+              <div class="k">Estado</div>
+              <div class="v">
+                <span class="status-pill">{{ factura.estado || '-' }}</span>
+              </div>
+            </div>
 
-      <!-- Eliminar (solo si permiso con ctx estadoFactura) -->
-      <ion-button *ngIf="canEliminarLinea" color="danger" fill="outline" slot="end" (click)="eliminarLinea(l)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
-    </ion-item>
+            <div class="kv" *ngIf="factura">
+              <div class="k">Total (calculado)</div>
+              <div class="v">{{ factura.total }}</div>
+            </div>
 
-  </ion-list>
+            <!-- aviso útil -->
+            <div class="hint-card" *ngIf="!canNuevoLinea">
+              <ion-icon name="information-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">
+                No se pueden crear líneas en esta factura (solo permitido si está <b>Pagada</b> según permisos).
+              </div>
+            </div>
 
-  <ion-text *ngIf="lineas.length === 0 && !loading && !errorMsg">
-    <p>No hay líneas para esta factura.</p>
-  </ion-text>
+            <ion-button
+              class="back-btn"
+              expand="block"
+              fill="outline"
+              (click)="volverAFacturas()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver a facturas
+            </ion-button>
 
-  <ion-button expand="block" fill="outline" (click)="volverAFacturas()" style="margin-top: 12px;">
-    Volver a facturas
-  </ion-button>
+          </div>
+        </div>
+      </aside>
 
+      <!-- Listado (derecha) -->
+      <section class="list-panel">
+
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando líneas…</span>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
+
+        <!-- LISTADO -->
+        <ion-list class="lines-list" *ngIf="!loading">
+
+          <ion-item class="line-item" lines="none" *ngFor="let l of lineas">
+
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="cube-outline"></ion-icon>
+            </div>
+
+            <ion-label class="ion-text-wrap">
+              <h2>{{ nombreElemento(l) }}</h2>
+
+              <div class="meta">
+                <div class="meta-row"><span class="k">Cantidad:</span> <span class="v">{{ l.cantidad }}</span></div>
+                <div class="meta-row"><span class="k">Precio unitario:</span> <span class="v">{{ precioElemento(l) }}</span></div>
+                <div class="meta-row"><span class="k">Importe:</span> <span class="v">{{ importeLinea(l) }}</span></div>
+              </div>
+            </ion-label>
+
+            <div class="actions" slot="end">
+              <!-- Ver detalle -->
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(l)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
+
+              <!-- Eliminar -->
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminarLinea"
+                fill="outline"
+                (click)="eliminarLinea(l)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+
+          </ion-item>
+
+        </ion-list>
+
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="lineas.length === 0 && !loading && !errorMsg">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay líneas para esta factura.
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
 </ion-content>

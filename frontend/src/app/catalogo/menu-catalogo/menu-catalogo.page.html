@@ -1,48 +1,85 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Catálogo</ion-title>
-
+<ion-header class="catalog-header">
+  <ion-toolbar class="catalog-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
+
+    <ion-title class="catalog-title">Catálogo</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="catalog-content">
+  <div class="catalog-shell">
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>¿Qué quieres gestionar?</ion-card-title>
-      <ion-card-subtitle>Elige una sección del catálogo</ion-card-subtitle>
-    </ion-card-header>
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="albums-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
+        <div>
+          <div class="page-title">Gestión del catálogo</div>
+          <div class="page-subtitle">
+            Elige una sección para administrar el catálogo.
+          </div>
+        </div>
+      </div>
 
-      <ion-list>
+      <div class="page-head-right">
+        <div class="hint-chip">
+          <ion-icon name="sparkles-outline"></ion-icon>
+          <span>2 secciones</span>
+        </div>
+      </div>
+    </div>
 
-        <ion-item button detail (click)="irServicios()">
-          <ion-icon name="construct-outline" slot="start"></ion-icon>
-          <ion-label>
-            <h2>Servicios</h2>
-            <p>Gestión de servicios (listar, crear, editar, borrar)</p>
-          </ion-label>
-        </ion-item>
+    <!-- Card principal -->
+    <section class="main-panel">
+      <div class="card">
+        <div class="card-head">
+          <div class="head-left">
+            <div class="icon-badge" aria-hidden="true">
+              <ion-icon name="grid-outline"></ion-icon>
+            </div>
 
-        <ion-item button detail (click)="irProductos()">
-          <ion-icon name="cube-outline" slot="start"></ion-icon>
-          <ion-label>
-            <h2>Productos</h2>
-            <p>Gestión de productos (listar, crear, editar, borrar)</p>
-          </ion-label>
-        </ion-item>
+            <div>
+              <div class="card-title">¿Qué quieres gestionar?</div>
+              <div class="card-subtitle">Elige una sección del catálogo</div>
+            </div>
+          </div>
+        </div>
 
-      </ion-list>
+        <ion-list class="catalog-list">
+          <ion-item class="catalog-item" button detail="true" lines="none" (click)="irServicios()">
+            <div class="item-icon" slot="start" aria-hidden="true">
+              <ion-icon name="construct-outline"></ion-icon>
+            </div>
 
-    </ion-card-content>
-  </ion-card>
+            <ion-label class="ion-text-wrap">
+              <h2>Servicios</h2>
+              <p>Gestión de servicios (listar, crear, editar, borrar)</p>
+            </ion-label>
+          </ion-item>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
+          <ion-item class="catalog-item" button detail="true" lines="none" (click)="irProductos()">
+            <div class="item-icon alt" slot="start" aria-hidden="true">
+              <ion-icon name="cube-outline"></ion-icon>
+            </div>
 
+            <ion-label class="ion-text-wrap">
+              <h2>Productos</h2>
+              <p>Gestión de productos (listar, crear, editar, borrar)</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Volver
+      </ion-button>
+    </section>
+
+  </div>
 </ion-content>

@@ -1,131 +1,230 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Nueva línea de factura</ion-title>
+<ion-header class="bill-line-form-header">
+  <ion-toolbar class="bill-line-form-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-facturas"></ion-back-button>
     </ion-buttons>
+
+    <ion-title class="bill-line-form-title">Nueva línea de factura</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="bill-line-form-content">
+  <div class="bill-line-form-shell">
 
-  <!-- INFO FACTURA -->
-  <ion-card *ngIf="factura">
-    <ion-card-header>
-      <ion-card-title>Factura #{{ factura.idFactura }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p><b>Estado:</b> {{ factura.estado }}</p>
-      <ion-text color="danger" *ngIf="!canNuevo">
-        <p style="margin-top:10px;">
-          No tienes permiso para crear líneas en esta factura.
-        </p>
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="receipt-outline"></ion-icon>
+        </div>
 
-  <form #f="ngForm" (ngSubmit)="guardar()">
+        <div>
+          <div class="page-title">Alta de línea</div>
+          <div class="page-subtitle">
+            Selecciona un elemento, define cantidad y aplica descuento si procede.
+          </div>
+        </div>
+      </div>
 
-    <!-- ELEMENTO -->
-    <ion-item>
-      <ion-label position="floating">Elemento *</ion-label>
-      <ion-select
-        name="idElemento"
-        [(ngModel)]="form.idElemento"
-        required
-        (ionChange)="onElementoChange()"
-        #idElemento="ngModel"
-        [disabled]="!canNuevo">
-
-        <ion-select-option *ngFor="let e of elementos" [value]="e.idElemento">
-          {{ elementoLabel(e) }}
-        </ion-select-option>
-
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="idElemento.invalid && idElemento.touched" style="margin-left:16px;">
-      Debes seleccionar un elemento.
-    </ion-note>
-
-    <!-- CANTIDAD -->
-    <ion-item>
-      <ion-label position="floating">Cantidad *</ion-label>
-      <ion-input
-        type="number"
-        inputmode="numeric"
-        name="cantidad"
-        [(ngModel)]="form.cantidad"
-        required
-        min="1"
-        step="1"
-        #cantidad="ngModel"
-        [disabled]="!canNuevo">
-      </ion-input>
-    </ion-item>
-    <ion-note color="danger" *ngIf="cantidad.invalid && cantidad.touched" style="margin-left:16px;">
-      La cantidad es obligatoria y debe ser mayor que 0.
-    </ion-note>
-
-    <!-- DESCUENTO % -->
-    <ion-item>
-      <ion-label position="floating">Descuento (%)</ion-label>
-      <ion-input
-        type="number"
-        inputmode="decimal"
-        name="descuentoPct"
-        [(ngModel)]="form.descuentoPct"
-        min="0"
-        max="100"
-        step="0.01"
-        [disabled]="!canNuevo">
-      </ion-input>
-    </ion-item>
-
-    <!-- RESUMEN (auto) -->
-    <ion-card style="margin-top: 14px;" *ngIf="form.idElemento">
-      <ion-card-header>
-        <ion-card-title>Resumen</ion-card-title>
-      </ion-card-header>
-
-      <ion-card-content>
-        <p><b>Factura:</b> {{ idFactura }}</p>
-        <p><b>Precio unitario:</b> {{ precioUnitario | number:'1.2-2' }} €</p>
-        <p><b>Subtotal:</b> {{ subtotal | number:'1.2-2' }} €</p>
-        <p><b>Descuento:</b> -{{ descuentoImporte | number:'1.2-2' }} €</p>
-        <p><b>Importe final:</b> {{ importeFinal | number:'1.2-2' }} €</p>
-        <ion-text color="medium">
-          <p style="margin-top:10px;">
-            * El total de la factura se recalcula automáticamente en el backend al crear la línea.
-          </p>
-        </ion-text>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- MENSAJES -->
-    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
-      {{ errorMsg }}
-    </div>
-    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
-      {{ okMsg }}
+      <div class="page-head-right">
+        <div class="hint-chip">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <span>Campos obligatorios (*)</span>
+        </div>
+      </div>
     </div>
 
-    <!-- BOTONES -->
-    <ion-button
-      expand="block"
-      type="submit"
-      [disabled]="!canNuevo || f.invalid || loading"
-      style="margin-top: 18px;">
-      {{ loading ? 'Guardando...' : 'Guardar' }}
-    </ion-button>
+    <!-- Layout (desktop: 2 columnas) -->
+    <div class="form-layout">
 
-    <ion-button
-      expand="block"
-      fill="outline"
-      type="button"
-      (click)="cancelar()">
-      Cancelar
-    </ion-button>
+      <!-- Panel informativo (desktop: izquierda) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
 
-  </form>
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
+          <div class="side-copy">
+            <h3>Factura</h3>
+
+            <div class="kv" *ngIf="factura">
+              <div class="k">Factura</div>
+              <div class="v">#{{ factura.idFactura }}</div>
+            </div>
+
+            <div class="kv" *ngIf="factura">
+              <div class="k">Estado</div>
+              <div class="v">
+                <span class="status-pill">{{ factura.estado || '-' }}</span>
+              </div>
+            </div>
+
+            <div class="hint-card danger" *ngIf="factura && !canNuevo">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">
+                No tienes permiso para crear líneas en esta factura.
+              </div>
+            </div>
+          </div>
+
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
+
+      <!-- Formulario (desktop: derecha) -->
+      <section class="form-panel">
+        <div class="form-card">
+
+          <form #f="ngForm" (ngSubmit)="guardar()" class="line-form">
+
+            <!-- Datos -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="list-circle-outline"></ion-icon>
+                <span>Datos de la línea</span>
+              </div>
+
+              <!-- ELEMENTO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Elemento *</ion-label>
+                <ion-select
+                  name="idElemento"
+                  [(ngModel)]="form.idElemento"
+                  required
+                  (ionChange)="onElementoChange()"
+                  #idElemento="ngModel"
+                  [disabled]="!canNuevo">
+
+                  <ion-select-option *ngFor="let e of elementos" [value]="e.idElemento">
+                    {{ elementoLabel(e) }}
+                  </ion-select-option>
+
+                </ion-select>
+              </ion-item>
+              <div class="field-error" *ngIf="idElemento.invalid && idElemento.touched">
+                Debes seleccionar un elemento.
+              </div>
+
+              <!-- CANTIDAD -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Cantidad *</ion-label>
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  name="cantidad"
+                  [(ngModel)]="form.cantidad"
+                  required
+                  min="1"
+                  step="1"
+                  #cantidad="ngModel"
+                  [disabled]="!canNuevo">
+                </ion-input>
+              </ion-item>
+              <div class="field-error" *ngIf="cantidad.invalid && cantidad.touched">
+                La cantidad es obligatoria y debe ser mayor que 0.
+              </div>
+
+              <!-- DESCUENTO % -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Descuento (%)</ion-label>
+                <ion-input
+                  type="number"
+                  inputmode="decimal"
+                  name="descuentoPct"
+                  [(ngModel)]="form.descuentoPct"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  [disabled]="!canNuevo">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- RESUMEN -->
+            <div class="block" *ngIf="form.idElemento">
+              <div class="block-title">
+                <ion-icon name="calculator-outline"></ion-icon>
+                <span>Resumen</span>
+              </div>
+
+              <div class="summary-card">
+                <div class="summary-grid">
+                  <div class="kv2">
+                    <div class="k">Factura</div>
+                    <div class="v">{{ idFactura }}</div>
+                  </div>
+
+                  <div class="kv2">
+                    <div class="k">Precio unitario</div>
+                    <div class="v">{{ precioUnitario | number:'1.2-2' }} €</div>
+                  </div>
+
+                  <div class="kv2">
+                    <div class="k">Subtotal</div>
+                    <div class="v">{{ subtotal | number:'1.2-2' }} €</div>
+                  </div>
+
+                  <div class="kv2">
+                    <div class="k">Descuento</div>
+                    <div class="v">-{{ descuentoImporte | number:'1.2-2' }} €</div>
+                  </div>
+
+                  <div class="kv2 full">
+                    <div class="k">Importe final</div>
+                    <div class="v big">{{ importeFinal | number:'1.2-2' }} €</div>
+                  </div>
+                </div>
+
+                <div class="note-chip">
+                  <ion-icon name="information-circle-outline"></ion-icon>
+                  <span>El total de la factura se recalcula automáticamente al crear la línea.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mensajes -->
+            <div class="server-error" *ngIf="errorMsg">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ errorMsg }}</div>
+            </div>
+
+            <div class="server-ok" *ngIf="okMsg">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ okMsg }}</div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="!canNuevo || f.invalid || loading">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ loading ? 'Guardando...' : 'Guardar' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelar()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
 </ion-content>

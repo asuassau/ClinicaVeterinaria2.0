@@ -1,13 +1,13 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Detalle de factura</ion-title>
-
+<ion-header class="factura-detail-header">
+  <ion-toolbar class="factura-detail-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-facturas"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="factura-detail-title">Detalle de factura</ion-title>
+
     <ion-buttons slot="end" *ngIf="factura && !editMode && canEditarFactura">
-      <ion-button (click)="activarEdicion()">
+      <ion-button class="edit-btn" (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
       </ion-button>
@@ -15,258 +15,374 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="factura-detail-content">
+  <div class="factura-detail-shell">
 
-  <ion-item *ngIf="loading">
-    <ion-label>Cargando factura...</ion-label>
-  </ion-item>
+    <!-- Estados -->
+    <div class="state-row" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando factura…</span>
+    </div>
 
-  <ion-item *ngIf="errorMsg" lines="none">
-    <ion-label style="color:red">{{ errorMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert error" *ngIf="errorMsg">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ errorMsg }}</div>
+    </div>
 
-  <ion-item *ngIf="okMsg" lines="none">
-    <ion-label style="color:green">{{ okMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert ok" *ngIf="okMsg">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ okMsg }}</div>
+    </div>
 
-  <!-- ===================== -->
-  <!-- MODO DETALLE (VER) -->
-  <!-- ===================== -->
-  <div *ngIf="factura && !editMode">
+    <!-- Contenido -->
+    <div *ngIf="factura && !loading" class="layout">
 
-    <ion-list>
+      <!-- Panel lateral (desktop) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>ID Factura</h2>
-          <p>{{ factura.idFactura }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-copy">
+            <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
+            <p class="ion-text-wrap">
+              {{ editMode
+                ? 'Actualiza la factura y guarda los cambios según permisos.'
+                : 'Revisa los datos de la factura y edita si tienes permisos.' }}
+            </p>
 
-      <ion-item>
-        <ion-label>
-          <h2>Nº Factura</h2>
-          <p>{{ factura.n_factura || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip" *ngIf="!editMode">
+              <ion-icon name="receipt-outline"></ion-icon>
+              <span>Datos de facturación</span>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Fecha creación</h2>
-          <p>{{ fechaSolo(factura.fechaCreacion) }} - {{ horaSolo(factura.fechaCreacion) }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip warn" *ngIf="editMode && isPagada">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <span>Factura pagada: campos bloqueados</span>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Fecha pago</h2>
-          <p>
-            {{ fechaSolo(factura.FechaPago || null) }}
-            <span *ngIf="factura.FechaPago"> - {{ horaSolo(factura.FechaPago) }}</span>
-          </p>
-        </ion-label>
-      </ion-item>
+            <div class="chip ok" *ngIf="!editMode && factura?.estado === 'Pagada'">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>Factura pagada</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Estado</h2>
-          <p>{{ factura.estado || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
 
-      <ion-item>
-        <ion-label>
-          <h2>Forma de pago</h2>
-          <p>{{ factura.formaPago || '-' }}</p>
-        </ion-label>
-      </ion-item>
+      <!-- Panel principal -->
+      <section class="main-panel">
 
-      <ion-item>
-        <ion-label>
-          <h2>Descuento (%)</h2>
-          <p>{{ factura.descPct ?? 0 }}</p>
-        </ion-label>
-      </ion-item>
+        <!-- ===================== -->
+        <!-- MODO DETALLE (VER) -->
+        <!-- ===================== -->
+        <div *ngIf="!editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge" aria-hidden="true">
+                <ion-icon name="receipt-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Información de la factura</div>
+                <div class="card-subtitle">
+                  Nº {{ factura.n_factura || '—' }} · ID {{ factura.idFactura }}
+                </div>
+              </div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Impuesto (%)</h2>
-          <p>{{ factura.impuestoPct ?? 0 }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="role-pill">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <span>{{ factura.estado || '-' }}</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Total</h2>
-          <p>{{ factura.total | number:'1.2-2' }} €</p>
-        </ion-label>
-      </ion-item>
+          <div class="kv-grid">
+            <div class="kv">
+              <div class="k">ID Factura</div>
+              <div class="v">{{ factura.idFactura }}</div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Emisor</h2>
-          <p>{{ userLabelById(factura.idUsuario_emisor) }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="kv">
+              <div class="k">Nº Factura</div>
+              <div class="v">{{ factura.n_factura || '-' }}</div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Pagador</h2>
-          <p>{{ userLabelById(factura.idUsuario_pagador) }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="kv">
+              <div class="k">Fecha creación</div>
+              <div class="v">{{ fechaSolo(factura.fechaCreacion) }} · {{ horaSolo(factura.fechaCreacion) }}</div>
+            </div>
 
-    </ion-list>
+            <div class="kv">
+              <div class="k">Fecha pago</div>
+              <div class="v">
+                {{ fechaSolo(factura.FechaPago || null) }}
+                <span *ngIf="factura.FechaPago"> · {{ horaSolo(factura.FechaPago) }}</span>
+              </div>
+            </div>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
-    </ion-button>
+            <div class="kv">
+              <div class="k">Estado</div>
+              <div class="v">{{ factura.estado || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Forma de pago</div>
+              <div class="v">{{ factura.formaPago || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Descuento (%)</div>
+              <div class="v">{{ factura.descPct ?? 0 }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Impuesto (%)</div>
+              <div class="v">{{ factura.impuestoPct ?? 0 }}</div>
+            </div>
+
+            <div class="kv full emphasis">
+              <div class="k">Total</div>
+              <div class="v">{{ factura.total | number:'1.2-2' }} €</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Emisor</div>
+              <div class="v">{{ userLabelById(factura.idUsuario_emisor) }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Pagador</div>
+              <div class="v">{{ userLabelById(factura.idUsuario_pagador) }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver al listado
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- MODO EDICIÓN (solo si permiso) -->
+        <!-- ===================== -->
+        <div *ngIf="editMode && canEditarFactura" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge edit" aria-hidden="true">
+                <ion-icon name="create-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Editar factura</div>
+                <div class="card-subtitle">Modifica los campos y guarda.</div>
+              </div>
+            </div>
+
+            <div class="role-pill soft">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Permisos aplicados</span>
+            </div>
+          </div>
+
+          <form #f="ngForm" (ngSubmit)="guardarCambios()" class="factura-form">
+
+            <!-- Bloque: datos fijos -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="document-text-outline"></ion-icon>
+                <span>Datos fijos</span>
+              </div>
+
+              <div class="kv-grid compact">
+                <div class="kv">
+                  <div class="k">ID Factura</div>
+                  <div class="v">{{ factura.idFactura }}</div>
+                </div>
+
+                <div class="kv">
+                  <div class="k">Nº Factura</div>
+                  <div class="v">{{ factura.n_factura || '-' }}</div>
+                </div>
+
+                <div class="kv">
+                  <div class="k">Fecha creación</div>
+                  <div class="v">{{ fechaSolo(factura.fechaCreacion) }} · {{ horaSolo(factura.fechaCreacion) }}</div>
+                </div>
+
+                <div class="kv">
+                  <div class="k">Fecha pago</div>
+                  <div class="v">
+                    {{ fechaSolo(factura.FechaPago || null) }}
+                    <span *ngIf="factura.FechaPago"> · {{ horaSolo(factura.FechaPago) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloque: estado y pago -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="card-outline"></ion-icon>
+                <span>Estado y pago</span>
+              </div>
+
+              <div class="grid-2">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Estado *</ion-label>
+                  <ion-select name="estado" [(ngModel)]="form.estado" required>
+                    <ion-select-option *ngFor="let e of estados" [value]="e">
+                      {{ e }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Forma de pago</ion-label>
+                  <ion-select
+                    name="formaPago"
+                    [(ngModel)]="form.formaPago"
+                    [disabled]="isPagada">
+                    <ion-select-option *ngFor="let fp of formasPago" [value]="fp">
+                      {{ fp }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <div class="hint-note" *ngIf="isPagada">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <div class="ion-text-wrap">
+                  No se puede modificar la forma de pago si la factura está <b>Pagada</b>.
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloque: impuestos y total -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="calculator-outline"></ion-icon>
+                <span>Importes</span>
+              </div>
+
+              <div class="grid-2">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Descuento (%)</ion-label>
+                  <ion-input
+                    type="number"
+                    inputmode="decimal"
+                    name="descPct"
+                    [(ngModel)]="form.descPct"
+                    [disabled]="isPagada"
+                    min="0"
+                    max="100"
+                    step="0.01">
+                  </ion-input>
+                </ion-item>
+
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Impuesto (%)</ion-label>
+                  <ion-input
+                    type="number"
+                    inputmode="decimal"
+                    name="impuestoPct"
+                    [(ngModel)]="form.impuestoPct"
+                    [disabled]="isPagada"
+                    min="0"
+                    max="100"
+                    step="0.01">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <div class="readonly-card soft">
+                <div class="readonly-row">
+                  <ion-icon name="cash-outline"></ion-icon>
+                  <div>
+                    <div class="readonly-title">Total</div>
+                    <div class="readonly-value">{{ factura.total | number:'1.2-2' }} €</div>
+                  </div>
+                </div>
+                <div class="readonly-note">
+                  * Se recalcula automáticamente con las líneas.
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloque: participantes -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="people-outline"></ion-icon>
+                <span>Participantes</span>
+              </div>
+
+              <div class="kv-grid compact">
+                <div class="kv full">
+                  <div class="k">Emisor</div>
+                  <div class="v">{{ userLabelById(factura.idUsuario_emisor) }}</div>
+                </div>
+              </div>
+
+              <ng-container *ngIf="!isPagada; else pagadorReadOnly">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Pagador *</ion-label>
+                  <ion-select name="idUsuario_pagador" [(ngModel)]="form.idUsuario_pagador" required>
+                    <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
+                      {{ userOptionLabel(u) }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ng-container>
+
+              <ng-template #pagadorReadOnly>
+                <div class="kv-grid compact">
+                  <div class="kv full">
+                    <div class="k">Pagador</div>
+                    <div class="v">{{ userLabelById(factura.idUsuario_pagador) }}</div>
+                  </div>
+                </div>
+              </ng-template>
+
+              <div class="hint-note soft">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <div class="ion-text-wrap">
+                  * Si cambias el estado a <b>Pagada</b>, se generará automáticamente la <b>Fecha de pago</b>.
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || saving">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+
+      </section>
+    </div>
 
   </div>
-
-  <!-- ===================== -->
-  <!-- MODO EDICIÓN (solo si permiso) -->
-  <!-- ===================== -->
-  <div *ngIf="factura && editMode && canEditarFactura">
-
-    <form #f="ngForm" (ngSubmit)="guardarCambios()">
-
-      <ion-item>
-        <ion-label>
-          <h2>ID Factura</h2>
-          <p>{{ factura.idFactura }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Nº Factura</h2>
-          <p>{{ factura.n_factura || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Fecha creación</h2>
-          <p>{{ fechaSolo(factura.fechaCreacion) }} - {{ horaSolo(factura.fechaCreacion) }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Fecha pago</h2>
-          <p>
-            {{ fechaSolo(factura.FechaPago || null) }}
-            <span *ngIf="factura.FechaPago"> - {{ horaSolo(factura.FechaPago) }}</span>
-          </p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Estado *</ion-label>
-        <ion-select name="estado" [(ngModel)]="form.estado" required>
-          <ion-select-option *ngFor="let e of estados" [value]="e">
-            {{ e }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Forma de pago</ion-label>
-        <ion-select
-          name="formaPago"
-          [(ngModel)]="form.formaPago"
-          [disabled]="isPagada">
-          <ion-select-option *ngFor="let fp of formasPago" [value]="fp">
-            {{ fp }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-note color="medium" *ngIf="isPagada" style="margin-left:16px;">
-        No se puede modificar la forma de pago si la factura está Pagada.
-      </ion-note>
-
-      <ion-item>
-        <ion-label position="floating">Descuento (%)</ion-label>
-        <ion-input
-          type="number"
-          inputmode="decimal"
-          name="descPct"
-          [(ngModel)]="form.descPct"
-          [disabled]="isPagada"
-          min="0"
-          max="100"
-          step="0.01">
-        </ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Impuesto (%)</ion-label>
-        <ion-input
-          type="number"
-          inputmode="decimal"
-          name="impuestoPct"
-          [(ngModel)]="form.impuestoPct"
-          [disabled]="isPagada"
-          min="0"
-          max="100"
-          step="0.01">
-        </ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Total</h2>
-          <p>{{ factura.total | number:'1.2-2' }} €</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          <h2>Emisor</h2>
-          <p>{{ userLabelById(factura.idUsuario_emisor) }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item *ngIf="!isPagada">
-        <ion-label position="floating">Pagador *</ion-label>
-        <ion-select name="idUsuario_pagador" [(ngModel)]="form.idUsuario_pagador" required>
-          <ion-select-option *ngFor="let u of usuarios" [value]="u.idUsuario">
-            {{ userOptionLabel(u) }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item *ngIf="isPagada">
-        <ion-label>
-          <h2>Pagador</h2>
-          <p>{{ userLabelById(factura.idUsuario_pagador) }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-text color="medium">
-        <p style="margin-top:10px;">
-          * Si cambias el estado a <b>Pagada</b>, se generará automáticamente la <b>Fecha de pago</b>.
-        </p>
-      </ion-text>
-
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="f.invalid || saving"
-        style="margin-top: 18px;">
-        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        type="button"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </ion-button>
-
-    </form>
-  </div>
-
 </ion-content>

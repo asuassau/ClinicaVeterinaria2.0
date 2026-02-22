@@ -1,96 +1,181 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Nueva línea de historial</ion-title>
+<ion-header class="line-form-header">
+  <ion-toolbar class="line-form-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-historiales"></ion-back-button>
     </ion-buttons>
+
+    <ion-title class="line-form-title">Nueva línea de historial</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="line-form-content">
+  <div class="line-form-shell">
 
-  <form #f="ngForm" (ngSubmit)="guardar()">
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="create-outline"></ion-icon>
+        </div>
 
-    <!-- INFO (auto) -->
-    <ion-card style="margin-bottom: 12px;">
-      <ion-card-header>
-        <ion-card-title>Datos automáticos</ion-card-title>
-      </ion-card-header>
+        <div>
+          <div class="page-title">Alta de línea</div>
+          <div class="page-subtitle ion-text-wrap">
+            Completa la información para añadir una nueva entrada al historial.
+          </div>
+        </div>
+      </div>
 
-      <ion-card-content>
-        <p><b>Historial:</b> {{ idHistorial }}</p>
-        <p><b>Autor:</b> {{ autorLabel || '-' }}</p>
-        <p><b>Fecha creación:</b> se genera automáticamente</p>
-        <p><b>Fecha edición:</b> se genera automáticamente al modificar</p>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- PESO -->
-    <ion-item>
-      <ion-label position="floating">Peso (kg)</ion-label>
-      <ion-input
-        type="number"
-        inputmode="decimal"
-        name="peso"
-        [(ngModel)]="form.peso"
-        min="0"
-        step="0.01">
-      </ion-input>
-    </ion-item>
-
-    <!-- TIPO -->
-    <ion-item>
-      <ion-label position="floating">Tipo *</ion-label>
-      <ion-select name="tipo" [(ngModel)]="form.tipo" required #tipo="ngModel">
-        <ion-select-option *ngFor="let t of tipos" [value]="t">
-          {{ t }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="tipo.invalid && tipo.touched" style="margin-left:16px;">
-      Debes seleccionar un tipo.
-    </ion-note>
-
-    <!-- DESCRIPCIÓN -->
-    <ion-item>
-      <ion-label position="floating">Descripción *</ion-label>
-      <ion-textarea
-        name="descripcion"
-        [(ngModel)]="form.descripcion"
-        required
-        autoGrow="true"
-        #descripcion="ngModel">
-      </ion-textarea>
-    </ion-item>
-    <ion-note color="danger" *ngIf="descripcion.invalid && descripcion.touched" style="margin-left:16px;">
-      La descripción es obligatoria.
-    </ion-note>
-
-    <!-- MENSAJES -->
-    <div *ngIf="errorMsg" style="color: red; margin-top: 12px;">
-      {{ errorMsg }}
-    </div>
-    <div *ngIf="okMsg" style="color: green; margin-top: 12px;">
-      {{ okMsg }}
+      <div class="page-head-right">
+        <div class="hint-chip">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <span>Campos obligatorios (*)</span>
+        </div>
+      </div>
     </div>
 
-    <!-- BOTONES -->
-    <ion-button
-      expand="block"
-      type="submit"
-      [disabled]="f.invalid || loading"
-      style="margin-top: 18px;">
-      {{ loading ? 'Guardando...' : 'Guardar' }}
-    </ion-button>
+    <!-- Layout (desktop: 2 columnas) -->
+    <div class="form-layout">
 
-    <ion-button
-      expand="block"
-      fill="outline"
-      type="button"
-      (click)="cancelar()">
-      Cancelar
-    </ion-button>
+      <!-- Panel lateral (desktop: izquierda) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-  </form>
+          <div class="side-copy">
+            <h3>Datos automáticos</h3>
 
+            <div class="side-kv">
+              <div class="kv-row">
+                <span class="k">Historial:</span>
+                <span class="v">{{ idHistorial }}</span>
+              </div>
+
+              <div class="kv-row">
+                <span class="k">Autor:</span>
+                <span class="v">{{ autorLabel || '-' }}</span>
+              </div>
+
+              <div class="kv-row">
+                <span class="k">Fecha creación:</span>
+                <span class="v">se genera automáticamente</span>
+              </div>
+
+              <div class="kv-row">
+                <span class="k">Fecha edición:</span>
+                <span class="v">se genera al modificar</span>
+              </div>
+            </div>
+
+            <div class="chip">
+              <ion-icon name="information-circle-outline"></ion-icon>
+              <span>Sincronizado con historial</span>
+            </div>
+          </div>
+
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
+
+      <!-- Formulario (desktop: derecha) -->
+      <section class="form-panel">
+        <div class="form-card">
+
+          <form #f="ngForm" (ngSubmit)="guardar()" class="line-form">
+
+            <!-- Bloque: Datos -->
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="clipboard-outline"></ion-icon>
+                <span>Datos de la línea</span>
+              </div>
+
+              <!-- PESO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Peso (kg)</ion-label>
+                <ion-input
+                  type="number"
+                  inputmode="decimal"
+                  name="peso"
+                  [(ngModel)]="form.peso"
+                  min="0"
+                  step="0.01">
+                </ion-input>
+              </ion-item>
+
+              <!-- TIPO -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Tipo *</ion-label>
+                <ion-select name="tipo" [(ngModel)]="form.tipo" required #tipo="ngModel">
+                  <ion-select-option *ngFor="let t of tipos" [value]="t">
+                    {{ t }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div class="field-error" *ngIf="tipo.invalid && tipo.touched">
+                Debes seleccionar un tipo.
+              </div>
+
+              <!-- DESCRIPCIÓN -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Descripción *</ion-label>
+                <ion-textarea
+                  name="descripcion"
+                  [(ngModel)]="form.descripcion"
+                  required
+                  autoGrow="true"
+                  #descripcion="ngModel">
+                </ion-textarea>
+              </ion-item>
+              <div class="field-error" *ngIf="descripcion.invalid && descripcion.touched">
+                La descripción es obligatoria.
+              </div>
+            </div>
+
+            <!-- Mensajes -->
+            <div class="server-error" *ngIf="errorMsg">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ errorMsg }}</div>
+            </div>
+
+            <div class="server-ok" *ngIf="okMsg">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <div class="ion-text-wrap">{{ okMsg }}</div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || loading">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ loading ? 'Guardando...' : 'Guardar' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelar()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
 </ion-content>

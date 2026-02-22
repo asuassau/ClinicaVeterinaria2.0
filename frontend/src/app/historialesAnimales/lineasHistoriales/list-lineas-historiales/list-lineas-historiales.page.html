@@ -1,14 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Líneas de historial</ion-title>
-
-        <ion-buttons slot="start">
+<ion-header class="lines-header">
+  <ion-toolbar class="lines-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-historiales"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="lines-title">Líneas de historial</ion-title>
 
-<ion-buttons slot="end" *ngIf="canNuevo">
-  <ion-button (click)="crearLinea()">
+    <ion-buttons slot="end" *ngIf="canNuevo">
+      <ion-button class="new-btn" (click)="crearLinea()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -16,104 +15,178 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="lines-content">
+  <div class="lines-shell">
 
-  <!-- REFERENCIA HISTORIAL -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ historialRefLabel() }}</ion-card-title>
-    </ion-card-header>
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="list-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
-      <p *ngIf="animalRefLabel()"><b>Animal:</b> {{ animalRefLabel() }}</p>
-      <p><b>Total líneas:</b> {{ lineasFiltradas.length }}</p>
-    </ion-card-content>
-  </ion-card>
+        <div>
+          <div class="page-title">{{ historialRefLabel() }}</div>
+          <div class="page-subtitle ion-text-wrap">
+            <span *ngIf="animalRefLabel()">
+              Animal: {{ animalRefLabel() }} ·
+            </span>
+            Filtra y consulta las líneas asociadas al historial.
+          </div>
+        </div>
+      </div>
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
+      <div class="page-head-right" *ngIf="!loading && lineasFiltradas">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ lineasFiltradas.length }} líneas</span>
+        </div>
+      </div>
+    </div>
 
-    <ion-card-content>
+    <div class="lines-layout">
 
-      <ion-item>
-        <ion-label>Autor</ion-label>
-        <ion-select [(ngModel)]="filtroAutor" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todos">Todos</ion-select-option>
+      <!-- Panel filtros (desktop: izquierda) -->
+      <aside class="filters-panel">
 
-          <ion-select-option
-            *ngFor="let a of autoresDisponibles()"
-            [value]="a.idUsuario">
-            {{ a.label }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+        <!-- Referencia (mini card) -->
+        <div class="ref-card">
+          <div class="ref-head">
+            <div class="ref-title">Referencia</div>
+            <div class="ref-subtitle ion-text-wrap">{{ historialRefLabel() }}</div>
+          </div>
 
-      <ion-item>
-        <ion-label position="floating">
-          Buscar (fecha creación, fecha edición, autor, descripción)
-        </ion-label>
-        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+          <div class="ref-meta">
+            <div class="meta-row" *ngIf="animalRefLabel()">
+              <span class="k">Animal:</span>
+              <span class="v">{{ animalRefLabel() }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="k">Total líneas:</span>
+              <span class="v">{{ lineasFiltradas.length }}</span>
+            </div>
+          </div>
+        </div>
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+        <!-- Filtros -->
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Ajusta el listado por autor y búsqueda.</p>
+          </div>
 
-    </ion-card-content>
-  </ion-card>
+          <div class="filters-body">
+            <ion-item class="field" lines="inset">
+              <ion-label>Autor</ion-label>
+              <ion-select [(ngModel)]="filtroAutor" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todos">Todos</ion-select-option>
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+                <ion-select-option
+                  *ngFor="let a of autoresDisponibles()"
+                  [value]="a.idUsuario">
+                  {{ a.label }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">
+                Buscar (fecha creación, fecha edición, autor, descripción)
+              </ion-label>
+              <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
+          </div>
+        </div>
+      </aside>
 
-    <ion-item *ngFor="let vm of lineasFiltradas">
+      <!-- Listado (desktop: derecha) -->
+      <section class="list-panel">
 
-      <ion-label>
-        <h2>{{ vm.autorLabel }}</h2>
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando líneas…</span>
+        </div>
 
-        <p>
-          <b>Creación:</b>
-          {{ formatFecha(vm.fechaCreacion) }} {{ formatHora(vm.fechaCreacion) }}
-        </p>
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
 
-        <p>
-          <b>Edición:</b>
-          {{ vm.fechaEdicion === '-' ? '-' : (formatFecha(vm.fechaEdicion) + ' ' + formatHora(vm.fechaEdicion)) }}
-        </p>
+        <!-- LISTADO -->
+        <ion-list class="lines-list" *ngIf="!loading">
+          <ion-item class="line-item" lines="none" *ngFor="let vm of lineasFiltradas">
 
-        <p><b>Descripción:</b> {{ vm.descripcion || '-' }}</p>
-      </ion-label>
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="person-outline"></ion-icon>
+            </div>
 
-      <!-- VER DETALLE -->
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+            <ion-label class="ion-text-wrap">
+              <h2>{{ vm.autorLabel }}</h2>
 
-      <!-- ELIMINAR -->
-     <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarLinea(vm)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+              <div class="meta">
+                <div class="meta-row">
+                  <span class="k">Creación:</span>
+                  <span class="v">{{ formatFecha(vm.fechaCreacion) }} {{ formatHora(vm.fechaCreacion) }}</span>
+                </div>
 
-    </ion-item>
+                <div class="meta-row">
+                  <span class="k">Edición:</span>
+                  <span class="v">
+                    {{ vm.fechaEdicion === '-' ? '-' : (formatFecha(vm.fechaEdicion) + ' ' + formatHora(vm.fechaEdicion)) }}
+                  </span>
+                </div>
 
-  </ion-list>
+                <div class="meta-row">
+                  <span class="k">Descripción:</span>
+                  <span class="v">{{ vm.descripcion || '-' }}</span>
+                </div>
+              </div>
+            </ion-label>
 
-  <ion-text *ngIf="lineasFiltradas.length === 0 && !loading && !errorMsg">
-    <p>No hay líneas para este historial.</p>
-  </ion-text>
+            <!-- Acciones -->
+            <div class="actions" slot="end">
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(vm)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
 
-  <ion-button expand="block" fill="outline" (click)="volverAHistoriales()" style="margin-top: 12px;">
-    Volver a historiales
-  </ion-button>
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminar"
+                fill="outline"
+                (click)="eliminarLinea(vm)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
 
+          </ion-item>
+        </ion-list>
+
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="lineasFiltradas.length === 0 && !loading && !errorMsg">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay líneas para este historial.
+          </div>
+        </div>
+
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volverAHistoriales()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver a historiales
+        </ion-button>
+
+      </section>
+
+    </div>
+  </div>
 </ion-content>

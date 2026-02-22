@@ -1,146 +1,239 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Detalle de historial</ion-title>
-
+<ion-header class="hist-detail-header">
+  <ion-toolbar class="hist-detail-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-historiales"></ion-back-button>
     </ion-buttons>
 
-<ion-buttons slot="end" *ngIf="historial && !editMode && canEditar">
-  <ion-button (click)="activarEdicion()">
+    <ion-title class="hist-detail-title">Detalle de historial</ion-title>
+
+    <ion-buttons slot="end" *ngIf="historial && !editMode && canEditar">
+      <ion-button class="edit-btn" (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
       </ion-button>
     </ion-buttons>
-
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="hist-detail-content">
+  <div class="hist-detail-shell">
 
-  <ion-item *ngIf="loading">
-    <ion-label>Cargando historial...</ion-label>
-  </ion-item>
+    <!-- Estados -->
+    <div class="state-row" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando historial…</span>
+    </div>
 
-  <ion-item *ngIf="errorMsg" lines="none">
-    <ion-label style="color:red">{{ errorMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert error" *ngIf="errorMsg">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ errorMsg }}</div>
+    </div>
 
-  <ion-item *ngIf="okMsg" lines="none">
-    <ion-label style="color:green">{{ okMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert ok" *ngIf="okMsg">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ okMsg }}</div>
+    </div>
 
-  <!-- ===================== -->
-  <!-- MODO DETALLE (VER) -->
-  <!-- ===================== -->
-  <div *ngIf="historial && !editMode">
+    <!-- Contenido -->
+    <div *ngIf="historial" class="layout">
 
-    <ion-list>
+      <!-- Panel lateral (desktop) -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Gestión veterinaria</div>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>ID Historial</h2>
-          <p>{{ historial.idHistorial }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-copy">
+            <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
+            <p class="ion-text-wrap">
+              {{ editMode
+                ? 'Modifica el estado o el animal asociado y guarda los cambios.'
+                : 'Consulta los datos del historial y edita si tienes permisos.' }}
+            </p>
 
-      <ion-item>
-        <ion-label>
-          <h2>Fecha alta</h2>
-          <p>{{ historial.fechaAlta || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip" *ngIf="!editMode">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Datos protegidos</span>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Estado</h2>
-          <p>{{ historial.estado || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip warn" *ngIf="editMode">
+              <ion-icon name="create-outline"></ion-icon>
+              <span>Modo edición</span>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Animal</h2>
-          <p>{{ animalLabelById(historial.idAnimal) }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
 
-      <ion-item>
-        <ion-label>
-          <h2>ID Animal</h2>
-          <p>{{ historial.idAnimal }}</p>
-        </ion-label>
-      </ion-item>
+      <!-- Panel principal -->
+      <section class="main-panel">
 
-    </ion-list>
+        <!-- ===================== -->
+        <!-- MODO DETALLE (VER) -->
+        <!-- ===================== -->
+        <div *ngIf="!editMode" class="card">
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
-    </ion-button>
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge" aria-hidden="true">
+                <ion-icon name="document-text-outline"></ion-icon>
+              </div>
+
+              <div>
+                <div class="card-title">Información del historial</div>
+                <div class="card-subtitle">
+                  ID: {{ historial.idHistorial || '—' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="state-pill">
+              <ion-icon name="pulse-outline"></ion-icon>
+              <span>{{ historial.estado || '-' }}</span>
+            </div>
+          </div>
+
+          <div class="kv-grid">
+            <div class="kv">
+              <div class="k">ID Historial</div>
+              <div class="v">{{ historial.idHistorial || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Fecha alta</div>
+              <div class="v">{{ historial.fechaAlta || '-' }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Estado</div>
+              <div class="v">{{ historial.estado || '-' }}</div>
+            </div>
+
+            <div class="kv full">
+              <div class="k">Animal</div>
+              <div class="v">{{ animalLabelById(historial.idAnimal) }}</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">ID Animal</div>
+              <div class="v">{{ historial.idAnimal || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver al listado
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- MODO EDICIÓN -->
+        <!-- ===================== -->
+        <div *ngIf="editMode" class="card">
+
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge edit" aria-hidden="true">
+                <ion-icon name="create-outline"></ion-icon>
+              </div>
+
+              <div>
+                <div class="card-title">Editar historial</div>
+                <div class="card-subtitle">Modifica los campos y guarda.</div>
+              </div>
+            </div>
+
+            <div class="state-pill soft">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Permisos aplicados</span>
+            </div>
+          </div>
+
+          <form #f="ngForm" (ngSubmit)="guardarCambios()" class="hist-form">
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <span>Datos del historial</span>
+              </div>
+
+              <!-- ID Historial (solo lectura) -->
+              <div class="readonly-card">
+                <div class="readonly-row">
+                  <ion-icon name="key-outline"></ion-icon>
+                  <div>
+                    <div class="readonly-title">ID Historial</div>
+                    <div class="readonly-value">{{ historial.idHistorial || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fecha alta (solo lectura) -->
+              <div class="readonly-card">
+                <div class="readonly-row">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <div>
+                    <div class="readonly-title">Fecha alta</div>
+                    <div class="readonly-value">{{ historial.fechaAlta || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ESTADO (editable) -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Estado *</ion-label>
+                <ion-select name="estado" [(ngModel)]="form.estado" required>
+                  <ion-select-option *ngFor="let e of estados" [value]="e">
+                    {{ e }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <!-- ANIMAL (editable) -->
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Animal *</ion-label>
+                <ion-select name="idAnimal" [(ngModel)]="form.idAnimal" required>
+                  <ion-select-option *ngFor="let a of animalesVM" [value]="a.idAnimal">
+                    {{ a.label }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || saving">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+              </ion-button>
+
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+
+      </section>
+    </div>
 
   </div>
-
-  <!-- ===================== -->
-  <!-- MODO EDICIÓN -->
-  <!-- ===================== -->
-  <div *ngIf="historial && editMode">
-
-    <form #f="ngForm" (ngSubmit)="guardarCambios()">
-
-      <!-- ID Historial (solo lectura) -->
-      <ion-item>
-        <ion-label>
-          <h2>ID Historial</h2>
-          <p>{{ historial.idHistorial }}</p>
-        </ion-label>
-      </ion-item>
-
-      <!-- Fecha alta (solo lectura) -->
-      <ion-item>
-        <ion-label>
-          <h2>Fecha alta</h2>
-          <p>{{ historial.fechaAlta || '-' }}</p>
-        </ion-label>
-      </ion-item>
-
-      <!-- ESTADO (editable) -->
-      <ion-item>
-        <ion-label position="floating">Estado *</ion-label>
-        <ion-select name="estado" [(ngModel)]="form.estado" required>
-          <ion-select-option *ngFor="let e of estados" [value]="e">
-            {{ e }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- ANIMAL (editable) -->
-      <ion-item>
-        <ion-label position="floating">Animal *</ion-label>
-        <ion-select name="idAnimal" [(ngModel)]="form.idAnimal" required>
-          <ion-select-option *ngFor="let a of animalesVM" [value]="a.idAnimal">
-            {{ a.label }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="f.invalid || saving"
-        style="margin-top: 18px;">
-        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        type="button"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </ion-button>
-
-    </form>
-
-  </div>
-
 </ion-content>

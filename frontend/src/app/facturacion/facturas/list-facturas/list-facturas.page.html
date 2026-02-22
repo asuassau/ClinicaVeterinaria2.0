@@ -1,13 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Facturas</ion-title>
-
-        <ion-buttons slot="start">
+<ion-header class="facturas-header">
+  <ion-toolbar class="facturas-toolbar">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="facturas-title">Facturas</ion-title>
+
     <ion-buttons slot="end" *ngIf="canNuevo">
-      <ion-button (click)="crearFactura()">
+      <ion-button class="new-btn" (click)="crearFactura()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -15,86 +15,172 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="facturas-content">
+  <div class="facturas-shell">
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
+    <!-- Cabecera de página -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="receipt-outline"></ion-icon>
+        </div>
 
-    <ion-card-content>
+        <div>
+          <div class="page-title">Gestión de facturas</div>
+          <div class="page-subtitle">
+            Filtra, consulta y administra facturas.
+          </div>
+        </div>
+      </div>
 
-      <ion-item>
-        <ion-label>Forma de pago</ion-label>
-        <ion-select [(ngModel)]="filtroFormaPago" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todos">Todas</ion-select-option>
-          <ion-select-option *ngFor="let fp of formasPago" [value]="fp">
-            {{ fp }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      <div class="page-head-right" *ngIf="facturasFiltradas && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ facturasFiltradas.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-      <ion-item>
-        <ion-label position="floating">
-          Buscar (pagador, fecha, estado, total, formaPago, id)
-        </ion-label>
-        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+    <div class="facturas-layout">
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+      <!-- Panel filtros (izquierda en desktop) -->
+      <aside class="filters-panel">
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Ajusta por forma de pago y búsqueda.</p>
+          </div>
 
-    </ion-card-content>
-  </ion-card>
+          <div class="filters-body">
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+            <ion-item class="field" lines="inset">
+              <ion-label>Forma de pago</ion-label>
+              <ion-select [(ngModel)]="filtroFormaPago" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todos">Todas</ion-select-option>
+                <ion-select-option *ngFor="let fp of formasPago" [value]="fp">
+                  {{ fp }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">
+                Buscar (pagador, fecha, estado, total, formaPago, id)
+              </ion-label>
+              <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
 
-    <ion-item *ngFor="let vm of facturasFiltradas">
+          </div>
+        </div>
+      </aside>
 
-      <ion-label>
-        <h2>
-          {{ formatFecha(vm.fechaCreacion) }} - {{ vm.estado }}
-        </h2>
+      <!-- Listado (derecha en desktop) -->
+      <section class="list-panel">
 
-        <p><b>Pagador:</b> {{ vm.pagadorNombre }}</p>
-        <p><b>Total:</b> {{ formatMoney(vm.total) }} €</p>
-        <p><b>Forma de pago:</b> {{ vm.formaPago || '-' }}</p>
-      </ion-label>
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando facturas…</span>
+        </div>
 
-      <!-- VER -->
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
 
-      <!-- BORRAR (condicional por estado) -->
-      <ion-button *ngIf="canEliminar(vm)" color="danger" fill="outline" slot="end" (click)="eliminarFactura(vm)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+        <!-- LISTADO -->
+        <ion-list class="facturas-list" *ngIf="!loading && !errorMsg">
+          <ion-item class="factura-item" lines="none" *ngFor="let vm of facturasFiltradas">
 
-      <!-- LÍNEAS -->
-      <ion-button color="medium" fill="outline" slot="end" (click)="verLineas(vm)">
-        <ion-icon name="list-outline"></ion-icon>
-      </ion-button>
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
 
-    </ion-item>
+            <ion-label class="ion-text-wrap">
+              <h2>Factura #{{ vm.idFactura }}</h2>
 
-  </ion-list>
+              <div class="meta">
+                <div class="meta-row">
+                  <span class="k">Fecha:</span>
+                  <span class="v">{{ formatFecha(vm.fechaCreacion) }}</span>
+                </div>
 
-  <ion-text *ngIf="facturasFiltradas.length === 0 && !loading">
-    <p>No hay facturas para mostrar.</p>
-  </ion-text>
- <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
+                <div class="meta-row">
+                  <span class="k">Estado:</span>
+                  <span class="status-pill">{{ vm.estado || '-' }}</span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="k">Pagador:</span>
+                  <span class="v">{{ vm.pagadorNombre }}</span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="k">Total:</span>
+                  <span class="money-pill">{{ formatMoney(vm.total) }} €</span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="k">Forma de pago:</span>
+                  <span class="pay-pill">{{ vm.formaPago || '-' }}</span>
+                </div>
+              </div>
+            </ion-label>
+
+            <!-- Acciones -->
+            <div class="actions" slot="end">
+
+              <!-- VER -->
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(vm)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
+
+              <!-- BORRAR (condicional por estado) -->
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminar(vm)"
+                fill="outline"
+                (click)="eliminarFactura(vm)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+
+              <!-- LÍNEAS -->
+              <ion-button
+                class="action-btn"
+                fill="outline"
+                (click)="verLineas(vm)">
+                <ion-icon name="list-outline"></ion-icon>
+              </ion-button>
+
+            </div>
+          </ion-item>
+        </ion-list>
+
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="facturasFiltradas.length === 0 && !loading && !errorMsg">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay facturas para mostrar.
+          </div>
+        </div>
+
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+
+      </section>
+    </div>
+
+  </div>
 </ion-content>

@@ -1,14 +1,13 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Historiales</ion-title>
-
+<ion-header class="hist-header">
+  <ion-toolbar class="hist-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="hist-title">Historiales</ion-title>
 
- <ion-buttons slot="end" *ngIf="canNuevo">
-  <ion-button (click)="crearHistorial()">
+    <ion-buttons slot="end" *ngIf="canNuevo">
+      <ion-button class="new-btn" (click)="crearHistorial()">
         <ion-icon name="add" slot="start"></ion-icon>
         Nuevo
       </ion-button>
@@ -16,90 +15,150 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="hist-content">
+  <div class="hist-shell">
 
-  <!-- FILTROS -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
-   <ion-buttons slot="start">
-      <ion-back-button defaultHref="/menu"></ion-back-button>
-    </ion-buttons>
+    <!-- Cabecera -->
+    <div class="page-head">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="file-tray-full-outline"></ion-icon>
+        </div>
 
+        <div>
+          <div class="page-title">Gestión de historiales</div>
+          <div class="page-subtitle">
+            Filtra por estado y busca por animal, dueño o identificador.
+          </div>
+        </div>
+      </div>
 
-    <ion-card-content>
+      <div class="page-head-right" *ngIf="historialesFiltrados && !loading">
+        <div class="count-chip">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>{{ historialesFiltrados.length }} resultados</span>
+        </div>
+      </div>
+    </div>
 
-      <ion-item>
-        <ion-label>Estado</ion-label>
-        <ion-select [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()">
-          <ion-select-option value="todos">Todos</ion-select-option>
-          <ion-select-option *ngFor="let e of estados" [value]="e">
-            {{ e }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+    <div class="hist-layout">
 
-      <ion-item>
-        <ion-label position="floating">
-          Buscar (animal, especie, raza, dueño, estado, id)
-        </ion-label>
-        <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
-      </ion-item>
+      <!-- Filtros -->
+      <aside class="filters-panel">
+        <div class="filters-card">
+          <div class="filters-head">
+            <h2>Filtros</h2>
+            <p>Ajusta el listado por estado y búsqueda.</p>
+          </div>
 
-      <ion-button expand="block" color="medium" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </ion-button>
+          <div class="filters-body">
+            <ion-item class="field" lines="inset">
+              <ion-label>Estado</ion-label>
+              <ion-select [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()">
+                <ion-select-option value="todos">Todos</ion-select-option>
+                <ion-select-option *ngFor="let e of estados" [value]="e">
+                  {{ e }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-    </ion-card-content>
-  </ion-card>
+            <ion-item class="field" lines="inset">
+              <ion-label position="floating">
+                Buscar (animal, especie, raza, dueño, estado, id)
+              </ion-label>
+              <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
+            </ion-item>
 
-  <!-- LOADING -->
-  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+            <ion-button class="clear-btn" expand="block" fill="outline" (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar filtros
+            </ion-button>
+          </div>
+        </div>
+      </aside>
 
-  <!-- ERROR -->
-  <ion-text color="danger" *ngIf="errorMsg">
-    <p>{{ errorMsg }}</p>
-  </ion-text>
+      <!-- Listado -->
+      <section class="list-panel">
 
-  <!-- LISTADO -->
-  <ion-list *ngIf="!loading">
+        <!-- LOADING -->
+        <div class="state-row" *ngIf="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando historiales…</span>
+        </div>
 
-    <ion-item *ngFor="let vm of historialesFiltrados">
+        <!-- ERROR -->
+        <div class="error-card" *ngIf="errorMsg">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <div class="ion-text-wrap">{{ errorMsg }}</div>
+        </div>
 
-      <ion-label>
-        <h2>
-          {{ vm.animalNombre }} ({{ vm.estado }})
-        </h2>
+        <!-- LISTADO -->
+        <ion-list class="hist-list" *ngIf="!loading">
+          <ion-item class="hist-item" lines="none" *ngFor="let vm of historialesFiltrados">
 
-        <p><b>Especie:</b> {{ vm.especie || '-' }}</p>
-        <p><b>Raza:</b> {{ vm.raza || '-' }}</p>
-        <p><b>Dueño:</b> {{ vm.duenoLabel }}</p>
-      </ion-label>
+            <div class="avatar" slot="start" aria-hidden="true">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
 
-      <!-- VER -->
-      <ion-button *ngIf="canVer" color="warning" fill="outline" slot="end" (click)="verDetalle(vm)">
-        <ion-icon name="eye-outline"></ion-icon>
-      </ion-button>
+            <ion-label class="ion-text-wrap">
+              <h2>
+                {{ vm.animalNombre }}
+                <span class="state-pill">{{ vm.estado }}</span>
+              </h2>
 
-      <!-- BORRAR -->
-      <ion-button *ngIf="canEliminar" color="danger" fill="outline" slot="end" (click)="eliminarHistorial(vm)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
+              <div class="meta">
+                <div class="meta-row"><span class="k">Especie:</span> <span class="v">{{ vm.especie || '-' }}</span></div>
+                <div class="meta-row"><span class="k">Raza:</span> <span class="v">{{ vm.raza || '-' }}</span></div>
+                <div class="meta-row"><span class="k">Dueño:</span> <span class="v">{{ vm.duenoLabel }}</span></div>
+              </div>
+            </ion-label>
 
-      <!-- LÍNEAS -->
-      <ion-button color="medium" fill="outline" slot="end" (click)="verLineas(vm)">
-        <ion-icon name="list-outline"></ion-icon>
-      </ion-button>
+            <!-- Acciones -->
+            <div class="actions" slot="end">
 
-    </ion-item>
+              <ion-button
+                class="action-btn"
+                *ngIf="canVer"
+                fill="outline"
+                (click)="verDetalle(vm)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
 
-  </ion-list>
+              <ion-button
+                class="action-btn danger"
+                *ngIf="canEliminar"
+                fill="outline"
+                (click)="eliminarHistorial(vm)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
 
-  <ion-text *ngIf="historialesFiltrados.length === 0 && !loading">
-    <p>No hay historiales para mostrar.</p>
-  </ion-text>
-  <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver
-  </ion-button>
+              <ion-button
+                class="action-btn soft"
+                fill="outline"
+                (click)="verLineas(vm)">
+                <ion-icon name="list-outline"></ion-icon>
+              </ion-button>
+
+            </div>
+
+          </ion-item>
+        </ion-list>
+
+        <!-- VACÍO -->
+        <div class="empty-card" *ngIf="historialesFiltrados.length === 0 && !loading">
+          <ion-icon name="search-outline"></ion-icon>
+          <div class="ion-text-wrap">
+            No hay historiales para mostrar.
+          </div>
+        </div>
+
+        <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+
+      </section>
+    </div>
+
+  </div>
 </ion-content>

@@ -1,282 +1,426 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Detalle de producto</ion-title>
-
+<ion-header class="product-detail-header">
+  <ion-toolbar class="product-detail-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/list-productos"></ion-back-button>
     </ion-buttons>
 
+    <ion-title class="product-detail-title">Detalle de producto</ion-title>
+
     <ion-buttons slot="end" *ngIf="producto && !editMode && canEditar">
-      <ion-button (click)="activarEdicion()">
+      <ion-button class="edit-btn" (click)="activarEdicion()">
         <ion-icon name="create-outline" slot="start"></ion-icon>
         Editar
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="producto && editMode">
+      <ion-button class="cancel-top-btn" fill="outline" (click)="cancelarEdicion()" [disabled]="saving">
+        Cancelar
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="product-detail-content">
+  <div class="product-detail-shell">
 
-  <ion-item *ngIf="loading">
-    <ion-label>Cargando producto...</ion-label>
-  </ion-item>
+    <!-- Estados -->
+    <div class="state-row" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando producto…</span>
+    </div>
 
-  <ion-item *ngIf="errorMsg" lines="none">
-    <ion-label style="color:red">{{ errorMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert error" *ngIf="errorMsg">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ errorMsg }}</div>
+    </div>
 
-  <ion-item *ngIf="okMsg" lines="none">
-    <ion-label style="color:green">{{ okMsg }}</ion-label>
-  </ion-item>
+    <div class="state-alert ok" *ngIf="okMsg">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="ion-text-wrap">{{ okMsg }}</div>
+    </div>
 
-  <!-- ===================== -->
-  <!-- MODO DETALLE (VER) -->
-  <!-- ===================== -->
-  <div *ngIf="producto && !editMode">
-
-    <ion-grid class="photo-grid">
-    <ion-row class="ion-align-items-center">
-      <ion-col size="12">
-        <div class="photo-box">
-          <ion-img
-            *ngIf="originalPhoto"
-            class="photo-frame"
-            [src]="originalPhoto">
-          </ion-img>
-
-          <ion-img
-            *ngIf="!originalPhoto"
-            class="photo-frame placeholder"
-            src="../../../../assets/No-Image-Placeholder.svg">
-          </ion-img>
+    <!-- Cabecera de página (solo cuando hay producto) -->
+    <div class="page-head" *ngIf="producto && !loading">
+      <div class="page-head-left">
+        <div class="page-icon" aria-hidden="true">
+          <ion-icon name="cube-outline"></ion-icon>
         </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 
+        <div>
+          <div class="page-title">{{ editMode ? 'Editar producto' : 'Información del producto' }}</div>
+          <div class="page-subtitle">
+            {{ producto?.Elemento?.nombre || ('Producto #' + (producto?.idElemento ?? '—')) }}
+          </div>
+        </div>
+      </div>
 
-    <ion-list>
+      <div class="page-head-right">
+        <div class="hint-chip" *ngIf="!editMode">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          <span>{{ producto?.tipo || '—' }}</span>
+        </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>ID</h2>
-          <p>{{ producto.idElemento }}</p>
-        </ion-label>
-      </ion-item>
+        <div class="hint-chip warn" *ngIf="editMode && !canEditarCamposBase">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <span>Solo stock y foto</span>
+        </div>
+      </div>
+    </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Nombre</h2>
-          <p>{{ producto.Elemento?.nombre || '-' }}</p>
-        </ion-label>
-      </ion-item>
+    <!-- Layout (desktop: 2 columnas) -->
+    <div *ngIf="producto && !loading" class="layout">
 
-      <ion-item>
-        <ion-label>
-          <h2>Descripción</h2>
-          <p>{{ producto.Elemento?.descripcion || '-' }}</p>
-        </ion-label>
-      </ion-item>
+      <!-- Lateral -->
+      <aside class="side-panel" aria-hidden="true">
+        <div class="side-card">
 
-      <ion-item>
-        <ion-label>
-          <h2>Precio</h2>
-          <p>{{ producto.Elemento?.precio ?? '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-top">
+            <img class="brand-logo" src="../../assets/marca/imagen corporativa.png" alt="DGM" />
+            <div class="brand-text">
+              <div class="brand-title">DGM</div>
+              <div class="brand-subtitle">Catálogo</div>
+            </div>
+          </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Tipo</h2>
-          <p>{{ producto.tipo || '-' }}</p>
-        </ion-label>
-      </ion-item>
+          <div class="side-copy">
+            <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
 
-      <ion-item>
-        <ion-label>
-          <h2>Stock</h2>
-          <p>{{ producto.stock }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="kv">
+              <div class="k">Stock</div>
+              <div class="v">
+                <span class="strong">{{ producto.stock }}</span>
+              </div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Stock mínimo</h2>
-          <p>{{ producto.stockMinimo }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="kv">
+              <div class="k">Stock mínimo</div>
+              <div class="v">
+                <span class="strong">{{ producto.stockMinimo }}</span>
+              </div>
+            </div>
 
-      <ion-item>
-        <ion-label>
-          <h2>Foto</h2>
-          <p>{{ producto.foto || '-' }}</p>
-        </ion-label>
-      </ion-item>
+            <div class="chip" *ngIf="!editMode">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Datos protegidos</span>
+            </div>
 
-    </ion-list>
+            <div class="chip warn" *ngIf="editMode && !canEditarCamposBase">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <span>Campos base bloqueados</span>
+            </div>
+          </div>
 
-    <ion-button expand="block" fill="outline" (click)="volver()" style="margin-top:12px;">
-      Volver al listado
-    </ion-button>
+          <div class="side-decor" aria-hidden="true"></div>
+        </div>
+      </aside>
 
-  </div>
+      <!-- Principal -->
+      <section class="main-panel">
 
-  <!-- ===================== -->
-  <!-- MODO EDICIÓN -->
-  <!-- ===================== -->
-  <div *ngIf="producto && editMode">
+        <!-- ===================== -->
+        <!-- MODO DETALLE (VER) -->
+        <!-- ===================== -->
+        <div *ngIf="!editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge" aria-hidden="true">
+                <ion-icon name="cube-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Detalle</div>
+                <div class="card-subtitle">
+                  {{ producto?.Elemento?.descripcion || '—' }}
+                </div>
+              </div>
+            </div>
 
-     <ion-grid class="photo-grid">
-        <ion-row class="ion-align-items-center">
-          <ion-col size="12" size-md="6">
-            <div class="photo-box" (click)="takePhoto()">
+            <div class="pill">
+              <ion-icon name="cash-outline"></ion-icon>
+              <span>{{ producto?.Elemento?.precio ?? '—' }}</span>
+            </div>
+          </div>
+
+          <!-- Foto (solo vista) -->
+          <div class="photo-wrap">
+            <div class="photo-box view">
               <ion-img
-                *ngIf="capturedPhoto"
+                *ngIf="originalPhoto"
                 class="photo-frame"
-                [src]="capturedPhoto">
+                [src]="originalPhoto">
               </ion-img>
 
               <ion-img
-                *ngIf="!capturedPhoto"
+                *ngIf="!originalPhoto"
                 class="photo-frame placeholder"
                 src="../../../../assets/No-Image-Placeholder.svg">
               </ion-img>
+            </div>
+          </div>
 
-              <div class="photo-hint">
-                <ion-icon name="camera-outline"></ion-icon>
-                <span>Toca para cambiar</span>
+          <div class="kv-grid">
+            <div class="kv2">
+              <div class="k">ID</div>
+              <div class="v">{{ producto.idElemento }}</div>
+            </div>
+
+            <div class="kv2">
+              <div class="k">Nombre</div>
+              <div class="v">{{ producto.Elemento?.nombre || '-' }}</div>
+            </div>
+
+            <div class="kv2 full">
+              <div class="k">Descripción</div>
+              <div class="v">{{ producto.Elemento?.descripcion || '-' }}</div>
+            </div>
+
+            <div class="kv2">
+              <div class="k">Precio</div>
+              <div class="v">{{ producto.Elemento?.precio ?? '-' }}</div>
+            </div>
+
+            <div class="kv2">
+              <div class="k">Tipo</div>
+              <div class="v">{{ producto.tipo || '-' }}</div>
+            </div>
+
+            <div class="kv2">
+              <div class="k">Stock</div>
+              <div class="v strong">{{ producto.stock }}</div>
+            </div>
+
+            <div class="kv2">
+              <div class="k">Stock mínimo</div>
+              <div class="v strong">{{ producto.stockMinimo }}</div>
+            </div>
+
+            <div class="kv2 full">
+              <div class="k">Foto</div>
+              <div class="v">{{ producto.foto || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button class="back-btn" expand="block" fill="outline" (click)="volver()">
+              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+              Volver al listado
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- MODO EDICIÓN -->
+        <!-- ===================== -->
+        <div *ngIf="editMode" class="card">
+          <div class="card-head">
+            <div class="head-left">
+              <div class="icon-badge edit" aria-hidden="true">
+                <ion-icon name="create-outline"></ion-icon>
+              </div>
+              <div>
+                <div class="card-title">Editar producto</div>
+                <div class="card-subtitle">Modifica los campos y guarda los cambios.</div>
               </div>
             </div>
-          </ion-col>
 
-          <ion-col size="12" size-md="6">
-            <div class="photo-actions">
-              <ion-button class="action-btn" fill="outline" (click)="takePhoto()">
-                <ion-icon slot="start" name="camera-outline"></ion-icon>
-                Take a photo
+            <div class="pill soft">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Permisos aplicados</span>
+            </div>
+          </div>
+
+          <!-- Foto + acciones (edición) -->
+          <div class="block">
+            <div class="block-title">
+              <ion-icon name="image-outline"></ion-icon>
+              <span>Fotografía</span>
+            </div>
+
+            <ion-grid class="photo-grid">
+              <ion-row class="ion-align-items-center">
+                <ion-col size="12" size-md="6">
+                  <div class="photo-box" (click)="takePhoto()">
+                    <ion-img
+                      *ngIf="capturedPhoto"
+                      class="photo-frame"
+                      [src]="capturedPhoto">
+                    </ion-img>
+
+                    <ion-img
+                      *ngIf="!capturedPhoto"
+                      class="photo-frame placeholder"
+                      src="../../../../assets/No-Image-Placeholder.svg">
+                    </ion-img>
+
+                    <div class="photo-hint">
+                      <ion-icon name="camera-outline"></ion-icon>
+                      <span>Toca para cambiar</span>
+                    </div>
+                  </div>
+                </ion-col>
+
+                <ion-col size="12" size-md="6">
+                  <div class="photo-actions">
+                    <ion-button class="action-btn" fill="outline" (click)="takePhoto()">
+                      <ion-icon slot="start" name="camera-outline"></ion-icon>
+                      Take a photo
+                    </ion-button>
+
+                    <ion-button class="action-btn" fill="outline" (click)="pickImage()">
+                      <ion-icon slot="start" name="image-outline"></ion-icon>
+                      Pick an image
+                    </ion-button>
+
+                    <ion-button class="action-btn danger" fill="outline" (click)="discardImage()">
+                      <ion-icon slot="start" name="aperture"></ion-icon>
+                      Discard image
+                    </ion-button>
+                  </div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+
+          <form #f="ngForm" (ngSubmit)="guardarCambios()" class="product-form">
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                <span>Datos del producto</span>
+              </div>
+
+              <div class="form-grid">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Nombre *</ion-label>
+                  <ion-input
+                    name="nombre"
+                    [(ngModel)]="form.nombre"
+                    required
+                    [disabled]="!canEditarCamposBase">
+                  </ion-input>
+                </ion-item>
+
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Precio *</ion-label>
+                  <ion-input
+                    type="number"
+                    inputmode="decimal"
+                    name="precio"
+                    [(ngModel)]="form.precio"
+                    required
+                    min="0"
+                    step="0.01"
+                    [disabled]="!canEditarCamposBase">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Descripción</ion-label>
+                <ion-textarea
+                  name="descripcion"
+                  [(ngModel)]="form.descripcion"
+                  autoGrow="true"
+                  [disabled]="!canEditarCamposBase">
+                </ion-textarea>
+              </ion-item>
+
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Tipo *</ion-label>
+                <ion-select
+                  name="tipo"
+                  [(ngModel)]="form.tipo"
+                  required
+                  [disabled]="!canEditarCamposBase">
+                  <ion-select-option *ngFor="let t of tipos" [value]="t">
+                    {{ t }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="block">
+              <div class="block-title">
+                <ion-icon name="layers-outline"></ion-icon>
+                <span>Inventario</span>
+              </div>
+
+              <div class="form-grid">
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Stock *</ion-label>
+                  <ion-input
+                    type="number"
+                    inputmode="numeric"
+                    name="stock"
+                    [(ngModel)]="form.stock"
+                    required
+                    min="0"
+                    step="1">
+                  </ion-input>
+                </ion-item>
+
+                <ion-item class="field" lines="inset">
+                  <ion-label position="floating">Stock mínimo *</ion-label>
+                  <ion-input
+                    type="number"
+                    inputmode="numeric"
+                    name="stockMinimo"
+                    [(ngModel)]="form.stockMinimo"
+                    required
+                    min="0"
+                    step="1"
+                    [disabled]="!canEditarCamposBase">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <ion-item class="field" lines="inset">
+                <ion-label position="floating">Foto (URL o nombre)</ion-label>
+                <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
+              </ion-item>
+
+              <div class="note" *ngIf="!canEditarCamposBase">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <div class="ion-text-wrap">
+                  Solo puedes modificar <b>stock</b> y <b>foto</b> con tu rol.
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || saving">
+                {{ saving ? 'Guardando...' : 'Guardar cambios' }}
               </ion-button>
 
-              <ion-button class="action-btn" fill="outline" (click)="pickImage()">
-                <ion-icon slot="start" name="image-outline"></ion-icon>
-                Pick an image
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()"
+                [disabled]="saving">
+                Cancelar
               </ion-button>
 
-              <ion-button class="action-btn danger" fill="outline" (click)="discardImage()">
-                <ion-icon slot="start" name="aperture"></ion-icon>
-                Discard image
+              <ion-button
+                class="back-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="volver()">
+                <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+                Volver al listado
               </ion-button>
             </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
 
+          </form>
+        </div>
 
-    <form #f="ngForm" (ngSubmit)="guardarCambios()">
-
-      <!-- Elemento -->
-      <ion-item>
-        <ion-label position="floating">Nombre *</ion-label>
-        <ion-input
-          name="nombre"
-          [(ngModel)]="form.nombre"
-          required
-          [disabled]="!canEditarCamposBase">
-        </ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Descripción</ion-label>
-        <ion-textarea
-          name="descripcion"
-          [(ngModel)]="form.descripcion"
-          autoGrow="true"
-          [disabled]="!canEditarCamposBase">
-        </ion-textarea>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Precio *</ion-label>
-        <ion-input
-          type="number"
-          inputmode="decimal"
-          name="precio"
-          [(ngModel)]="form.precio"
-          required
-          min="0"
-          step="0.01"
-          [disabled]="!canEditarCamposBase">
-        </ion-input>
-      </ion-item>
-
-      <!-- Producto -->
-      <ion-item>
-        <ion-label position="floating">Tipo *</ion-label>
-        <ion-select
-          name="tipo"
-          [(ngModel)]="form.tipo"
-          required
-          [disabled]="!canEditarCamposBase">
-          <ion-select-option *ngFor="let t of tipos" [value]="t">
-            {{ t }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <!-- ✅ Stock editable para admin/vet/recep -->
-      <ion-item>
-        <ion-label position="floating">Stock *</ion-label>
-        <ion-input
-          type="number"
-          inputmode="numeric"
-          name="stock"
-          [(ngModel)]="form.stock"
-          required
-          min="0"
-          step="1">
-        </ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Stock mínimo *</ion-label>
-        <ion-input
-          type="number"
-          inputmode="numeric"
-          name="stockMinimo"
-          [(ngModel)]="form.stockMinimo"
-          required
-          min="0"
-          step="1"
-          [disabled]="!canEditarCamposBase">
-        </ion-input>
-      </ion-item>
-
-      <!-- ✅ Foto editable para admin/vet/recep -->
-      <ion-item>
-        <ion-label position="floating">Foto (URL o nombre)</ion-label>
-        <ion-input name="foto" [(ngModel)]="form.foto"></ion-input>
-      </ion-item>
-
-      <ion-note color="medium" *ngIf="!canEditarCamposBase" style="margin-left:16px;">
-        Solo puedes modificar <b>stock</b> y <b>foto</b> con tu rol.
-      </ion-note>
-
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="f.invalid || saving"
-        style="margin-top: 18px;">
-        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        type="button"
-        (click)="cancelarEdicion()">
-        Cancelar
-      </ion-button>
-
-    </form>
+      </section>
+    </div>
   </div>
-
 </ion-content>
