@@ -50,7 +50,7 @@
         <div>
           <div class="page-title">{{ editMode ? 'Editar producto' : 'Información del producto' }}</div>
           <div class="page-subtitle">
-            {{ producto?.Elemento?.nombre || ('Producto #' + (producto?.idElemento ?? '—')) }}
+            {{ producto.Elemento?.nombre || ('Producto #' + producto.idElemento) }}
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
       <div class="page-head-right">
         <div class="hint-chip" *ngIf="!editMode">
           <ion-icon name="pricetag-outline"></ion-icon>
-          <span>{{ producto?.tipo || '—' }}</span>
+          <span>{{ producto.tipo || '—' }}</span>
         </div>
 
         <div class="hint-chip warn" *ngIf="editMode && !canEditarCamposBase">
@@ -130,14 +130,14 @@
               <div>
                 <div class="card-title">Detalle</div>
                 <div class="card-subtitle">
-                  {{ producto?.Elemento?.descripcion || '—' }}
+                  {{ producto.Elemento?.descripcion || '—' }}
                 </div>
               </div>
             </div>
 
             <div class="pill">
               <ion-icon name="cash-outline"></ion-icon>
-              <span>{{ producto?.Elemento?.precio ?? '—' }}</span>
+              <span>{{ producto.Elemento?.precio ?? '—' }}</span>
             </div>
           </div>
 

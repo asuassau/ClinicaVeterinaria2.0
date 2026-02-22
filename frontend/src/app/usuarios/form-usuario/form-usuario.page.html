@@ -155,17 +155,34 @@
                 <span>Contacto</span>
               </div>
 
-              <div class="grid-2">
-                <ion-item class="field" lines="inset">
-                  <ion-label position="floating">NIF</ion-label>
-                  <ion-input name="nif" [(ngModel)]="form.nif"></ion-input>
-                </ion-item>
+<div class="grid-2">
+  <div>
+    <ion-item class="field" lines="inset">
+      <ion-label position="floating">NIF / DNI / NIE *</ion-label>
+      <ion-input
+        name="nif"
+        [(ngModel)]="form.nif"
+        required
+        pattern="^([0-9]{8}[A-Za-z]|[XYZxyz][0-9]{7}[A-Za-z])$"
+        #nif="ngModel">
+      </ion-input>
+    </ion-item>
 
-                <ion-item class="field" lines="inset">
-                  <ion-label position="floating">Teléfono</ion-label>
-                  <ion-input type="tel" name="telefono" [(ngModel)]="form.telefono"></ion-input>
-                </ion-item>
-              </div>
+    <div class="field-error" *ngIf="nif.invalid && nif.touched">
+      <ng-container *ngIf="nif.errors?.['required']; else nifFormato">
+        El NIF/DNI/NIE es obligatorio.
+      </ng-container>
+      <ng-template #nifFormato>
+        Formato inválido. Ej: 12345678A o X1234567A.
+      </ng-template>
+    </div>
+  </div>
+
+  <ion-item class="field" lines="inset">
+    <ion-label position="floating">Teléfono</ion-label>
+    <ion-input type="tel" name="telefono" [(ngModel)]="form.telefono"></ion-input>
+  </ion-item>
+</div>
 
               <ion-item class="field" lines="inset">
                 <ion-label position="floating">Dirección</ion-label>

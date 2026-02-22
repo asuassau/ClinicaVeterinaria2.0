@@ -457,6 +457,12 @@
   }
 }
 
+.photo-box.view .photo-frame {
+  object-fit: contain;
+  object-position: center;
+  background: #ffffff; /* para que las "bandas" se vean limpias */
+}
+
 .photo-hint {
   position: absolute;
   left: 12px;
